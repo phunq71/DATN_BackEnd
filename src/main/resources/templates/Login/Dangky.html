@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        /* Reset & font */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Container chính */
+        .container {
+            background: #fff;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            padding: 40px 35px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        /* Tiêu đề */
+        .register h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: 1.1px;
+            user-select: none;
+        }
+
+        /* Form */
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Label */
+        form label {
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #444;
+            user-select: none;
+        }
+
+        /* Input và select */
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="password"],
+        form input[type="date"],
+        form select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1.8px solid #ddd;
+            font-size: 15px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+            width: 100%;
+        }
+
+        form input[type="text"]:focus,
+        form input[type="email"]:focus,
+        form input[type="password"]:focus,
+        form input[type="date"]:focus,
+        form select:focus {
+            border-color: black;
+            outline: none;
+            box-shadow: 0 0 5px rgba(45, 48, 54, 0.5);
+        }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-wrapper input {
+            height: 45px;
+            line-height: 45px;
+            width: 100%;
+            padding-right: 50px;
+            box-sizing: border-box;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 35%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+            user-select: none;
+            width: 30px; /* cố định chiều rộng */
+            height: 30px;
+        }
+
+        .toggle-password:hover {
+            color: black;
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            padding-left: 5px;
+        }
+
+        .gender-options label {
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .gender-options input[type="radio"] {
+            accent-color: black;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+
+        /* Nút đăng ký */
+        form button {
+            background-color: black;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 14px 0;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            user-select: none;
+        }
+
+        form button:hover {
+            background: white;
+            color: red;
+            box-shadow: 0 8px 20px black;
+        }
+
+        /* Đoạn dưới link */
+        .bottom-text {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .bottom-text a {
+            color: #2575fc;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .bottom-text a:hover {
+            color: #1a54d1;
+        }
+
+        /* Flex cho 3 select địa chỉ */
+        .address-selects {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .address-selects select {
+            flex: 1;
+        }
+
+    </style>
+</head>
+<body>
+<div class="register">
+    <h2>ĐĂNG KÝ TÀI KHOẢN</h2>
+    <form action="#" method="post" autocomplete="off" novalidate>
+        <label for="fullname">Họ và tên *</label>
+        <input type="text" id="fullname" name="fullname" required placeholder="Nhập họ và tên">
+
+        <label for="email">Email *</label>
+        <input type="email" id="email" name="email" required placeholder="Nhập email hợp lệ">
+
+        <label for="password">Mật khẩu *</label>
+        <div class="password-wrapper">
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Mật khẩu"
+                    required
+                    autocomplete="current-password"
+            />
+            <span toggle="#password" class="toggle-password">
+            <i class="fa-solid fa-eye"></i>
+          </span>
+        </div>
+
+        <label for="password">Xác nhận mật khẩu *</label>
+        <div class="password-wrapper">
+            <input
+                    type="password"
+                    placeholder="Mật khẩu"
+                    required
+                    autocomplete="current-password"
+            />
+            <span toggle="#password" class="toggle-password">
+            <i class="fa-solid fa-eye"></i>
+          </span>
+        </div>
+        <label for="birthday">Ngày sinh *</label>
+        <input type="date" id="birthday" name="birthday" max="2025-12-31">
+
+        <label>Giới tính *</label>
+        <div class="gender-options">
+            <label>
+                <input type="radio" name="gender" value="male" required />
+                Nam
+            </label>
+            <label>
+                <input type="radio" name="gender" value="female" required />
+                Nữ
+            </label>
+            <label>
+                <input type="radio" name="gender" value="other" required />
+                Khác
+            </label>
+        </div>
+
+
+        <label>Địa chỉ *</label>
+        <input type="text" id="address" name="address" required placeholder="Nhập địa chỉ(số nhà, đường,...)">
+        <div class="address-selects">
+            <select name="province" aria-label="Tỉnh/Thành phố">
+                <option value="">Tỉnh/Thành phố</option>
+            </select>
+            <select name="district" aria-label="Quận/Huyện">
+                <option value="">Quận/Huyện</option>
+            </select>
+            <select name="ward" aria-label="Xã/Phường">
+                <option value="">Xã/Phường</option>
+            </select>
+        </div>
+
+        <button type="submit">ĐĂNG KÝ</button>
+    </form>
+
+    <p class="bottom-text">Đã có tài khoản? <a href="Dangnhap.html">Đăng nhập</a></p>
+</div>
+<script>
+    // Xử lý toggle cho tất cả các icon con mắt
+    document.querySelectorAll('.toggle-password').forEach(function (toggle) {
+        toggle.addEventListener('click', function () {
+            const input = document.querySelector(this.getAttribute('toggle'));
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
