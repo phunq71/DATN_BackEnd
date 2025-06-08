@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OPULENTIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+    <style>
+        body {
+            color: white;
+        }
+
+        header {
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 28px;
+        }
+
+        .indicator-container {
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+        }
+
+        .indicator {
+            position: absolute;
+            height: 100%;
+            background-color: white;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+            will-change: left, width;
+        }
+
+        .hero {
+            width: 100%;
+            height: 100vh;
+        }
+
+        .hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .footer-heading {
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .footer-link:hover {
+            color: #0d6efd !important;
+        }
+
+        /*  */
+
+        /* Banner section - 1/3 chiều cao màn hình */
+        .banner-section {
+            height: 33.33vh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .banner-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: fadeInDown 1s ease;
+        }
+
+        .banner-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 1s ease;
+        }
+
+        .discount-badge {
+            background-color: #ff4757;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+        }
+
+        /* Products section - 2/3 chiều cao màn hình */
+        .products-section {
+            height: 66.66vh;
+            padding: 20px 0;
+            background-color: #f8f9fa;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #ffff;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: #ff4757;
+        }
+
+        /* Product card styles (đã sửa theo yêu cầu) */
+        .products-carousel {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .product-container {
+            width: 90%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .product-wrapper {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* .product-wrapper:hover {
+            transform: translateY(-10px);
+            
+        } */
+
+        .product-image {
+            height: 55vh;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .product-wrapper:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .new-label {
+            position: absolute;
+            top: 15px;
+            left: 10px;
+            background-color: #000;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 2;
+            transform: rotate(-15deg);
+            transition: all 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .discount-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            z-index: 2;
+            border-radius: 3px;
+        }
+
+        .product-wrapper:hover .discount-label {
+            font-size: large;
+            padding: 10px 20px;
+        }
+
+        .product-wrapper:hover .new-label {
+            padding: 5px 20px;
+        }
+
+        /* Phần product-info đã được sửa để đè lên ảnh sản phẩm */
+        .product-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1;
+
+            color: #000;
+        }
+
+        .product-wrapper:hover .product-info {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .price-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .sale-price {
+            font-weight: bold;
+            color: #ff4757;
+            font-size: 16px;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            bottom: 80px;
+            right: 4%;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: larger;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 2;
+            transform: translateY(300%);
+        }
+
+        .product-wrapper:hover .favorite-btn {
+            transform: translateY(0);
+        }
+
+        .favorite-btn:hover {
+            color: #ff4757;
+            transform: scale(1.2) !important;
+        }
+
+        /* Owl Carousel navigation */
+        .owl-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .owl-prev,
+        .owl-next {
+            pointer-events: auto;
+            width: 40px;
+            height: 40px;
+            background-color: white !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            color: #333 !important;
+            font-size: 20px !important;
+        }
+
+        .owl-prev:hover,
+        .owl-next:hover {
+            background-color: #ff4757 !important;
+            color: white !important;
+        }
+
+        .owl-prev {
+            margin-left: -50px;
+        }
+
+        .owl-next {
+            margin-right: -50px;
+        }
+
+        .owl-dots {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .owl-dot span {
+            width: 12px;
+            height: 12px;
+            margin: 5px;
+            background: #ddd !important;
+            display: block;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+        }
+
+        .owl-dot.active span {
+            background: #ff4757 !important;
+            width: 30px;
+            border-radius: 10px;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .banner-title {
+                font-size: 2rem;
+            }
+
+            .banner-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .discount-badge {
+                font-size: 1.2rem;
+                padding: 8px 15px;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .owl-prev {
+                margin-left: -20px;
+            }
+
+            .owl-next {
+                margin-right: -20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .banner-title {
+                font-size: 1.5rem;
+            }
+
+            .banner-subtitle {
+                font-size: 1rem;
+            }
+
+            .discount-badge {
+                font-size: 1rem;
+            }
+        }
+
+        /* REELS EFFECT */
+        .reels-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+
+            /* Ẩn scrollbar */
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE và Edge cũ */
+        }
+
+        .reels-row {
+            height: 100vh;
+            scroll-snap-align: start;
+        }
+
+        .nav-container {
+            margin: 5px 20px;
+        }
+
+
+        /* FN */
+        .fn-container {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.5s ease;
+        }
+
+        .fn-nav {
+            display: flex;
+            align-items: center;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .fn-item {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-size: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            background: #f8f8f8;
+            flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transform: translateY(0);
+        }
+
+        .fn-item:hover {
+            transform: translateY(-5px);
+            background: #e0e0e0;
+        }
+
+        .fn-item-search {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            background: #f0f0f0;
+            margin: 0 70px;
+        }
+
+        .fn-item-search:hover {
+            transform: translateY(-8px);
+        }
+
+        .fn-expand-btn {
+            display: none;
+            width: 50px;
+            height: 50px;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-size: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            background: #f8f8f8;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, -70px);
+            opacity: 0;
+        }
+
+        .fn-expand-btn:hover {
+            background: #e0e0e0;
+        }
+
+        /* Collapsed state */
+        .fn-container-collapsed {
+            justify-content: flex-start;
+            padding-left: 20px;
+        }
+
+        .fn-nav-collapsed {
+            padding: 10px 15px;
+        }
+
+        .fn-nav-collapsed .fn-item:not(.fn-expand-btn) {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+            pointer-events: none;
+            overflow: hidden;
+            transform: translateY(100px);
+        }
+
+        .fn-nav-collapsed .fn-expand-btn {
+            display: flex;
+            opacity: 1;
+            transform: translate(-50%, 0);
+            position: static;
+        }
+
+        /* Animation classes */
+        @keyframes fn-slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fn-animate-in {
+            animation: fn-slideUp 0.5s ease forwards;
+        }
+
+        /* Draggable styles */
+        .fn-expand-btn-draggable {
+            cursor: grab;
+        }
+
+        .fn-expand-btn-dragging {
+            cursor: grabbing;
+        }
+
+        .fn-container-left {
+            justify-content: flex-start;
+            padding-left: 20px;
+        }
+
+        .fn-container-center {
+            justify-content: center;
+        }
+
+        .fn-container-right {
+            justify-content: flex-end;
+            padding-right: 20px;
+        }
+
+        /* Search bar styles */
+        .fn-search-bar {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translate(-50%, 20px);
+            /* căn giữa ngang và hiệu ứng hiện ra */
+            width: 25%;
+            height: 50px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 25px;
+            /* bo tròn 2 đầu */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .fn-search-bar.show {
+            transform: translate(-50%, 0);
+            /* hiện lên giữ nguyên căn giữa */
+            opacity: 0.6;
+            pointer-events: auto;
+        }
+
+        .fn-search-bar input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 10px 20px;
+            color: #555;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 25px;
+            /* input cũng bo tròn theo */
+        }
+
+        .fn-search-bar input::placeholder {
+            color: #aaa;
+        }
+
+
+        /*  */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            margin-top: 0;
+            padding: 0 !important;
+            /* Loại bỏ padding để border sát cạnh */
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            border-color: rgba(255, 255, 255, 0.3) !important;
+            /* Màu border trắng với độ trong suốt */
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-box {
+            transition: all 0.3s ease;
+        }
+
+        .search-box input {
+            backdrop-filter: blur(5px);
+        }
+
+        .search-box input::placeholder {
+            color: #888 !important;
+            opacity: 1;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            box-shadow: none;
+            background-color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .search-box button:hover {
+            background: rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .search-box button:active {
+            background: rgba(0, 0, 0, 0.1) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="logo d-flex align-items-center">
+                    <img src="/logo/Opulentia.jpg" alt="logo" width="30" class="me-2">
+                    <span>OPULENTIA</span>
+                </div>
+
+                <nav class="position-relative">
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link menu-item active text-white" data-item="hot">Quần</a>
+                            <div class="dropdown-menu"
+                                style="background-color: rgba(0, 0, 0, 0.5); border: none; border-radius: 0;">
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Quần jeans</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Quần âu</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Quần shorts</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Quần jogger</a>
+                                <a class="dropdown-item text-white" href="#">Quần kaki</a>
+                                <!-- Mục cuối không có border -->
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link menu-item text-white" data-item="sale">Áo</a>
+                            <div class="dropdown-menu"
+                                style="background-color: rgba(0, 0, 0, 0.5); border: none; border-radius: 0;">
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Áo thun</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Áo sơ mi</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Áo khoác</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Áo hoodie</a>
+                                <a class="dropdown-item text-white" href="#">Áo len</a>
+                                <!-- Mục cuối không có border -->
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link menu-item text-white" data-item="new">Giày dép</a>
+                            <div class="dropdown-menu"
+                                style="background-color: rgba(0, 0, 0, 0.5); border: none; border-radius: 0;">
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Giày thể thao</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Giày tây</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Dép quai ngang</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Sandal</a>
+                                <a class="dropdown-item text-white" href="#">Giày boot</a>
+                                <!-- Mục cuối không có border -->
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link menu-item text-white" data-item="recent">Balo và túi xách</a>
+                            <div class="dropdown-menu"
+                                style="background-color: rgba(0, 0, 0, 0.5); border: none; border-radius: 0;">
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Balo laptop</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Túi đeo chéo</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Túi xách nữ</a>
+                                <a class="dropdown-item text-white border-bottom border-white"
+                                    style="border-width: 2px !important;" href="#">Balo du lịch</a>
+                                <a class="dropdown-item text-white" href="#">Túi đựng đồ</a>
+                                <!-- Mục cuối không có border -->
+                            </div>
+                        </li>
+                    </ul>
+
+                    <script>
+                        document.querySelectorAll('.nav-item').forEach(item => {
+                            item.addEventListener('mouseenter', () => {
+                                item.querySelector('.dropdown-menu').classList.add('show');
+                            });
+                            item.addEventListener('mouseleave', () => {
+                                item.querySelector('.dropdown-menu').classList.remove('show');
+                            });
+                        });
+                    </script>
+
+                    <div class="indicator-container">
+                        <div class="indicator"></div>
+                    </div>
+                </nav>
+
+                <div class="right-menu d-flex align-items-center">
+                    <div class="search-box position-relative ms-3" style="width: 180px;">
+                        <input type="text" class="form-control rounded-pill ps-3 pe-4" placeholder="Tìm kiếm..."
+                            style="background-color: rgba(255, 255, 255, 0.7); color: black; border: none;">
+                        <button class="btn position-absolute end-0 rounded-pill"
+                            style="background: none; border: none; height: 100%; width: 30px; padding: 0; top: 0;">
+                            <i class="fas fa-search text-dark"></i>
+                        </button>
+                    </div>
+                    <a href="#" class="text-white ms-3"><i class="fas fa-heart"></i></a>
+                    <a href="#" class="text-white ms-3"><i class="fas fa-shopping-bag"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="reels-container">
+        <div class="reels-row hero">
+            <img class="hero-image w-100 h-100"
+                src="https://im.uniqlo.com/global-cms/spa/resbaa2c1b78d954c9e8686b70c1310fdaafr.jpg" alt="hero">
+        </div>
+        <!-- ------------------------------------ -->
+        <!-- Banner section (1/3 chiều cao màn hình) -->
+        <div class="reels-row">
+            <section class="banner-section">
+                <img src="https://img3.thuthuatphanmem.vn/uploads/2019/10/14/banner-thoi-trang-giam-gia_113856960.jpg"
+                    alt="Khuyến mãi thời trang" class="banner-img">
+                <div class="banner-overlay">
+                    <div class="section-header">
+                        <h2 class="section-title">SẢN PHẨM NỔI BẬT</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products section (2/3 chiều cao màn hình) -->
+            <section class="products-section">
+
+
+                <div class="products-carousel owl-carousel owl-theme">
+                    <!-- Product 1 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <div class="new-label">NEW</div>
+                            <div class="discount-label">-10%</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Áo Polo H&M</div>
+                                <div class="price-container">
+                                    <span class="sale-price">900.000đ</span>
+                                    <span class="original-price">1.000.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 2 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/fc/11/fc11cb1d40fd52a00d3cd74e3bb5faeab85fc0c6.jpg"
+                                alt="Product" class="product-image">
+                            <div class="new-label">HOT</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Áo thun in hình Loose Fit</div>
+                                <div class="price-container">
+                                    <span class="sale-price">1.200.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 3 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/28/c4/28c47288852c92a93b7129b59c60c37d84c06d1a.jpg"
+                                alt="Product" class="product-image">
+                            <div class="discount-label">-20%</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Quần short kiểu may đo Loose Fit</div>
+                                <div class="price-container">
+                                    <span class="sale-price">200.000đ</span>
+                                    <span class="original-price">250.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 4 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/49/7b/497baceee10bcacd2973a7a21b1775c4b1c6ae88.jpg"
+                                alt="Product" class="product-image">
+                            <div class="new-label">NEW</div>
+                            <div class="discount-label">-15%</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Áo ba lỗ Loose Fit</div>
+                                <div class="price-container">
+                                    <span class="sale-price">1.500.000đ</span>
+                                    <span class="original-price">1.800.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 5 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Quần Short Thể Thao</div>
+                                <div class="price-container">
+                                    <span class="sale-price">350.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!--  -->
+        <div class="reels-row">
+            <section class="banner-section">
+                <img src="https://static.vecteezy.com/system/resources/previews/008/174/590/original/fashion-advertising-web-banner-illustration-vector.jpg"
+                    alt="Khuyến mãi thời trang" class="banner-img">
+                <div class="banner-overlay">
+                    <div class="section-header">
+                        <h2 class="section-title"></h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products section (2/3 chiều cao màn hình) -->
+            <section class="products-section">
+
+
+                <div class="products-carousel owl-carousel owl-theme">
+                    <!-- Product 1 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <div class="new-label">NEW</div>
+                            <div class="discount-label">-10%</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Áo Polo H&M</div>
+                                <div class="price-container">
+                                    <span class="sale-price">900.000đ</span>
+                                    <span class="original-price">1.000.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 2 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <div class="new-label">HOT</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Quần Jeans Slim</div>
+                                <div class="price-container">
+                                    <span class="sale-price">1.200.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 3 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <div class="discount-label">-20%</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Áo Thun Basic</div>
+                                <div class="price-container">
+                                    <span class="sale-price">200.000đ</span>
+                                    <span class="original-price">250.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 4 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <div class="new-label">NEW</div>
+                            <div class="discount-label">-15%</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Áo Khoác Denim</div>
+                                <div class="price-container">
+                                    <span class="sale-price">1.500.000đ</span>
+                                    <span class="original-price">1.800.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 5 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Quần Short Thể Thao</div>
+                                <div class="price-container">
+                                    <span class="sale-price">350.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="reels-row">
+            <section class="banner-section">
+                <img src="https://img3.thuthuatphanmem.vn/uploads/2019/10/14/banner-thoi-trang-dang-cap-hien-dai_113856116.png"
+                    alt="Khuyến mãi thời trang" class="banner-img">
+                <div class="banner-overlay">
+                    <div class="section-header">
+                        <h2 class="section-title">BỘ SƯU TẬP MÙA HÈ</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products section (2/3 chiều cao màn hình) -->
+            <section class="products-section">
+
+
+                <div class="products-carousel owl-carousel owl-theme">
+                    <!-- Product 1 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <div class="new-label">NEW</div>
+                            <div class="discount-label">-10%</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Áo Polo H&M</div>
+                                <div class="price-container">
+                                    <span class="sale-price">900.000đ</span>
+                                    <span class="original-price">1.000.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 2 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <div class="new-label">HOT</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Quần Jeans Slim</div>
+                                <div class="price-container">
+                                    <span class="sale-price">1.200.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 3 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <div class="discount-label">-20%</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Áo Thun Basic</div>
+                                <div class="price-container">
+                                    <span class="sale-price">200.000đ</span>
+                                    <span class="original-price">250.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 4 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <div class="new-label">NEW</div>
+                            <div class="discount-label">-15%</div>
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Áo Khoác Denim</div>
+                                <div class="price-container">
+                                    <span class="sale-price">1.500.000đ</span>
+                                    <span class="original-price">1.800.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 5 -->
+                    <div class="product-container item">
+                        <div class="product-wrapper">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                alt="Product" class="product-image">
+                            <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                            <div class="product-info">
+                                <div>Quần Short Thể Thao</div>
+                                <div class="price-container">
+                                    <span class="sale-price">350.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+
+
+        <!-- FOOTER -->
+        <div class="reels-row">
+            <footer class="bg-dark text-white d-flex align-items-center" style="height: 100vh;">
+                <div class="container-fluid px-5 w-100">
+                    <div class="row g-4 justify-content-center text-center">
+                        <!-- Về chúng tôi -->
+                        <div class="col-md-6 col-lg-3">
+                            <h5 class="footer-heading">VỀ CHÚNG TÔI</h5>
+                            <p class="fw-semibold">
+                                Công ty chúng tôi chuyên cung cấp các giải pháp công nghệ hàng đầu với hơn 10 năm kinh
+                                nghiệm trong ngành.
+                            </p>
+                        </div>
+
+                        <!-- Liên kết -->
+                        <div class="col-md-6 col-lg-2">
+                            <h5 class="footer-heading">LIÊN KẾT</h5>
+                            <ul class="list-unstyled">
+                                <li><a href="#" class="footer-link text-white text-decoration-none d-block">Trang
+                                        chủ</a></li>
+                                <li><a href="#" class="footer-link text-white text-decoration-none d-block">Sản phẩm</a>
+                                </li>
+                                <li><a href="#" class="footer-link text-white text-decoration-none d-block">Dịch vụ</a>
+                                </li>
+                                <li><a href="#" class="footer-link text-white text-decoration-none d-block">Blog</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Hỗ trợ -->
+                        <div class="col-md-6 col-lg-2">
+                            <h5 class="footer-heading">HỖ TRỢ</h5>
+                            <ul class="list-unstyled">
+                                <li><a href="#" class="footer-link text-white text-decoration-none d-block">FAQ</a></li>
+                                <li><a href="#" class="footer-link text-white text-decoration-none d-block">Hướng
+                                        dẫn</a></li>
+                                <li><a href="#" class="footer-link text-white text-decoration-none d-block">Liên hệ</a>
+                                </li>
+                                <li><a href="#" class="footer-link text-white text-decoration-none d-block">Chính
+                                        sách</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Liên hệ -->
+                        <div class="col-md-6 col-lg-5">
+                            <h5 class="footer-heading">LIÊN HỆ</h5>
+                            <p class="fw-semibold mb-1"><i class="fas fa-map-marker-alt me-2"></i>123 Đường ABC, Quận 1,
+                                TP.HCM</p>
+                            <p class="fw-semibold mb-1"><i class="fas fa-phone-alt me-2"></i>(028) 1234 5678</p>
+                            <p class="fw-semibold mb-3"><i class="fas fa-envelope me-2"></i>info@example.com</p>
+                            <div>
+                                <a href="#" class="text-white me-3 fs-5"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="text-white me-3 fs-5"><i class="fab fa-twitter"></i></a>
+                                <a href="#" class="text-white me-3 fs-5"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="text-white fs-5"><i class="fab fa-linkedin"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer bottom -->
+                    <div
+                        class="row footer-bottom mt-5 justify-content-between align-items-center text-center text-md-start">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <p class="mb-0 fw-bold">&copy; 2023 Công Ty ABC. Tất cả quyền được bảo lưu.</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="#" class="text-white me-3 fw-semibold text-decoration-none">Điều khoản</a>
+                            <a href="#" class="text-white fw-semibold text-decoration-none">Bảo mật</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Khởi tạo carousel
+            $(".products-carousel").owlCarousel({
+                loop: true,
+                margin: 20,
+                nav: true,
+                dots: true,
+                responsive: {
+                    0: {
+                        items: 1
+                    },
+                    600: {
+                        items: 2
+                    },
+                    1000: {
+                        items: 3
+                    }
+                }
+            });
+
+            // Xử lý nút yêu thích
+            $('.favorite-btn').click(function (e) {
+                e.stopPropagation();
+                const icon = $(this).find('i');
+                if (icon.hasClass('far')) {
+                    icon.removeClass('far').addClass('fas');
+                    $(this).css('color', '#ff4757');
+                } else {
+                    icon.removeClass('fas').addClass('far');
+                    $(this).css('color', '#333');
+                }
+            });
+
+            // Đặt chiều cao banner và sản phẩm theo viewport
+            function setHeights() {
+                const windowHeight = $(window).height();
+                $('.banner-section').css('height', windowHeight * 0.333 + 'px');
+                $('.products-section').css('height', windowHeight * 0.667 + 'px');
+            }
+
+            // Gọi hàm khi tải trang và khi thay đổi kích thước cửa sổ
+            setHeights();
+            $(window).resize(setHeights);
+        });
+    </script>
+
+
+    <!-- Thêm thanh search mới -->
+    <div class="fn-search-bar">
+        <input type="text" placeholder="Nhập từ khóa để tìm kiếm">
+    </div>
+
+    <div class="fn-container fn-container-center">
+        <div class="fn-nav">
+            <div class="fn-item fn-item-home">
+                <i class="fas fa-home"></i>
+            </div>
+            <div class="fn-item fn-item-search">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="fn-item fn-item-cart">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="fn-expand-btn">
+                <i class="fas fa-plus"></i>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navContainer = document.querySelector('.fn-container');
+            const nav = document.querySelector('.fn-nav');
+            const searchIcon = document.querySelector('.fn-item-search');
+            const expandBtn = document.querySelector('.fn-expand-btn');
+            const navItems = document.querySelectorAll('.fn-item:not(.fn-expand-btn)');
+            const searchBar = document.querySelector('.fn-search-bar');
+
+            let isCollapsed = false;
+            let startY = 0;
+            let isDragging = false;
+            let startPos = 0;
+            let isDraggingExpandBtn = false;
+            let isSearchBarVisible = false;
+
+            function resetAnimations() {
+                navItems.forEach(item => {
+                    item.classList.remove('fn-animate-in');
+                });
+            }
+
+            searchIcon.addEventListener('click', () => {
+                if (isCollapsed) return;
+
+                isSearchBarVisible = !isSearchBarVisible;
+                if (isSearchBarVisible) {
+                    searchBar.classList.add('show');
+                } else {
+                    searchBar.classList.remove('show');
+                }
+            });
+
+            searchIcon.addEventListener('mousedown', (e) => {
+                if (isCollapsed) return;
+                isDragging = true;
+                startY = e.clientY;
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging || isCollapsed) return;
+
+                const diffY = e.clientY - startY;
+
+                if (diffY > 80) {
+                    collapseNav();
+                    isDragging = false;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            searchIcon.addEventListener('touchstart', (e) => {
+                if (isCollapsed) return;
+                isDragging = true;
+                startY = e.touches[0].clientY;
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging || isCollapsed) return;
+
+                const diffY = e.touches[0].clientY - startY;
+
+                if (diffY > 80) {
+                    collapseNav();
+                    isDragging = false;
+                }
+            });
+
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+
+            expandBtn.addEventListener('click', expandNav);
+
+            // Thêm sự kiện kéo thả cho nút mở rộng
+            expandBtn.addEventListener('mousedown', startDragExpandBtn);
+            document.addEventListener('mousemove', dragExpandBtn);
+            document.addEventListener('mouseup', endDragExpandBtn);
+
+            function startDragExpandBtn(e) {
+                if (!isCollapsed) return;
+                isDraggingExpandBtn = true;
+                startPos = e.clientX;
+                expandBtn.classList.add('fn-expand-btn-draggable', 'fn-expand-btn-dragging');
+                e.preventDefault();
+            }
+
+            function dragExpandBtn(e) {
+                if (!isDraggingExpandBtn) return;
+
+                const containerWidth = document.documentElement.clientWidth;
+                const newPos = e.clientX;
+
+                // Xác định vị trí mới của container
+                if (newPos < containerWidth * 0.33) {
+                    navContainer.classList.remove('fn-container-left', 'fn-container-center', 'fn-container-right');
+                    navContainer.classList.add('fn-container-left');
+                } else if (newPos > containerWidth * 0.66) {
+                    navContainer.classList.remove('fn-container-left', 'fn-container-center', 'fn-container-right');
+                    navContainer.classList.add('fn-container-right');
+                } else {
+                    navContainer.classList.remove('fn-container-left', 'fn-container-center', 'fn-container-right');
+                    navContainer.classList.add('fn-container-center');
+                }
+            }
+
+            function endDragExpandBtn() {
+                isDraggingExpandBtn = false;
+                expandBtn.classList.remove('fn-expand-btn-dragging');
+                setTimeout(() => {
+                    expandBtn.classList.remove('fn-expand-btn-draggable');
+                }, 100);
+            }
+
+            function collapseNav() {
+                resetAnimations();
+                navContainer.classList.add('fn-container-collapsed');
+                nav.classList.add('fn-nav-collapsed');
+                isCollapsed = true;
+
+                // Ẩn thanh search nếu đang hiển thị
+                if (isSearchBarVisible) {
+                    searchBar.classList.remove('show');
+                    isSearchBarVisible = false;
+                }
+
+                // Thêm hiệu ứng chạy xuống cho các nút
+                navItems.forEach(item => {
+                    item.style.transition = 'all 0.5s ease';
+                    item.style.transform = 'translateY(100px)';
+                });
+
+                // Hiệu ứng nút dấu cộng chạy lên
+                setTimeout(() => {
+                    expandBtn.style.transform = 'translate(-50%, 0)';
+                    expandBtn.style.opacity = '1';
+                }, 300);
+            }
+
+            function expandNav() {
+                // Hiệu ứng nút dấu cộng biến mất
+                expandBtn.style.transform = 'translate(-50%, -70px)';
+                expandBtn.style.opacity = '0';
+
+                setTimeout(() => {
+                    navContainer.classList.remove('fn-container-collapsed');
+                    nav.classList.remove('fn-nav-collapsed');
+                    isCollapsed = false;
+
+                    // Thêm hiệu ứng chạy lên cho các nút
+                    navItems.forEach((item, index) => {
+                        item.style.transition = 'all 0.5s ease ' + (index * 0.1) + 's';
+                        item.style.transform = 'translateY(0)';
+                        setTimeout(() => {
+                            item.classList.add('fn-animate-in');
+                        }, index * 100);
+                    });
+                }, 300);
+            }
+        });
+    </script>
+    <!-- Main JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuItems = document.querySelectorAll('.menu-item');
+            const indicator = document.querySelector('.indicator');
+            const nav = document.querySelector('nav ul');
+
+            // Khởi tạo indicator với item active mặc định
+            updateIndicator(document.querySelector('.menu-item.active'));
+
+            menuItems.forEach(item => {
+                // Thay sự kiện click bằng mouseenter (hover)
+                item.addEventListener('mouseenter', function () {
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    updateIndicator(this);
+                });
+            });
+
+            // Thêm sự kiện mouseleave cho nav để reset về item active ban đầu khi rời menu
+            nav.addEventListener('mouseleave', function () {
+                const defaultActive = document.querySelector('.menu-item.active');
+                menuItems.forEach(i => i.classList.remove('active'));
+                defaultActive.classList.add('active');
+                updateIndicator(defaultActive);
+            });
+
+            function updateIndicator(activeItem) {
+                const itemRect = activeItem.getBoundingClientRect();
+                const navRect = nav.getBoundingClientRect();
+                const left = itemRect.left - navRect.left;
+                const width = itemRect.width;
+                indicator.style.left = `${left}px`;
+                indicator.style.width = `${width}px`;
+            }
+        });
+    </script>
+
+
+
+
+    <!-- REELS EFFECT -->
+    <script>
+        const container = document.querySelector('.reels-container');
+        let isScrolling;
+
+        container.addEventListener('scroll', () => {
+            clearTimeout(isScrolling);
+
+            isScrolling = setTimeout(() => {
+                const scrollTop = container.scrollTop;
+                const screenHeight = window.innerHeight;
+
+                const pageIndex = Math.round(scrollTop / screenHeight);
+                container.scrollTo({
+                    top: pageIndex * screenHeight,
+                    behavior: 'smooth'
+                });
+            }, 100); // Đợi 100ms sau khi người dùng ngừng cuộn
+        });
+
+    </script>
+</body>
+
+</html>
