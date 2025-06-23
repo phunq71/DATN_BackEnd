@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- Thêm thanh search mới -->
+<div th:fragment="b-nav" >
+<div class="fn-search-bar">
+  <style>
+    /* Footer styles */
+    .footer-heading {
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .footer-link:hover {
+      color: #0d6efd !important;
+    }
+
+    /* Floating Navigation styles */
+    .fn-container {
+      position: fixed;
+      bottom: 30px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      z-index: 1000;
+      transition: all 0.5s ease;
+    }
+
+    .fn-nav {
+      display: flex;
+      align-items: center;
+      transition: all 0.5s ease;
+      position: relative;
+    }
+
+    .fn-item {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: black;
+      font-size: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.5s ease;
+      background: #f8f8f8;
+      flex-shrink: 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transform: translateY(0);
+    }
+
+    .fn-item:hover {
+      transform: translateY(-5px);
+      background: #e0e0e0;
+    }
+
+    .fn-item-search {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      background: #f0f0f0;
+      margin: 0 70px;
+    }
+
+    .fn-item-search:hover {
+      transform: translateY(-8px);
+    }
+
+    .fn-expand-btn {
+      display: none;
+      width: 50px;
+      height: 50px;
+      align-items: center;
+      justify-content: center;
+      color: black;
+      font-size: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.5s ease;
+      background: #f8f8f8;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      position: absolute;
+      left: 50%;
+      bottom: 0; /* ✨ THÊM DÒNG NÀY để định vị sát đáy */
+      transform: translate(-50%, 0);
+      opacity: 0;
+    }
+
+    .fn-expand-btn:hover {
+      background: #e0e0e0;
+    }
+
+    /* Collapsed state */
+    .fn-container-collapsed {
+      justify-content: flex-start;
+      padding-left: 20px;
+    }
+
+    .fn-nav-collapsed {
+      padding: 10px 15px;
+    }
+
+    .fn-nav-collapsed .fn-item:not(.fn-expand-btn) {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      margin: 0;
+      padding: 0;
+      pointer-events: none;
+      overflow: hidden;
+      transform: translateY(100px);
+    }
+
+    .fn-nav-collapsed .fn-expand-btn {
+      display: flex;
+      opacity: 1;
+      /*transform: translate(-50%, 0);*/
+      /*position: static;*/
+    }
+
+    /* Animation classes */
+    @keyframes fn-slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fn-animate-in {
+      animation: fn-slideUp 0.5s ease forwards;
+    }
+
+    /* Draggable styles */
+    .fn-expand-btn-draggable {
+      cursor: grab;
+    }
+
+    .fn-expand-btn-dragging {
+      cursor: grabbing;
+    }
+
+    .fn-container-left {
+      justify-content: flex-start;
+      padding-left: 20px;
+    }
+
+    .fn-container-center {
+      justify-content: center;
+    }
+
+    .fn-container-right {
+      justify-content: flex-end;
+      padding-right: 20px;
+    }
+
+    /* Search bar styles */
+    .fn-search-bar {
+      position: fixed;
+      bottom: 120px;
+      left: 50%;
+      transform: translate(-50%, 20px);
+      width: 25%;
+      height: 50px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 25px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 999;
+    }
+
+    .fn-search-bar.show {
+      transform: translate(-50%, 0);
+      opacity: 0.6;
+      pointer-events: auto;
+    }
+
+    .fn-search-bar input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      padding: 10px 20px;
+      color: #555;
+      background-color: rgba(255, 255, 255, 0.7);
+      border-radius: 25px;
+    }
+
+    .fn-search-bar input::placeholder {
+      color: #aaa;
+    }
+
+    .fn-item-search i {
+      pointer-events: none;
+    }
+  </style>
+  <input type="text" placeholder="Nhập từ khóa để tìm kiếm">
+</div>
+
+<div class="fn-container fn-container-center">
+  <div class="fn-nav">
+    <div class="fn-item fn-item-home">
+      <i class="fas fa-home"></i>
+    </div>
+    <div class="fn-item fn-item-search">
+      <i class="fas fa-search"></i>
+    </div>
+    <div class="fn-item fn-item-cart">
+      <i class="fas fa-shopping-cart"></i>
+    </div>
+    <div class="fn-expand-btn">
+      <i class="fas fa-plus"></i>
+    </div>
+  </div>
+</div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const navContainer = document.querySelector('.fn-container');
+      const nav = document.querySelector('.fn-nav');
+      const searchIcon = document.querySelector('.fn-item-search');
+      const expandBtn = document.querySelector('.fn-expand-btn');
+      const navItems = document.querySelectorAll('.fn-item:not(.fn-expand-btn)');
+      const searchBar = document.querySelector('.fn-search-bar');
+
+      let isCollapsed = false;
+      let startY = 0;
+      let isDragging = false;
+      let startPos = 0;
+      let isDraggingExpandBtn = false;
+      let isSearchBarVisible = false;
+
+      function resetAnimations() {
+        navItems.forEach(item => {
+          item.classList.remove('fn-animate-in');
+        });
+      }
+
+      searchIcon.addEventListener('click', () => {
+        if (isCollapsed) return;
+
+        isSearchBarVisible = !isSearchBarVisible;
+        if (isSearchBarVisible) {
+          searchBar.classList.add('show');
+        } else {
+          searchBar.classList.remove('show');
+        }
+      });
+
+      searchIcon.addEventListener('mousedown', (e) => {
+        if (isCollapsed) return;
+        isDragging = true;
+        startY = e.clientY;
+        e.preventDefault();
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging || isCollapsed) return;
+
+        const diffY = e.clientY - startY;
+
+        if (diffY > 40) {
+          collapseNav();
+          isDragging = false;
+        }
+      });
+
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+
+      searchIcon.addEventListener('touchstart', (e) => {
+        if (isCollapsed) return;
+        isDragging = true;
+        startY = e.touches[0].clientY;
+      });
+
+      document.addEventListener('touchmove', (e) => {
+        if (!isDragging || isCollapsed) return;
+
+        const diffY = e.touches[0].clientY - startY;
+
+        if (diffY > 40) {
+          collapseNav();
+          isDragging = false;
+        }
+      });
+
+      document.addEventListener('touchend', () => {
+        isDragging = false;
+      });
+
+      expandBtn.addEventListener('click', expandNav);
+
+      // Thêm sự kiện kéo thả cho nút mở rộng
+      expandBtn.addEventListener('mousedown', startDragExpandBtn);
+      document.addEventListener('mousemove', dragExpandBtn);
+      document.addEventListener('mouseup', endDragExpandBtn);
+
+      function startDragExpandBtn(e) {
+        if (!isCollapsed) return;
+        isDraggingExpandBtn = true;
+        startPos = e.clientX;
+        expandBtn.classList.add('fn-expand-btn-draggable', 'fn-expand-btn-dragging');
+        e.preventDefault();
+      }
+
+      function dragExpandBtn(e) {
+        if (!isDraggingExpandBtn) return;
+
+        const containerWidth = document.documentElement.clientWidth;
+        const newPos = e.clientX;
+
+        // Xác định vị trí mới của container
+        if (newPos < containerWidth * 0.33) {
+          navContainer.classList.remove('fn-container-left', 'fn-container-center', 'fn-container-right');
+          navContainer.classList.add('fn-container-left');
+        } else if (newPos > containerWidth * 0.66) {
+          navContainer.classList.remove('fn-container-left', 'fn-container-center', 'fn-container-right');
+          navContainer.classList.add('fn-container-right');
+        } else {
+          navContainer.classList.remove('fn-container-left', 'fn-container-center', 'fn-container-right');
+          navContainer.classList.add('fn-container-center');
+        }
+      }
+
+      function endDragExpandBtn() {
+        isDraggingExpandBtn = false;
+        expandBtn.classList.remove('fn-expand-btn-dragging');
+        setTimeout(() => {
+          expandBtn.classList.remove('fn-expand-btn-draggable');
+        }, 100);
+      }
+
+      function collapseNav() {
+        resetAnimations();
+        navContainer.classList.add('fn-container-collapsed');
+        nav.classList.add('fn-nav-collapsed');
+        isCollapsed = true;
+
+        // Ẩn thanh search nếu đang hiển thị
+        if (isSearchBarVisible) {
+          searchBar.classList.remove('show');
+          isSearchBarVisible = false;
+        }
+
+        // Thêm hiệu ứng chạy xuống cho các nút
+        navItems.forEach(item => {
+          item.style.transition = 'all 0.5s ease';
+          item.style.transform = 'translateY(100px)';
+        });
+
+        // Hiệu ứng nút dấu cộng chạy lên
+        setTimeout(() => {
+          expandBtn.style.transform = 'translate(-50%, 0)';
+          expandBtn.style.opacity = '1';
+        }, 300);
+      }
+
+      function expandNav() {
+        // Hiệu ứng nút dấu cộng biến mất
+        expandBtn.style.transform = 'translate(-50%, -70px)';
+        expandBtn.style.opacity = '0';
+
+        setTimeout(() => {
+          navContainer.classList.remove('fn-container-collapsed');
+          nav.classList.remove('fn-nav-collapsed');
+          isCollapsed = false;
+
+          // Thêm hiệu ứng chạy lên cho các nút
+          navItems.forEach((item, index) => {
+            item.style.transition = 'all 0.5s ease ' + (index * 0.1) + 's';
+            item.style.transform = 'translateY(0)';
+            setTimeout(() => {
+              item.classList.add('fn-animate-in');
+            }, index * 100);
+          });
+        }, 300);
+      }
+    });
+  </script>
+
+</div>
+
+
+</body>
+</html>
