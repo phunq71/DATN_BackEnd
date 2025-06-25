@@ -404,7 +404,6 @@
     right: 0.5%;
     color: black;
     padding: 8px 15px;
-  	
     font-size: 0.7rem;
     font-weight: bold;
     text-decoration: none;
@@ -428,6 +427,41 @@
       right: 3%;
     }
   }
+
+  .color-options {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 0;
+    position: absolute;
+    overflow: hidden;
+    height: 0;
+    opacity: 0;
+    transition: all 0.3s ease;
+    left: 4%;
+    bottom:18%;
+  }
+
+  .color-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #eee;
+    cursor: pointer;
+    transform: translateY(-30px);
+    transition: transform 0.3s ease;
+  }
+
+  .product-wrapper:hover .color-options {
+    height: auto;
+    opacity: 1;
+  }
+
+  .product-wrapper:hover .color-circle {
+    transform: translateY(0);
+  }
+
+
 </style>
 
 <div class="reels-container">
@@ -437,6 +471,7 @@
   </div>
 
   <!-- First content section -->
+
   <div class="reels-row">
     <section class="banner-section">
       <img src="https://img3.thuthuatphanmem.vn/uploads/2019/10/14/banner-thoi-trang-giam-gia_113856960.jpg"
@@ -449,7 +484,7 @@
     </section>
 
     <section class="products-section">
-      <a href="#" class="view-all-btn">Xem tất cả >></a>
+      <a href="/viewAll" class="view-all-btn">Xem tất cả >></a>
       <div class="products-carousel owl-carousel owl-theme">
         <!-- Product 1 -->
         <div class="product-container item">
@@ -459,6 +494,11 @@
             <div class="new-label">NEW</div>
             <div class="discount-label">-10%</div>
             <button class="favorite-btn"><i class="far fa-heart"></i></button>
+            <div class="color-options">
+              <div class="color-circle" style="background-color: #201714;"></div>
+              <div class="color-circle" style="background-color: #e1d5bc;"></div>
+              <div class="color-circle" style="background-color: #656565;"></div>
+            </div>
             <div class="product-info">
               <div>Áo Polo H&M</div>
               <div class="price-container">
@@ -476,6 +516,10 @@
                  alt="Product" class="product-image">
             <div class="new-label">HOT</div>
             <button class="favorite-btn"><i class="far fa-heart"></i></button>
+            <div class="color-options">
+              <div class="color-circle" style="background-color: #ffffff;"></div>
+              <div class="color-circle" style="background-color: #1abc9c;"></div>
+            </div>
             <div class="product-info">
               <div>Áo thun in hình Loose Fit</div>
               <div class="price-container">
@@ -492,6 +536,12 @@
                  alt="Product" class="product-image">
             <div class="discount-label">-20%</div>
             <button class="favorite-btn"><i class="far fa-heart"></i></button>
+            <div class="color-options">
+              <div class="color-circle" style="background-color: #e1d5bc;"></div>
+              <div class="color-circle" style="background-color: #f1c40f;"></div>
+              <div class="color-circle" style="background-color: #e67e22;"></div>
+              <div class="color-circle" style="background-color: #95a5a6;"></div>
+            </div>
             <div class="product-info">
               <div>Quần short kiểu may đo Loose Fit</div>
               <div class="price-container">
@@ -510,6 +560,11 @@
             <div class="new-label">NEW</div>
             <div class="discount-label">-15%</div>
             <button class="favorite-btn"><i class="far fa-heart"></i></button>
+            <div class="color-options">
+              <div class="color-circle" style="background-color: #ffffff;"></div>
+              <div class="color-circle" style="background-color: #16a085;"></div>
+              <div class="color-circle" style="background-color: #000000;"></div>
+            </div>
             <div class="product-info">
               <div>Áo ba lỗ Loose Fit</div>
               <div class="price-container">
@@ -526,6 +581,10 @@
             <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
                  alt="Product" class="product-image">
             <button class="favorite-btn"><i class="far fa-heart"></i></button>
+            <div class="color-options">
+              <div class="color-circle" style="background-color: #27ae60;"></div>
+              <div class="color-circle" style="background-color: #2980b9;"></div>
+            </div>
             <div class="product-info">
               <div>Quần Short Thể Thao</div>
               <div class="price-container">
@@ -562,6 +621,11 @@
             <div class="new-label">NEW</div>
             <div class="discount-label">-10%</div>
             <button class="favorite-btn"><i class="far fa-heart"></i></button>
+            <div class="color-options">
+              <div class="color-circle" style="background-color: #ffffff;"></div>
+              <div class="color-circle" style="background-color: #16a085;"></div>
+              <div class="color-circle" style="background-color: #000000;"></div>
+            </div>
             <div class="product-info">
               <div>Áo Polo H&M</div>
               <div class="price-container">
@@ -812,6 +876,30 @@
           behavior: 'smooth'
         });
       }, 100);
+    });
+  });
+</script>
+
+<!--Hiệu ứng rớt từng ô màu-->
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Lặp qua tất cả các product-wrapper
+    document.querySelectorAll('.product-wrapper').forEach(wrapper => {
+      const colorCircles = wrapper.querySelectorAll('.color-circle');
+
+      // Nếu có các color-circle
+      if (colorCircles.length > 0) {
+        // Thêm style động cho mỗi circle
+        colorCircles.forEach((circle, index) => {
+          const delay = (index + 1) * 0.1; // 0.1s, 0.2s, 0.3s,...
+          circle.style.transitionDelay = `${delay}s`;
+        });
+
+        // Thêm style cho wrapper (tùy chọn)
+        const maxDelay = (colorCircles.length) * 0.1;
+        wrapper.style.setProperty('--max-transition-delay', `${maxDelay}s`);
+      }
     });
   });
 </script>

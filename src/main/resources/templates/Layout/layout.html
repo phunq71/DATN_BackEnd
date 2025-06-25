@@ -15,8 +15,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
+<style>
+    body{
+        font-family: 'Arial', sans-serif;
+    }
+</style>
 <body>
-	<header th:replace="~{Layout/header :: header}"></header>
+	<header class="container" th:replace="~{Layout/header :: header}"></header>
     <main th:replace="${view}"></main>
 	<div th:replace="~{Layout/bottom-navigation :: b-nav}"></div>
     <footer th:replace="~{Layout/footer :: footer}"></footer>

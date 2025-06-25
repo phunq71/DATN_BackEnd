@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<style>
+    .color-options {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 0;
+        position: absolute;
+        overflow: hidden;
+        height: 0;
+        opacity: 0;
+        transition: all 0.3s ease;
+        left: 4%;
+        bottom:20%;
+    }
+
+    .color-circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px solid #eee;
+        cursor: pointer;
+        transform: translateY(-30px);
+        transition: transform 0.3s ease;
+    }
+
+    .product-wrapper:hover .color-options {
+        height: auto;
+        opacity: 1;
+    }
+
+    .product-wrapper:hover .color-circle {
+        transform: translateY(0);
+    }
+
+    .banner-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        animation: fadeInDown 1s ease;
+    }
+
+    .banner-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        animation: fadeInUp 1s ease;
+    }
+
+    .discount-badge {
+        background-color: #ff4757;
+        color: white;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-size: 1.8rem;
+        font-weight: bold;
+        animation: pulse 2s infinite;
+        box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+    }
+
+    /* Products section */
+    .products-section {
+        padding: 20px 0;
+        background-color: #f8f9fa;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        color: #ffff;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 10px;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: #ff4757;
+    }
+
+    /* Product grid styles */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 30px;
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .product-wrapper {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .product-image {
+        height: 300px;
+        width: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .product-wrapper:hover .product-image {
+        transform: scale(1.05);
+    }
+
+    .new-label {
+        position: absolute;
+        top: 15px;
+        left: 10px;
+        background-color: #000;
+        color: #fff;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 2;
+        transform: rotate(-15deg);
+        transition: all 0.3s ease;
+        border-radius: 3px;
+    }
+
+    .discount-label {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: red;
+        color: white;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        z-index: 2;
+        border-radius: 3px;
+    }
+
+    .product-wrapper:hover .discount-label {
+        font-size: large;
+        padding: 10px 20px;
+    }
+
+    .product-wrapper:hover .new-label {
+        padding: 5px 20px;
+    }
+
+    .product-info {
+        position: relative;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        transform: translateY(100%);
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 1;
+        color: #000;
+    }
+
+
+    .product-wrapper:hover .product-info {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .price-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 14px;
+    }
+
+    .sale-price {
+        font-weight: bold;
+        color: #ff4757;
+        font-size: 16px;
+    }
+
+    .favorite-btn {
+        position: absolute;
+        bottom: 80px;
+        right: 4%;
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #333;
+        font-size: larger;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        z-index: 2;
+        transform: translateY(300%);
+    }
+
+    .product-wrapper:hover .favorite-btn {
+        transform: translateY(0);
+    }
+
+    .favorite-btn:hover {
+        color: #ff4757;
+        transform: scale(1.2) !important;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .banner-title {
+            font-size: 2rem;
+        }
+        .banner-subtitle {
+            font-size: 1.2rem;
+        }
+        .discount-badge {
+            font-size: 1.2rem;
+            padding: 8px 15px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+        }
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+    }
+
+    @media (max-width: 480px) {
+        .banner-title {
+            font-size: 1.5rem;
+        }
+        .banner-subtitle {
+            font-size: 1rem;
+        }
+        .discount-badge {
+            font-size: 1rem;
+        }
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+    }
+</style>
+
+<div class="reels-row">
+    <section class="banner-section">
+        <img src="https://img3.thuthuatphanmem.vn/uploads/2019/10/14/banner-thoi-trang-giam-gia_113856960.jpg"
+             alt="Khuyến mãi thời trang" class="banner-img">
+        <div class="banner-overlay">
+            <div class="section-header">
+                <h2 class="section-title text-dark fw-bold m-1">SẢN PHẨM NỔI BẬT</h2>
+            </div>
+        </div>
+    </section>
+
+    <section class="products-section">
+        <div class="products-grid">
+            <!-- Product 1 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">-10%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #201714;"></div>
+                        <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                        <div class="color-circle" style="background-color: #656565;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo Polo H&M</div>
+                        <div class="price-container">
+                            <span class="sale-price">900.000đ</span>
+                            <span class="original-price">1.000.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/fc/11/fc11cb1d40fd52a00d3cd74e3bb5faeab85fc0c6.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">HOT</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #ffffff;"></div>
+                        <div class="color-circle" style="background-color: #1abc9c;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo thun in hình Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">1.200.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/28/c4/28c47288852c92a93b7129b59c60c37d84c06d1a.jpg"
+                         alt="Product" class="product-image">
+                    <div class="discount-label">-20%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                        <div class="color-circle" style="background-color: #f1c40f;"></div>
+                        <div class="color-circle" style="background-color: #e67e22;"></div>
+                        <div class="color-circle" style="background-color: #95a5a6;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Quần short kiểu may đo Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">200.000đ</span>
+                            <span class="original-price">250.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/49/7b/497baceee10bcacd2973a7a21b1775c4b1c6ae88.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">-15%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #ffffff;"></div>
+                        <div class="color-circle" style="background-color: #16a085;"></div>
+                        <div class="color-circle" style="background-color: #000000;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo ba lỗ Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">1.500.000đ</span>
+                            <span class="original-price">1.800.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 5 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                         alt="Product" class="product-image">
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #27ae60;"></div>
+                        <div class="color-circle" style="background-color: #2980b9;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Quần Short Thể Thao</div>
+                        <div class="price-container">
+                            <span class="sale-price">350.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- Product 1 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">-10%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #201714;"></div>
+                        <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                        <div class="color-circle" style="background-color: #656565;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo Polo H&M</div>
+                        <div class="price-container">
+                            <span class="sale-price">900.000đ</span>
+                            <span class="original-price">1.000.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/fc/11/fc11cb1d40fd52a00d3cd74e3bb5faeab85fc0c6.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">HOT</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #ffffff;"></div>
+                        <div class="color-circle" style="background-color: #1abc9c;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo thun in hình Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">1.200.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/28/c4/28c47288852c92a93b7129b59c60c37d84c06d1a.jpg"
+                         alt="Product" class="product-image">
+                    <div class="discount-label">-20%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                        <div class="color-circle" style="background-color: #f1c40f;"></div>
+                        <div class="color-circle" style="background-color: #e67e22;"></div>
+                        <div class="color-circle" style="background-color: #95a5a6;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Quần short kiểu may đo Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">200.000đ</span>
+                            <span class="original-price">250.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/49/7b/497baceee10bcacd2973a7a21b1775c4b1c6ae88.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">-15%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #ffffff;"></div>
+                        <div class="color-circle" style="background-color: #16a085;"></div>
+                        <div class="color-circle" style="background-color: #000000;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo ba lỗ Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">1.500.000đ</span>
+                            <span class="original-price">1.800.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 5 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                         alt="Product" class="product-image">
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #27ae60;"></div>
+                        <div class="color-circle" style="background-color: #2980b9;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Quần Short Thể Thao</div>
+                        <div class="price-container">
+                            <span class="sale-price">350.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Product 1 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">-10%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #201714;"></div>
+                        <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                        <div class="color-circle" style="background-color: #656565;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo Polo H&M</div>
+                        <div class="price-container">
+                            <span class="sale-price">900.000đ</span>
+                            <span class="original-price">1.000.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/fc/11/fc11cb1d40fd52a00d3cd74e3bb5faeab85fc0c6.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">HOT</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #ffffff;"></div>
+                        <div class="color-circle" style="background-color: #1abc9c;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo thun in hình Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">1.200.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/28/c4/28c47288852c92a93b7129b59c60c37d84c06d1a.jpg"
+                         alt="Product" class="product-image">
+                    <div class="discount-label">-20%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                        <div class="color-circle" style="background-color: #f1c40f;"></div>
+                        <div class="color-circle" style="background-color: #e67e22;"></div>
+                        <div class="color-circle" style="background-color: #95a5a6;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Quần short kiểu may đo Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">200.000đ</span>
+                            <span class="original-price">250.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/49/7b/497baceee10bcacd2973a7a21b1775c4b1c6ae88.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">-15%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #ffffff;"></div>
+                        <div class="color-circle" style="background-color: #16a085;"></div>
+                        <div class="color-circle" style="background-color: #000000;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo ba lỗ Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">1.500.000đ</span>
+                            <span class="original-price">1.800.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 5 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                         alt="Product" class="product-image">
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #27ae60;"></div>
+                        <div class="color-circle" style="background-color: #2980b9;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Quần Short Thể Thao</div>
+                        <div class="price-container">
+                            <span class="sale-price">350.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Product 1 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">-10%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #201714;"></div>
+                        <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                        <div class="color-circle" style="background-color: #656565;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo Polo H&M</div>
+                        <div class="price-container">
+                            <span class="sale-price">900.000đ</span>
+                            <span class="original-price">1.000.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/fc/11/fc11cb1d40fd52a00d3cd74e3bb5faeab85fc0c6.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">HOT</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #ffffff;"></div>
+                        <div class="color-circle" style="background-color: #1abc9c;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo thun in hình Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">1.200.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/28/c4/28c47288852c92a93b7129b59c60c37d84c06d1a.jpg"
+                         alt="Product" class="product-image">
+                    <div class="discount-label">-20%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                        <div class="color-circle" style="background-color: #f1c40f;"></div>
+                        <div class="color-circle" style="background-color: #e67e22;"></div>
+                        <div class="color-circle" style="background-color: #95a5a6;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Quần short kiểu may đo Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">200.000đ</span>
+                            <span class="original-price">250.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/49/7b/497baceee10bcacd2973a7a21b1775c4b1c6ae88.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">-15%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #ffffff;"></div>
+                        <div class="color-circle" style="background-color: #16a085;"></div>
+                        <div class="color-circle" style="background-color: #000000;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo ba lỗ Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">1.500.000đ</span>
+                            <span class="original-price">1.800.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 5 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                         alt="Product" class="product-image">
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #27ae60;"></div>
+                        <div class="color-circle" style="background-color: #2980b9;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Quần Short Thể Thao</div>
+                        <div class="price-container">
+                            <span class="sale-price">350.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- Product 1 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">-10%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #201714;"></div>
+                        <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                        <div class="color-circle" style="background-color: #656565;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo Polo H&M</div>
+                        <div class="price-container">
+                            <span class="sale-price">900.000đ</span>
+                            <span class="original-price">1.000.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/fc/11/fc11cb1d40fd52a00d3cd74e3bb5faeab85fc0c6.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">HOT</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #ffffff;"></div>
+                        <div class="color-circle" style="background-color: #1abc9c;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo thun in hình Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">1.200.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/28/c4/28c47288852c92a93b7129b59c60c37d84c06d1a.jpg"
+                         alt="Product" class="product-image">
+                    <div class="discount-label">-20%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                        <div class="color-circle" style="background-color: #f1c40f;"></div>
+                        <div class="color-circle" style="background-color: #e67e22;"></div>
+                        <div class="color-circle" style="background-color: #95a5a6;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Quần short kiểu may đo Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">200.000đ</span>
+                            <span class="original-price">250.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/49/7b/497baceee10bcacd2973a7a21b1775c4b1c6ae88.jpg"
+                         alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">-15%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="color-options">
+                        <div class="color-circle" style="background-color: #ffffff;"></div>
+                        <div class="color-circle" style="background-color: #16a085;"></div>
+                        <div class="color-circle" style="background-color: #000000;"></div>
+                    </div>
+                    <div class="product-info">
+                        <div>Áo ba lỗ Loose Fit</div>
+                        <div class="price-container">
+                            <span class="sale-price">1.500.000đ</span>
+                            <span class="original-price">1.800.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </section>
+</div>
+
+<!--Hiệu ứng rớt từng ô màu-->
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lặp qua tất cả các product-wrapper
+        document.querySelectorAll('.product-wrapper').forEach(wrapper => {
+            const colorCircles = wrapper.querySelectorAll('.color-circle');
+
+            // Nếu có các color-circle
+            if (colorCircles.length > 0) {
+                // Thêm style động cho mỗi circle
+                colorCircles.forEach((circle, index) => {
+                    const delay = (index + 1) * 0.1; // 0.1s, 0.2s, 0.3s,...
+                    circle.style.transitionDelay = `${delay}s`;
+                });
+
+                // Thêm style cho wrapper (tùy chọn)
+                const maxDelay = (colorCircles.length) * 0.1;
+                wrapper.style.setProperty('--max-transition-delay', `${maxDelay}s`);
+            }
+        });
+    });
+</script>
+</body>
+</html>

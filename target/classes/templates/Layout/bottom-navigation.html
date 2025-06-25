@@ -185,7 +185,7 @@
 
     .fn-search-bar.show {
       transform: translate(-50%, 0);
-      opacity: 0.6;
+      opacity: 0.8;
       pointer-events: auto;
     }
 
@@ -207,6 +207,23 @@
     .fn-item-search i {
       pointer-events: none;
     }
+    .custom-tooltip {
+      position: absolute;
+      background: black;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 1000;
+      opacity: 0.5;
+    }
+
+    .fn-nav a{
+      text-decoration: none;
+      color: black;
+    }
   </style>
   <input type="text" placeholder="Nhập từ khóa để tìm kiếm">
 </div>
@@ -214,9 +231,9 @@
 <div class="fn-container fn-container-center">
   <div class="fn-nav">
     <div class="fn-item fn-item-home">
-      <i class="fas fa-home"></i>
+      <a href="/index"> <i class="fas fa-home"></i> </a>
     </div>
-    <div class="fn-item fn-item-search">
+    <div class="fn-item fn-item-search" id="search-btn" title="Tìm kiếm sản phẩm" data-extra="Kéo xuống để thu gọn">
       <i class="fas fa-search"></i>
     </div>
     <div class="fn-item fn-item-cart">
@@ -391,6 +408,32 @@
           });
         }, 300);
       }
+    });
+  </script>
+
+<!--  Xử lý tooltip-->
+  <script>
+    const el = document.getElementById('search-btn');
+    const originalTitle = el.getAttribute('title');
+    const extra = el.getAttribute('data-extra');
+
+    el.addEventListener('mouseenter', () => {
+      el.setAttribute('data-original-title', originalTitle);
+      el.removeAttribute('title');
+
+      const customTooltip = document.createElement('div');
+      customTooltip.className = 'custom-tooltip';
+      customTooltip.innerHTML = `${originalTitle}<br>${extra}`;
+      document.body.appendChild(customTooltip);
+
+      const rect = el.getBoundingClientRect();
+      customTooltip.style.top = (window.scrollY + rect.top - 40) + 'px';
+      customTooltip.style.left = (window.scrollX + rect.left) + 'px';
+    });
+
+    el.addEventListener('mouseleave', () => {
+      el.setAttribute('title', el.getAttribute('data-original-title'));
+      document.querySelectorAll('.custom-tooltip').forEach(tip => tip.remove());
     });
   </script>
 

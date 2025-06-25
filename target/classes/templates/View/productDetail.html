@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirSense Jacket | Wool Like</title>
+
+</head>
+<body>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Arial', sans-serif;
+    }
+
+    body {
+        background-color: #f9f9f9;
+        color: #333;
+    }
+
+    .product-slider {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .product-images, .product-info {
+        width: 50%;
+        height: 100%;
+        padding: 2rem;
+        box-sizing: border-box;
+    }
+
+    .product-images {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #fff;
+        touch-action: pan-y; /* Allow vertical touch scrolling but prevent browser handling horizontal */
+    }
+
+    .image-slider {
+        display: flex;
+        width: 100%;
+        height: 80%;
+        overflow: hidden;
+        position: relative;
+        cursor: grab;
+    }
+
+    .image-slider:active {
+        cursor: grabbing;
+    }
+
+    .image-slider-container {
+        display: flex;
+        width: 100%;
+        height: 100%;
+    }
+
+    .image-slider img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        position: absolute;
+        transition: transform 0.5s ease, opacity 0.5s ease;
+        opacity: 0;
+        user-select: none; /* Prevent image selection during drag */
+    }
+
+    .image-slider img.active {
+        opacity: 1;
+    }
+
+    .product-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #f5f5f5;
+    }
+
+    .product-info h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+    }
+
+    .color-selector, .size-selector {
+        margin: 1rem 0;
+    }
+
+    .color-options {
+        display: flex;
+        margin-top: 0.5rem;
+        gap: 10px;
+    }
+
+    .color-option {
+        width: 60px;
+        height: 60px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .color-option:hover {
+        transform: scale(1.05);
+    }
+
+    .color-option.selected {
+        border: 2px solid #333;
+        transform: scale(1.05);
+    }
+
+    .selected-color {
+        font-weight: bold;
+    }
+
+    .size-guide {
+        margin-left: 1rem;
+        text-decoration: underline;
+        color: #666;
+        cursor: pointer;
+    }
+
+    .rating {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0;
+    }
+
+    .stars {
+        color: gold;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+    }
+
+    .review-count {
+        margin-left: 0.5rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .price {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 1.5rem 0;
+    }
+
+    .stock-status {
+        color: #e53935;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+    }
+
+    .add-to-cart {
+        background: #000;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-bottom: 1rem;
+        width: 100%;
+        transition: background 0.3s ease;
+    }
+
+    .add-to-cart:hover {
+        background: #333;
+    }
+
+    .find-in-store {
+        text-decoration: underline;
+        color: #666;
+        text-align: center;
+        display: block;
+        cursor: pointer;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .product-slider {
+            flex-direction: column;
+            height: auto;
+        }
+
+        .product-images, .product-info {
+            width: 100%;
+            height: auto;
+        }
+
+        .image-slider {
+            height: 300px;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+        }
+    }
+</style>
+
+<div class="product-slider">
+    <!-- Phần hình ảnh (50%) -->
+    <div class="product-images">
+        <div class="image-slider">
+            <!-- Hình ảnh sẽ được thêm bằng JavaScript -->
+        </div>
+    </div>
+
+    <!-- Phần thông tin (50%) -->
+    <div class="product-info">
+        <h1>AirSense Jacket | Wool Like</h1>
+
+        <div class="color-selector">
+            <span>Color: </span>
+            <span class="selected-color">WHITE</span>
+            <div class="color-options">
+                <!-- Color options sẽ được thêm bằng JavaScript -->
+            </div>
+        </div>
+
+        <div class="size-selector">
+            <span>Size: </span>
+            <span class="selected-size">MEN XS</span>
+            <a href="#" class="size-guide">Check my size</a>
+        </div>
+
+        <div class="rating">
+            <div class="stars">★★★★★</div>
+            <span class="review-count">(430)</span>
+        </div>
+
+        <div class="price">1.471.000 VND</div>
+
+        <div class="stock-status">Low stock</div>
+
+        <button class="add-to-cart">ADD TO CART</button>
+
+        <a href="#" class="find-in-store">Find stock in store</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dữ liệu sản phẩm
+        const productData = {
+            colors: [
+                {
+                    name: "WHITE",
+                    mainImage: "https://image.hm.com/assets/hm/51/ba/51ba40d8f0d80713246fad69ab3b99732af9bf36.jpg",
+                    secondaryImages: [
+                        "https://image.hm.com/assets/hm/57/f5/57f56e6bafb4b3b0c2162397ffce180277d6d817.jpg",
+                        "https://image.hm.com/assets/hm/ea/3a/ea3a6295ca1d7694da633353b5d4c1392a1d85d1.jpg",
+                        "https://image.hm.com/assets/hm/5c/b6/5cb6b6b4231f8e35bc091519200b8aee8a72e962.jpg",
+                        "https://image.hm.com/assets/hm/34/2c/342cf61191155b58769531bc31362195f26990ab.jpg"
+                    ]
+                },
+                {
+                    name: "BLACK",
+                    mainImage: "https://image.hm.com/assets/hm/49/d5/49d532391fbb7ce88640c726644cc24b552aab27.jpg",
+                    secondaryImages: [
+                        "https://image.hm.com/assets/hm/0d/01/0d0106ad470fd9c0d973a559e35ae70fd21696a9.jpg",
+                        "https://image.hm.com/assets/hm/61/67/61670f1b50ebbee319a3b5fe648f11feb0475336.jpg",
+                        "https://image.hm.com/assets/hm/54/8e/548e83b569cd006a398e6ffc9e2cf21e1bf0acb5.jpg",
+                        "https://image.hm.com/assets/hm/09/06/0906537cdc265369952536bdd44bb41940aca873.jpg",
+                        "https://image.hm.com/assets/hm/5b/30/5b30a0ea8c3f68ba5ee78b9fc89677d97d8e2ed5.jpg"
+                    ]
+                },
+                {
+                    name: "DARK GRAY",
+                    mainImage: "https://image.hm.com/assets/hm/8e/6f/8e6f72b18865f9ac5109f16b11cd52cb9f8d8711.jpg",
+                    secondaryImages: [
+                        "https://image.hm.com/assets/hm/bd/ca/bdca880c800fd893362646021b45a2bc8d4ce6a8.jpg",
+                        "https://image.hm.com/assets/hm/5e/47/5e47831cd605e47a2ca36d60b55a20399567e61e.jpg",
+                        "https://image.hm.com/assets/hm/35/05/35055597bd6b3d98a38d0e27d2acf39f69c32072.jpg",
+                        "https://image.hm.com/assets/hm/be/ae/beaef270b4de6527d636de9a305ba331d14f4a6b.jpg",
+                        "https://image.hm.com/assets/hm/02/5c/025c37ac03f8b8f9cbe0f48b522d030d0b7ea153.jpg"
+                    ]
+                },
+                {
+                    name: "MINT",
+                    mainImage: "https://image.hm.com/assets/hm/ab/9e/ab9e23eb0c1d65fefb0c82d969f2152a04bba7d5.jpg",
+                    secondaryImages: [
+                        "https://image.hm.com/assets/hm/6e/78/6e784ba00fc77382eb988a6b9f17a931889de81e.jpg",
+                        "https://image.hm.com/assets/hm/25/17/2517c9aa5de91cdf51ae88a5f50ed0e8d7ffefd8.jpg",
+                        "https://image.hm.com/assets/hm/e6/0f/e60fa947204ef8ec15cae3096ab3ab932bfa9f03.jpg",
+                        "https://image.hm.com/assets/hm/34/ff/34ffe0ffda9ebcd9db071730747afa8a20aa14af.jpg",
+                        "https://image.hm.com/assets/hm/e6/29/e62943d01387c5e0269bdbde70ebfa3518d5b379.jpg"
+                    ]
+                }
+            ]
+        };
+
+        // Biến toàn cục
+        let currentColorIndex = 0;
+        let currentImageIndex = 0;
+        let colorOptions = [];
+        let isDragging = false;
+        let startPosX = 0;
+        let currentTranslateX = 0;
+        let prevTranslateX = 0;
+        let animationID = 0;
+        const slider = document.querySelector('.image-slider');
+
+        // Khởi tạo trang
+        function initPage() {
+            createColorOptions();
+            loadAllImages();
+            initFirstColor();
+            setupEventListeners();
+        }
+
+        // Tạo các lựa chọn màu sắc
+        function createColorOptions() {
+            const colorOptionsContainer = document.querySelector('.color-options');
+
+            productData.colors.forEach((color, index) => {
+                const colorOption = document.createElement('div');
+                colorOption.className = 'color-option';
+                if (index === 0) colorOption.classList.add('selected');
+                colorOption.style.backgroundImage = `url(${color.mainImage})`;
+                colorOption.dataset.colorIndex = index;
+
+                colorOption.addEventListener('click', function() {
+                    selectColor(index);
+                });
+
+                colorOptionsContainer.appendChild(colorOption);
+                colorOptions.push(colorOption);
+            });
+        }
+
+        // Tải tất cả hình ảnh vào DOM nhưng ẩn đi
+        function loadAllImages() {
+            const imageSlider = document.querySelector('.image-slider');
+
+            productData.colors.forEach((color, colorIndex) => {
+                // Thêm ảnh chính
+                const mainImg = document.createElement('img');
+                mainImg.src = color.mainImage;
+                mainImg.alt = `AirSense Jacket - ${color.name}`;
+                mainImg.dataset.colorIndex = colorIndex;
+                mainImg.dataset.imageIndex = 0;
+                imageSlider.appendChild(mainImg);
+
+                // Thêm các ảnh phụ
+                color.secondaryImages.forEach((imgSrc, imgIndex) => {
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.alt = `AirSense Jacket - ${color.name}`;
+                    img.dataset.colorIndex = colorIndex;
+                    img.dataset.imageIndex = imgIndex + 1;
+                    imageSlider.appendChild(img);
+                });
+            });
+        }
+
+        // Khởi tạo màu đầu tiên
+        function initFirstColor() {
+            selectColor(0);
+        }
+
+        // Chọn màu
+        function selectColor(colorIndex) {
+            currentColorIndex = colorIndex;
+            currentImageIndex = 0;
+
+            // Cập nhật UI
+            updateSelectedColorUI();
+            showCurrentImage();
+        }
+
+        // Cập nhật UI khi chọn màu
+        function updateSelectedColorUI() {
+            // Cập nhật tên màu
+            document.querySelector('.selected-color').textContent = productData.colors[currentColorIndex].name;
+
+            // Cập nhật ô màu được chọn
+            colorOptions.forEach((option, index) => {
+                if (index === currentColorIndex) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
+
+        // Hiển thị ảnh hiện tại
+        function showCurrentImage() {
+            // Ẩn tất cả ảnh
+            document.querySelectorAll('.image-slider img').forEach(img => {
+                img.classList.remove('active');
+            });
+
+            // Hiển thị ảnh được chọn
+            const activeImage = document.querySelector(`.image-slider img[data-color-index="${currentColorIndex}"][data-image-index="${currentImageIndex}"]`);
+            if (activeImage) {
+                activeImage.classList.add('active');
+            }
+        }
+
+        // Thiết lập event listeners cho kéo và lăn chuột
+        function setupEventListeners() {
+            // Mouse events
+            slider.addEventListener('mousedown', dragStart);
+            slider.addEventListener('mousemove', drag);
+            slider.addEventListener('mouseup', dragEnd);
+            slider.addEventListener('mouseleave', dragEnd);
+
+            // Touch events
+            slider.addEventListener('touchstart', touchStart);
+            slider.addEventListener('touchmove', touchMove);
+            slider.addEventListener('touchend', touchEnd);
+
+            // Wheel event for mouse wheel scrolling
+            slider.addEventListener('wheel', handleWheel, { passive: false });
+        }
+
+        // Drag functions
+        function dragStart(e) {
+            e.preventDefault();
+            isDragging = true;
+            startPosX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+            slider.style.cursor = 'grabbing';
+            cancelAnimationFrame(animationID);
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const currentPosition = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+            const diff = currentPosition - startPosX;
+
+            // Only trigger navigation if drag distance is significant
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    // Dragged right - go to previous image
+                    navigateImage(-1);
+                    isDragging = false;
+                    slider.style.cursor = 'grab';
+                } else {
+                    // Dragged left - go to next image
+                    navigateImage(1);
+                    isDragging = false;
+                    slider.style.cursor = 'grab';
+                }
+            }
+        }
+
+        function dragEnd() {
+            isDragging = false;
+            slider.style.cursor = 'grab';
+        }
+
+        // Touch functions
+        function touchStart(e) {
+            dragStart(e.touches[0]);
+        }
+
+        function touchMove(e) {
+            drag(e.touches[0]);
+        }
+
+        function touchEnd() {
+            dragEnd();
+        }
+
+        // Mouse wheel function
+        function handleWheel(e) {
+            e.preventDefault();
+            if (e.deltaY > 0) {
+                // Wheel down - next image
+                navigateImage(1);
+            } else {
+                // Wheel up - previous image
+                navigateImage(-1);
+            }
+        }
+
+        // Navigate between images
+        function navigateImage(direction) {
+            const totalImages = 1 + productData.colors[currentColorIndex].secondaryImages.length;
+            currentImageIndex = (currentImageIndex + direction + totalImages) % totalImages;
+            showCurrentImage();
+        }
+
+        // Khởi tạo trang
+        initPage();
+    });
+</script>
+</body>
+</html>

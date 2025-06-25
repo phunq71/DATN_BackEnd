@@ -11,28 +11,33 @@ public class HomeController {
 //		return "View/Home";
 //	}
 
-	@GetMapping("/login")
-	public String login() {
-		return "Login/Dangky";
-	}
+//	@GetMapping("/header")
+//	public String header() {
+//		return "Layout/header";
+//	}
+//
+//	@GetMapping("/footer")
+//	public String footer() {
+//		return "Layout/footer";
+//	}
 
-	@GetMapping("/header")
-	public String header() {
-		return "Layout/header";
-	}
-	
-	@GetMapping("/footer")
-	public String footer() {
-		return "Layout/footer";
-	}
-	
 	@GetMapping("/index")
 	public String index() {
 		return "View/index";
 	}
 
-	@GetMapping("/bottom-navigation")
-	public String bottomNavigation() {
-		return "Layout/bottom-navigation";
+	@GetMapping("/viewAll")
+	public String viewAll() {
+		return "View/highlightProducts";
 	}
+
+	@GetMapping("/detail")
+	public String detail() {
+		return "View/productDetail";
+	}
+//
+//	@GetMapping("/bottom-navigation")
+//	public String bottomNavigation() {
+//		return "Layout/bottom-navigation";
+//	}
 }
