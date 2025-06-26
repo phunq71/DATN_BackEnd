@@ -1550,6 +1550,16 @@
             input.value = value;
         });
     });
+
+
+    document.querySelector('.description-header').addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        const icon = this.querySelector('.toggle-icon');
+
+        content.classList.toggle('show');
+        icon.textContent = content.classList.contains('show') ? '-' : '+';
+    });
+
 </script>
 
 <!--Xử lý chọn size-->

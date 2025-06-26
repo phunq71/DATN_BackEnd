@@ -35,6 +35,11 @@ public class HomeController {
 	public String detail() {
 		return "View/productDetail";
 	}
+
+	@GetMapping("/cart")
+	public String cart() {
+		return "View/Cart";
+	}
 //
 //	@GetMapping("/bottom-navigation")
 //	public String bottomNavigation() {
