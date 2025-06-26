@@ -32,8 +32,11 @@
     .product-images, .product-info {
         width: 50%;
         height: 100%;
-        padding: 2rem;
         box-sizing: border-box;
+    }
+
+    .product-info {
+        padding: 2rem;
     }
 
     .product-images {
@@ -44,12 +47,15 @@
         align-items: center;
         background-color: #fff;
         touch-action: pan-y; /* Allow vertical touch scrolling but prevent browser handling horizontal */
+        height: 100%;
+        padding: 0;
+        margin: 0;
     }
 
     .image-slider {
         display: flex;
         width: 100%;
-        height: 80%;
+        height: 100%;
         overflow: hidden;
         position: relative;
         cursor: grab;
@@ -68,7 +74,8 @@
     .image-slider img {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
+        object-position: center;
         position: absolute;
         transition: transform 0.5s ease, opacity 0.5s ease;
         opacity: 0;
@@ -142,7 +149,6 @@
     }
 
     .stars {
-        color: gold;
         font-size: 1.2rem;
         letter-spacing: 2px;
     }
@@ -156,7 +162,7 @@
     .price {
         font-size: 1.8rem;
         font-weight: bold;
-        margin: 1.5rem 0;
+        margin: 1rem 0;
     }
 
     .stock-status {
@@ -210,6 +216,583 @@
             height: 50px;
         }
     }
+
+    .size-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .size-option {
+        width: 40px;
+        height: 40px;
+        border: 2px solid black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s ease;
+    }
+
+    .size-option.selected {
+        background-color: black;
+        color: white;
+        border: 2px solid white;
+        box-shadow: 0 0 0 2px black;
+    }
+
+    .size-option.out-of-stock {
+        background-color: #e0e0e0;
+        color: #a0a0a0;
+        cursor: not-allowed;
+    }
+
+    .rating-progress {
+        width: 100%;
+        background-color: #eee;
+        height: 6px;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 5px;
+    }
+    .rating-progress-bar {
+        height: 100%;
+        background-color: #999;
+        width: 84%; /* Tương đương 4.2 sao */
+    }
+
+    .rating-box {
+        width: 60%;
+    }
+
+    /* Phần mô tả sản phẩm */
+    .product-description {
+        margin: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 15px;
+    }
+
+    .description-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        padding: 10px 0;
+    }
+
+    .description-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .toggle-icon {
+        font-size: 20px;
+    }
+
+    .description-content {
+        display: none;
+        padding: 10px 0;
+        line-height: 1.6;
+    }
+
+    .description-content.show {
+        display: block;
+    }
+
+    .review-otherProducts{
+        display: flex;
+        width: 100%;
+        height: 100vh;
+    }
+
+    .review{
+        width: 60%;
+        height: 100%;
+        margin: 10px;
+    }
+
+    .otherProduct {
+        width: 40%;
+        height: 100%;
+        margin: 10px;
+    }
+
+    .otherProduct-title{
+        display: flex;
+        margin-right:15px ;
+    }
+
+    .otherProduct-title h4{
+        margin-left: auto;
+        font-weight: bold;
+    }
+
+    /* Products List Section */
+    .ot-products-section {
+        font-family: 'Arial', sans-serif;
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 15px;
+        overflow-y: auto;
+        max-height: 70vh;
+    }
+
+    .ot-products-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .ot-product-container {
+        display: flex;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .ot-product-wrapper {
+        display: flex;
+        width: 100%;
+    }
+
+    .ot-product-image-container {
+        width: 200px;
+        flex-shrink: 0;
+    }
+
+    .ot-product-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .ot-product-info {
+        flex-grow: 1;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ot-product-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .ot-price-container {
+        margin-top: auto;
+    }
+
+    .ot-sale-price {
+        font-weight: bold;
+        color: #e74c3c;
+        font-size: 16px;
+    }
+
+    .ot-original-price {
+        font-size: 14px;
+        color: #95a5a6;
+        text-decoration: line-through;
+        margin-left: 8px;
+    }
+
+    .ot-color-options {
+        display: flex;
+        gap: 6px;
+        margin: 10px 0;
+    }
+
+    .ot-color-circle {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 1px solid #eee;
+    }
+
+    .ot-labels-container {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .ot-new-label,
+    .ot-discount-label {
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+    }
+
+    .ot-new-label {
+        background-color: #000000;
+    }
+
+    .ot-discount-label {
+        background-color: #e74c3c;
+    }
+
+    .ot-favorite-btn {
+        background: none;
+        border: none;
+        color: #333;
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: auto;
+        align-self: flex-start;
+    }
+
+
+    /* Phần đánh giá */
+    .rating-section {
+        max-width: 100%;
+        overflow-y: auto;
+        max-height: 70vh;
+        padding-right: 5px;
+    }
+
+    .rating-overview {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 0 15px;
+    }
+
+    .average-rating {
+        font-size: 36px;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .stars {
+        color: #000;
+        font-size: 24px;
+        letter-spacing: 2px;
+    }
+
+    .rating-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .progress-container {
+        flex-grow: 1;
+        height: 10px;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        margin: 0 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: #000;
+        border-radius: 5px;
+    }
+
+    /* Phần đánh giá chi tiết */
+    .customer-reviews {
+        margin-top: 30px;
+    }
+
+    .review-item {
+        border-bottom: 1px solid #e0e0e0;
+        padding: 20px 0;
+    }
+
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .reviewer-name {
+        font-weight: bold;
+    }
+
+    .review-stars {
+        color: #000;
+        font-size: 16px;
+    }
+
+    .review-meta {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 10px;
+        display: flex;
+    }
+
+    .review-images {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+    }
+
+    .review-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border: 1px solid #e0e0e0;
+        cursor: pointer;
+    }
+
+    .review-content {
+        line-height: 1.6;
+    }
+
+    .filter-section {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+    }
+
+    .filter-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        margin-left: 20px;
+    }
+
+    .filter-btn i {
+        margin-right: 5px;
+        font-size: 18px;
+    }
+
+    .clear-filter {
+        background: none;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        margin-left: 10px;
+        cursor: pointer;
+        display: none;
+    }
+
+    .filter-modal {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 20px;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 0;
+    }
+
+    .filter-group {
+        margin-bottom: 20px;
+    }
+
+    .filter-group h4 {
+        margin-bottom: 10px;
+    }
+
+    .star-filters {
+        display: flex;
+        gap: 15px;
+    }
+
+    .star-filter {
+        display: flex;
+        align-items: center;
+    }
+
+    .color-filters, .size-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #000;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .apply-btn {
+        background-color: #000;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .review-time {
+        margin-left: auto;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .star {
+        color: #ccc; /* Màu sao xám */
+        position: relative;
+        display: inline-block;
+        font-size: 24px;
+    }
+
+    .star.full {
+        color: #000000; /* Màu sao vàng */
+    }
+
+    .star.partial::before {
+        content: '★';
+        position: absolute;
+        left: 0;
+        width: var(--percentage);
+        overflow: hidden;
+        color: #000000; /* Màu sao vàng */
+    }
+
+    .quantity-field {
+        display: inline-flex;  /* Hiển thị các phần tử con trên cùng 1 hàng */
+
+        border-radius: 4px;     /* Bo góc nhẹ (tuỳ chọn) */
+        overflow: hidden;       /* Ẩn phần tràn ra ngoài */
+    }
+
+    .qty-btn {
+        width: 30px;
+        height: 30px;
+        background: #ffffff;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 0;
+        border: 1px solid #000000; /* Viền bao quanh toàn bộ field */
+    }
+
+    .qty-btn:hover {
+        background: #e0e0e0;
+    }
+
+    .qty-input {
+        width: 40px;
+        height: 30px;
+        text-align: center;
+        border: 1px solid #000000; /* Viền bao quanh toàn bộ field */
+        padding: 0;
+        -moz-appearance: textfield;   /* Ẩn mũi tên tăng/giảm trên Firefox */
+    }
+
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;     /* Ẩn mũi tên tăng/giảm trên Chrome/Safari */
+        margin: 0;
+    }
+
+    .viewAll {
+        display: flex;
+    }
+
+    .viewAll h5{
+        margin-left: auto;
+        margin-right: 10px;
+    }
+</style>
+<!--style cho zoom ảnh-->
+<style>
+    /* Style cho modal phóng to (thêm mới) */
+    .image-zoom-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        cursor: grab;
+    }
+
+    .image-zoom-modal.grabbing {
+        cursor: grabbing;
+    }
+
+    .zoom-modal-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90%;
+        overflow: hidden;
+    }
+
+    .zoom-modal-image {
+        max-width: 100%;
+        max-height: 80vh;
+        display: block;
+        margin: 0 auto;
+        transition: transform 0.3s;
+        transform-origin: center center;
+        cursor: grab;
+    }
+
+    .zoom-modal-image.grabbing {
+        cursor: grabbing;
+    }
+
+    .close-zoom-modal {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        color: white;
+        font-size: 30px;
+        cursor: pointer;
+        z-index: 1001;
+    }
 </style>
 
 <div class="product-slider">
@@ -233,14 +816,31 @@
         </div>
 
         <div class="size-selector">
+            <div class="size-container">
+                <div class="size-option out-of-stock" data-size="S">S</div>
+                <div class="size-option" data-size="M">M</div>
+                <div class="size-option" data-size="L">L</div>
+                <div class="size-option" data-size="XL">XL</div>
+                <div class="size-option" data-size="XXL">XXL</div>
+            </div>
             <span>Size: </span>
             <span class="selected-size">MEN XS</span>
             <a href="#" class="size-guide">Check my size</a>
         </div>
 
         <div class="rating">
-            <div class="stars">★★★★★</div>
-            <span class="review-count">(430)</span>
+            <div class="rating-box">
+                <div style="color:#666">★ 4.5</div>
+                <div class="rating-progress">
+                    <div class="rating-progress-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quantity-field">
+            <button class="qty-btn minus">-</button>
+            <input type="number" class="qty-input" value="1" min="1">
+            <button class="qty-btn plus">+</button>
         </div>
 
         <div class="price">1.471.000 VND</div>
@@ -250,6 +850,438 @@
         <button class="add-to-cart">ADD TO CART</button>
 
         <a href="#" class="find-in-store">Find stock in store</a>
+    </div>
+</div>
+
+
+<!-- Phần mô tả sản phẩm -->
+<div class="product-description">
+    <div class="description-header" onclick="toggleDescription()">
+        <div class="description-title">Mô tả</div>
+        <div class="toggle-icon">+</div>
+    </div>
+    <div class="description-content">
+        <p>Đây là phần mô tả chi tiết về sản phẩm. Bạn có thể thêm bất kỳ thông tin nào về sản phẩm ở đây.</p>
+        <p>- Chất liệu: 100% cotton</p>
+        <p>- Màu sắc: Đen, Trắng, Xám</p>
+        <p>- Kích thước: S, M, L, XL</p>
+        <p>- Hướng dẫn bảo quản: Giặt ở nhiệt độ thường, không sử dụng chất tẩy</p>
+    </div>
+</div>
+
+<!-- Phần đánh giá -->
+<div class="review-otherProducts">
+    <div class="review">
+        <div class="rating-overview">
+            <div class="average-rating">4.5</div>
+            <div class="stars">
+                <span class="star full">★</span>
+                <span class="star full">★</span>
+                <span class="star full">★</span>
+                <span class="star full">★</span>
+                <span class="star partial" style="--percentage: 50%">★</span>
+            </div>
+
+
+            <div class="filter-section">
+                <button class="filter-btn" onclick="openFilterModal()">
+                    <i class="fas fa-filter"></i> Lọc
+                </button>
+                <button class="clear-filter" onclick="clearFilters()">Hủy lọc</button>
+            </div>
+        </div>
+        <div class="rating-section">
+
+
+            <div class="rating-bar">
+                <div>5 sao</div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 70%"></div>
+                </div>
+                <div>42</div>
+            </div>
+
+            <div class="rating-bar">
+                <div>4 sao</div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 20%"></div>
+                </div>
+                <div>12</div>
+            </div>
+
+            <div class="rating-bar">
+                <div>3 sao</div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 5%"></div>
+                </div>
+                <div>3</div>
+            </div>
+
+            <div class="rating-bar">
+                <div>2 sao</div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 3%"></div>
+                </div>
+                <div>2</div>
+            </div>
+
+            <div class="rating-bar">
+                <div>1 sao</div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 2%"></div>
+                </div>
+                <div>1</div>
+            </div>
+
+            <!-- Phần đánh giá chi tiết của khách hàng -->
+            <div class="customer-reviews">
+                <h3>Đánh giá của khách hàng</h3>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="reviewer-name">Nguyễn Văn A</div>
+                        <div class="review-stars">★★★★★</div>
+                    </div>
+                    <div class="review-meta">
+                        <span>Màu: Đen | Size: L</span>
+                        <span class="review-time">2 ngày trước</span>
+                    </div>
+                    <div class="review-content">
+                        Sản phẩm chất lượng tốt, vải mặc rất mát và thoải mái. Giao hàng nhanh, đóng gói cẩn thận.
+                    </div>
+                    <div class="review-images">
+                        <img src="https://down-vn.img.susercontent.com/file/vn-11134103-7ras8-m53wpnc57qwz7b.webp" alt="Review 1" class="review-image">
+                        <img src="https://down-vn.img.susercontent.com/file/vn-11134103-7ra0g-macethugpwp13c.webp" alt="Review 2" class="review-image">
+                    </div>
+                </div>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="reviewer-name">Trần Thị B</div>
+                        <div class="review-stars">★★★★☆</div>
+                    </div>
+                    <div class="review-meta">
+                        <span>Màu: Trắng | Size: M</span>
+                        <span class="review-time">1 ngày trước</span>
+                    </div>
+                    <div class="review-content">
+                        Áo đẹp nhưng hơi bị xù lông sau 2 lần giặt. Nhân viên tư vấn nhiệt tình.
+                    </div>
+                    <div class="review-images">
+                        <img src="https://down-vn.img.susercontent.com/file/vn-11134103-7r98o-lvy57i707xspb5.webp" alt="Review 3" class="review-image">
+                        <img src="https://down-vn.img.susercontent.com/file/vn-11134103-7ras8-m4xaltgp9suv36.webp" alt="Review 3" class="review-image">
+                    </div>
+                </div>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="reviewer-name">Phạm Minh C</div>
+                        <div class="review-stars">★★★★★</div>
+                    </div>
+                    <div class="review-meta">
+                        <span>Màu: Xám | Size: XL</span>
+                        <span class="review-time">3 ngày trước</span>
+                    </div>
+                    <div class="review-content">
+                        Áo đẹp hơn mong đợi, form dáng chuẩn, vải dày dặn. Rất đáng tiền!
+                    </div>
+                </div>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="reviewer-name">Lê Thị D</div>
+                        <div class="review-stars">★★★☆☆</div>
+                    </div>
+                    <div class="review-meta">
+                        <span>Màu: Xanh navy | Size: M</span>
+                        <span class="review-time">4 ngày trước</span>
+                    </div>
+                    <div class="review-content">
+                        Chất liệu ổn nhưng giao hàng hơi chậm. Shop nên cải thiện khâu vận chuyển.
+                    </div>
+                </div>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="reviewer-name">Ngô Quang E</div>
+                        <div class="review-stars">★★★★☆</div>
+                    </div>
+                    <div class="review-meta">
+                        <span>Màu: Trắng | Size: S</span>
+                        <span class="review-time">5 ngày trước</span>
+                    </div>
+                    <div class="review-content">
+                        Mua lần 2 rồi, sản phẩm vẫn chất lượng. Tuy nhiên lần này bao bì hơi cẩu thả.
+                    </div>
+                </div>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="reviewer-name">Đặng Kim F</div>
+                        <div class="review-stars">★★☆☆☆</div>
+                    </div>
+                    <div class="review-meta">
+                        <span>Màu: Be | Size: M</span>
+                        <span class="review-time">1 tuần trước</span>
+                    </div>
+                    <div class="review-content">
+                        Áo bị lệch đường may, mặc vào không vừa như bảng size. Hơi thất vọng.
+                    </div>
+                </div>
+
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="reviewer-name">Vũ Thanh G</div>
+                        <div class="review-stars">★★★★★</div>
+                    </div>
+                    <div class="review-meta">
+                        <span>Màu: Đen | Size: L</span>
+                        <span class="review-time">6 ngày trước</span>
+                    </div>
+                    <div class="review-content">
+                        Tư vấn siêu nhiệt tình, đặt nhầm size vẫn được hỗ trợ đổi nhanh chóng.
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="otherProduct">
+        <div class="otherProduct-title">
+            <h4>Sản phẩm tương tự</h4>
+        </div>
+        <section class="ot-products-section">
+            <div class="ot-products-list">
+                <!-- Product 1 -->
+                <div class="ot-product-container">
+                    <div class="ot-product-wrapper">
+                        <div class="ot-product-info">
+                            <div class="ot-labels-container">
+                                <div class="ot-new-label">NEW</div>
+                                <div class="ot-discount-label">-10%</div>
+                            </div>
+                            <div class="ot-product-title">Áo Polo H&M</div>
+                            <div class="ot-color-options">
+                                <div class="ot-color-circle" style="background-color: #201714;"></div>
+                                <div class="ot-color-circle" style="background-color: #e1d5bc;"></div>
+                                <div class="ot-color-circle" style="background-color: #656565;"></div>
+                            </div>
+                            <div class="ot-price-container">
+                                <span class="ot-sale-price">900.000đ</span>
+                                <span class="ot-original-price">1.000.000đ</span>
+                            </div>
+                            <button class="ot-favorite-btn"><i class="ot-far ot-fa-heart"></i></button>
+                        </div>
+                        <div class="ot-product-image-container">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                 alt="Áo Polo H&M" class="ot-product-image">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="ot-product-container">
+                    <div class="ot-product-wrapper">
+                        <div class="ot-product-info">
+                            <div class="ot-labels-container">
+                                <div class="ot-new-label">HOT</div>
+                            </div>
+                            <div class="ot-product-title">Áo thun in hình Loose Fit</div>
+                            <div class="ot-color-options">
+                                <div class="ot-color-circle" style="background-color: #ffffff;"></div>
+                                <div class="ot-color-circle" style="background-color: #1abc9c;"></div>
+                            </div>
+                            <div class="ot-price-container">
+                                <span class="ot-sale-price">1.200.000đ</span>
+                            </div>
+                            <button class="ot-favorite-btn"><i class="ot-far ot-fa-heart"></i></button>
+                        </div>
+                        <div class="ot-product-image-container">
+                            <img src="https://image.hm.com/assets/hm/fc/11/fc11cb1d40fd52a00d3cd74e3bb5faeab85fc0c6.jpg"
+                                 alt="Áo thun in hình Loose Fit" class="ot-product-image">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="ot-product-container">
+                    <div class="ot-product-wrapper">
+                        <div class="ot-product-info">
+                            <div class="ot-labels-container">
+                                <div class="ot-discount-label">-20%</div>
+                            </div>
+                            <div class="ot-product-title">Quần short kiểu may đo Loose Fit</div>
+                            <div class="ot-color-options">
+                                <div class="ot-color-circle" style="background-color: #e1d5bc;"></div>
+                                <div class="ot-color-circle" style="background-color: #f1c40f;"></div>
+                                <div class="ot-color-circle" style="background-color: #e67e22;"></div>
+                                <div class="ot-color-circle" style="background-color: #95a5a6;"></div>
+                            </div>
+                            <div class="ot-price-container">
+                                <span class="ot-sale-price">200.000đ</span>
+                                <span class="ot-original-price">250.000đ</span>
+                            </div>
+                            <button class="ot-favorite-btn"><i class="ot-far ot-fa-heart"></i></button>
+                        </div>
+                        <div class="ot-product-image-container">
+                            <img src="https://image.hm.com/assets/hm/28/c4/28c47288852c92a93b7129b59c60c37d84c06d1a.jpg"
+                                 alt="Quần short kiểu may đo Loose Fit" class="ot-product-image">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="ot-product-container">
+                    <div class="ot-product-wrapper">
+                        <div class="ot-product-info">
+                            <div class="ot-labels-container">
+                                <div class="ot-new-label">NEW</div>
+                                <div class="ot-discount-label">-15%</div>
+                            </div>
+                            <div class="ot-product-title">Áo ba lỗ Loose Fit</div>
+                            <div class="ot-color-options">
+                                <div class="ot-color-circle" style="background-color: #ffffff;"></div>
+                                <div class="ot-color-circle" style="background-color: #16a085;"></div>
+                                <div class="ot-color-circle" style="background-color: #000000;"></div>
+                            </div>
+                            <div class="ot-price-container">
+                                <span class="ot-sale-price">1.500.000đ</span>
+                                <span class="ot-original-price">1.800.000đ</span>
+                            </div>
+                            <button class="ot-favorite-btn"><i class="ot-far ot-fa-heart"></i></button>
+                        </div>
+                        <div class="ot-product-image-container">
+                            <img src="https://image.hm.com/assets/hm/49/7b/497baceee10bcacd2973a7a21b1775c4b1c6ae88.jpg"
+                                 alt="Áo ba lỗ Loose Fit" class="ot-product-image">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 5 -->
+                <div class="ot-product-container">
+                    <div class="ot-product-wrapper">
+                        <div class="ot-product-info">
+                            <div class="ot-product-title">Quần Short Thể Thao</div>
+                            <div class="ot-color-options">
+                                <div class="ot-color-circle" style="background-color: #27ae60;"></div>
+                                <div class="ot-color-circle" style="background-color: #2980b9;"></div>
+                            </div>
+                            <div class="ot-price-container">
+                                <span class="ot-sale-price">350.000đ</span>
+                            </div>
+                            <button class="ot-favorite-btn"><i class="ot-far ot-fa-heart"></i></button>
+                        </div>
+                        <div class="ot-product-image-container">
+                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
+                                 alt="Quần Short Thể Thao" class="ot-product-image">
+                        </div>
+                    </div>
+                </div>
+                <div class="viewAll">
+                    <h5>Xem tất cả</h5>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Modal filter -->
+<div id="filterModal" class="filter-modal">
+    <div class="modal-content">
+        <h3>Lọc đánh giá</h3>
+
+        <div class="filter-group">
+            <h4>Số sao</h4>
+            <div class="star-filters">
+                <div class="star-filter">
+                    <input type="checkbox" id="star5" value="5">
+                    <label for="star5">5</label>
+                </div>
+                <div class="star-filter">
+                    <input type="checkbox" id="star4" value="4">
+                    <label for="star4">4</label>
+                </div>
+                <div class="star-filter">
+                    <input type="checkbox" id="star3" value="3">
+                    <label for="star3">3</label>
+                </div>
+                <div class="star-filter">
+                    <input type="checkbox" id="star2" value="2">
+                    <label for="star2">2</label>
+                </div>
+                <div class="star-filter">
+                    <input type="checkbox" id="star1" value="1">
+                    <label for="star1">1</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h4>Đánh giá có ảnh</h4>
+            <label class="toggle-switch">
+                <input type="checkbox" id="hasImage">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="filter-group">
+            <h4>Màu sắc</h4>
+            <div class="color-filters">
+                <div>
+                    <input type="checkbox" id="colorBlack" value="Đen">
+                    <label for="colorBlack">Đen</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="colorWhite" value="Trắng">
+                    <label for="colorWhite">Trắng</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="colorGray" value="Xám">
+                    <label for="colorGray">Xám</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="colorMint" value="Xanh">
+                    <label for="colorGray">Xanh bạc hà</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h4>Size</h4>
+            <div class="size-filters">
+                <div>
+                    <input type="checkbox" id="sizeS" value="S">
+                    <label for="sizeS">S</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="sizeM" value="M">
+                    <label for="sizeM">M</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="sizeL" value="L">
+                    <label for="sizeL">L</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="sizeXL" value="XL">
+                    <label for="sizeXL">XL</label>
+                </div>
+            </div>
+        </div>
+
+        <button class="apply-btn" onclick="applyFilters()">Áp dụng</button>
+    </div>
+</div>
+
+
+<!--Modal zoom ảnh-->
+<!-- Thêm modal phóng to -->
+<div class="image-zoom-modal">
+    <span class="close-zoom-modal">&times;</span>
+    <div class="zoom-modal-content">
+        <img class="zoom-modal-image" src="" alt="">
     </div>
 </div>
 
@@ -281,12 +1313,13 @@
                 },
                 {
                     name: "DARK GRAY",
-                    mainImage: "https://image.hm.com/assets/hm/8e/6f/8e6f72b18865f9ac5109f16b11cd52cb9f8d8711.jpg",
+                    mainImage: "https://image.hm.com/assets/hm/bd/ca/bdca880c800fd893362646021b45a2bc8d4ce6a8.jpg",
                     secondaryImages: [
                         "https://image.hm.com/assets/hm/bd/ca/bdca880c800fd893362646021b45a2bc8d4ce6a8.jpg",
                         "https://image.hm.com/assets/hm/5e/47/5e47831cd605e47a2ca36d60b55a20399567e61e.jpg",
                         "https://image.hm.com/assets/hm/35/05/35055597bd6b3d98a38d0e27d2acf39f69c32072.jpg",
                         "https://image.hm.com/assets/hm/be/ae/beaef270b4de6527d636de9a305ba331d14f4a6b.jpg",
+                        "https://image.hm.com/assets/hm/8e/6f/8e6f72b18865f9ac5109f16b11cd52cb9f8d8711.jpg",
                         "https://image.hm.com/assets/hm/02/5c/025c37ac03f8b8f9cbe0f48b522d030d0b7ea153.jpg"
                     ]
                 },
@@ -499,6 +1532,254 @@
 
         // Khởi tạo trang
         initPage();
+    });
+
+
+
+    document.querySelectorAll('.qty-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.parentNode.querySelector('.qty-input');
+            let value = parseInt(input.value);
+
+            if (this.classList.contains('minus') && value > 1) {
+                value--;
+            } else if (this.classList.contains('plus')) {
+                value++;
+            }
+
+            input.value = value;
+        });
+    });
+</script>
+
+<!--Xử lý chọn size-->
+<script>
+    document.querySelectorAll('.size-option:not(.out-of-stock)').forEach(option => {
+        option.addEventListener('click', function() {
+            // Bỏ chọn tất cả các option trước
+            document.querySelectorAll('.size-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // Chọn option hiện tại
+            this.classList.add('selected');
+
+            // Có thể thêm code để lưu size được chọn nếu cần
+            const selectedSize = this.getAttribute('data-size');
+            console.log('Size selected:', selectedSize);
+        });
+    });
+
+
+    document.querySelectorAll('.quantity-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.parentNode.querySelector('.quantity-input');
+            let value = parseInt(input.value);
+
+            if (this.classList.contains('minus') && value > 1) {
+                value--;
+            } else if (this.classList.contains('plus')) {
+                value++;
+            }
+
+            input.value = value;
+            // Có thể thêm code cập nhật giỏ hàng ở đây
+        });
+    });
+</script>
+
+<!--Xử lý filter-->
+<script>
+    // Mở modal filter
+    function openFilterModal() {
+        document.getElementById('filterModal').style.display = 'block';
+    }
+
+    // Đóng modal filter
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('filterModal')) {
+            document.getElementById('filterModal').style.display = 'none';
+        }
+    }
+
+    // Áp dụng filter
+    function applyFilters() {
+        // Logic lọc đánh giá ở đây
+        console.log('Áp dụng filter');
+
+        // Hiển thị nút hủy lọc
+        document.querySelector('.clear-filter').style.display = 'block';
+
+        // Đóng modal
+        document.getElementById('filterModal').style.display = 'none';
+    }
+
+    // Hủy lọc
+    function clearFilters() {
+        // Reset tất cả filter
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        // Ẩn nút hủy lọc
+        document.querySelector('.clear-filter').style.display = 'none';
+
+        // Hiển thị lại tất cả đánh giá
+        console.log('Hủy lọc');
+    }
+</script>
+
+<!--Hiệu ứng cho nut favorite-->
+<script>
+    // Xử lý nút yêu thích
+    $('.ot-favorite-btn').click(function (e) {
+        e.stopPropagation();
+        const icon = $(this).find('i');
+        if (icon.hasClass('far')) {
+            icon.removeClass('far').addClass('fas');
+            $(this).css('color', '#ff4757');
+        } else {
+            icon.removeClass('fas').addClass('far');
+            $(this).css('color', '#333');
+        }
+    });
+</script>
+<!--Hiệu ứng rớt từng ô màu-->
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lặp qua tất cả các product-wrapper
+        document.querySelectorAll('.ot-product-wrapper').forEach(wrapper => {
+            const colorCircles = wrapper.querySelectorAll('.ot-color-circle');
+
+            // Nếu có các color-circle
+            if (colorCircles.length > 0) {
+                // Thêm style động cho mỗi circle
+                colorCircles.forEach((circle, index) => {
+                    const delay = (index + 1) * 0.1; // 0.1s, 0.2s, 0.3s,...
+                    circle.style.transitionDelay = `${delay}s`;
+                });
+
+                // Thêm style cho wrapper (tùy chọn)
+                const maxDelay = (colorCircles.length) * 0.1;
+                wrapper.style.setProperty('--max-transition-delay', `${maxDelay}s`);
+            }
+        });
+    });
+</script>
+
+<!--script zoom ảnh-->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const reviewImages = document.querySelectorAll('.review-image');
+        const zoomModal = document.querySelector('.image-zoom-modal');
+        const zoomModalImg = document.querySelector('.zoom-modal-image');
+        const closeModal = document.querySelector('.close-zoom-modal');
+
+        let currentScale = 1;
+        let isDragging = false;
+        let startPos = { x: 0, y: 0 };
+        let translatePos = { x: 0, y: 0 };
+
+        // Mở modal khi click vào ảnh
+        reviewImages.forEach(img => {
+            img.addEventListener('click', function() {
+                zoomModal.style.display = 'flex';
+                zoomModalImg.src = this.src;
+                zoomModalImg.alt = this.alt;
+                resetImageState();
+            });
+        });
+
+        // Đóng modal
+        closeModal.addEventListener('click', closeModalHandler);
+        zoomModal.addEventListener('click', function(e) {
+            if (e.target === zoomModal) {
+                closeModalHandler();
+            }
+        });
+
+        // Zoom ảnh bằng chuột
+        zoomModalImg.addEventListener('wheel', function(e) {
+            e.preventDefault();
+
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            const newScale = Math.max(0.5, Math.min(3, currentScale + delta));
+
+            // Tính toán zoom dựa trên vị trí con trỏ
+            const rect = zoomModalImg.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left - translatePos.x;
+            const offsetY = e.clientY - rect.top - translatePos.y;
+
+            // Cập nhật vị trí để zoom tại điểm con trỏ
+            translatePos.x -= (offsetX * (newScale / currentScale - 1));
+            translatePos.y -= (offsetY * (newScale / currentScale - 1));
+
+            currentScale = newScale;
+            updateImageTransform();
+            updateCursorStyle();
+        });
+
+        // Xử lý kéo ảnh
+        zoomModalImg.addEventListener('mousedown', function(e) {
+            if (currentScale > 1) {
+                isDragging = true;
+                startPos = {
+                    x: e.clientX - translatePos.x,
+                    y: e.clientY - translatePos.y
+                };
+                zoomModalImg.classList.add('grabbing');
+                e.preventDefault(); // Ngăn chặn selection text
+            }
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+
+            translatePos.x = e.clientX - startPos.x;
+            translatePos.y = e.clientY - startPos.y;
+            updateImageTransform();
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                zoomModalImg.classList.remove('grabbing');
+                updateCursorStyle();
+            }
+        });
+
+        // Đóng bằng phím ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModalHandler();
+            }
+        });
+
+        // Cập nhật transform cho ảnh
+        function updateImageTransform() {
+            zoomModalImg.style.transform = `scale(${currentScale}) translate(${translatePos.x}px, ${translatePos.y}px)`;
+        }
+
+        // Cập nhật cursor style
+        function updateCursorStyle() {
+            zoomModalImg.classList.toggle('can-drag', currentScale > 1);
+        }
+
+        // Reset trạng thái ảnh
+        function resetImageState() {
+            currentScale = 1;
+            translatePos = { x: 0, y: 0 };
+            updateImageTransform();
+            zoomModalImg.classList.remove('grabbing', 'can-drag');
+        }
+
+        // Xử lý đóng modal
+        function closeModalHandler() {
+            zoomModal.style.display = 'none';
+            resetImageState();
+        }
     });
 </script>
 </body>
