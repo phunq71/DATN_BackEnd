@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quét QR thanh toán</title>
+
+</head>
+<body>
+<style>
+  .qrPay {
+    font-family: 'Arial', sans-serif;
+    margin: 0 auto;
+    margin-top: 70px;
+    margin-bottom: 120px;
+    padding: 20px;
+    color: #333;
+  }
+  .q-header {
+    display: flex;
+    /*justify-content: right;*/
+    align-items: center;
+    gap: 10px;
+  }
+  .q-logo {
+    height: 30px;
+  }
+  .q-container {
+    display: flex;
+    gap: 20px;
+  }
+  .q-left-col {
+    flex: 1;
+  }
+  .q-right-col {
+    flex: 1;
+  }
+  .q-title {
+    color: #2c3e50;
+    font-size: 24px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  .q-qr-container {
+    margin: 20px auto;
+    padding: 15px;
+    border: 1px solid #eee;
+
+    background: white;
+    text-align: center;
+  }
+  .q-qr-code {
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+    display: block;
+  }
+  .q-amount {
+    font-size: 28px;
+    font-weight: bold;
+    color: #26b044;
+    margin: 15px 0;
+    /*text-align: center;*/
+  }
+  .q-order-info {
+    background: #f9f9f9;
+    padding: 15px;
+
+    margin: 20px 0;
+    position: relative;
+  }
+  .q-order-id {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .q-copy-btn {
+    background: #e9ecef;
+    border: none;
+    padding: 4px 8px;
+
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 10px;
+  }
+  .q-copy-btn:hover {
+    background: #dee2e6;
+  }
+  .q-timer {
+    font-size: 18px;
+    color: #e74c3c;
+    margin: 15px 0;
+    text-align: center;
+  }
+  .q-instructions {
+    background: #f9f9f9;
+    padding: 15px;
+
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .q-status {
+    font-size: 18px;
+    padding: 10px;
+    margin: 15px 0;
+    text-align: center;
+  }
+  .q-pending {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  .q-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .q-expired {
+    background-color: #e9ecef;  /* Màu xám nhạt */
+    color: #495057;            /* Màu xám đậm hơn cho chữ */
+  }
+
+  .q-btn-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .q-btn {
+    display: inline-block;
+    padding: 10px 20px;
+
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+  }
+  .q-btn-primary {
+    background-color: #656565;
+    color: white;
+    border: none;
+  }
+  .q-btn-secondary {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+  .q-btn-download {
+    background-color: #000000;
+    color: white;
+    border: none;
+    margin-top: 10px;
+    display: inline-block;
+  }
+  .q-support-link {
+    font-size: 12px;
+    color: #7f8c8d;
+    margin-top: 30px;
+    display: block;
+    text-align: center;
+  }
+  .q-alternative {
+    margin-top: 5px;
+    text-align: center;
+  }
+  .q-alternative-btn {
+    background: none;
+    border: none;
+    color: #3498db;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .q-bank-transfer {
+    background: #f0f8ff;
+    padding: 15px;
+
+    margin: 15px 0;
+    font-size: 14px;
+    display: none;
+  }
+  .q-bank-info {
+    margin-top: 10px;
+    padding: 10px;
+    background: white;
+
+    border: 1px solid #ddd;
+  }
+  .q-bank-transfer.active {
+    display: block;
+  }
+</style>
+<div class="qrPay">
+  <h1 class="q-title">Quét QR để thanh toán hoàn tất đặt hàng</h1>
+
+  <div class="q-container">
+    <!-- Cột trái - Mã QR và thông tin thanh toán -->
+    <div class="q-left-col">
+      <div class="q-qr-container">
+        <div class="q-header">
+          <img src="/logo/Opulentia.jpg" alt="Shop Logo" class="q-logo">
+          <img src="https://sepay.vn//assets/img/logo/sepay-blue-154x50.png" alt="SePay Logo" class="q-logo">
+        </div>
+        <img src="https://th.bing.com/th/id/R.dcf4b6e228aef80dd1a58f4c76f07128?rik=Qj2LybacmBALtA&riu=http%3a%2f%2fpngimg.com%2fuploads%2fqr_code%2fqr_code_PNG25.png&ehk=eKH2pdoegouCUxO1rt6BJXt4avVYywmyOS8biIPp5zc%3d&risl=&pid=ImgRaw&r=0" alt="Mã QR thanh toán" class="q-qr-code">
+        <a href="https://th.bing.com/th/id/R.dcf4b6e228aef80dd1a58f4c76f07128?rik=Qj2LybacmBALtA&riu=http%3a%2f%2fpngimg.com%2fuploads%2fqr_code%2fqr_code_PNG25.png&ehk=eKH2pdoegouCUxO1rt6BJXt4avVYywmyOS8biIPp5zc%3d&risl=&pid=ImgRaw&r=0" download="QR_ThanhToan" class="q-btn q-btn-download">Tải mã QR</a>
+      </div>
+
+
+
+<!--      <div class="q-timer" id="q-countdown">05:00</div>-->
+    </div>
+
+    <!-- Cột phải - Hướng dẫn và trạng thái -->
+    <div class="q-right-col">
+      <div class="q-order-info">
+        <p><strong>ID đơn hàng:</strong>
+          <span class="q-order-id">
+          <span id="orderId">DH20230615001</span>
+          <button class="q-copy-btn" onclick="copyOrderId()">Copy</button>
+        </span>
+        </p>
+      </div>
+      <div class="q-instructions">
+        <p><strong>Hướng dẫn thanh toán:</strong></p>
+        <ol>
+          <li>Mở ứng dụng ngân hàng hoặc ví điện tử</li>
+          <li>Chọn tính năng quét mã QR</li>
+          <li>Quét mã QR trên màn hình</li>
+          <li>Kiểm tra thông tin và xác nhận thanh toán</li>
+        </ol>
+      </div>
+      <div class="q-amount">₫5.121.000</div>
+      <div class="q-status q-pending">Đang chờ thanh toán</div>
+
+<!--      <div class="q-btn-group">-->
+<!--        <button class="q-btn q-btn-primary" id="q-checkStatus">Kiểm tra trạng thái</button>-->
+<!--        <a href="#" class="q-btn q-btn-secondary">Quay lại trang chủ</a>-->
+<!--      </div>-->
+    </div>
+  </div>
+
+  <!-- Phần chuyển khoản (ẩn ban đầu) -->
+  <div class="q-alternative">
+    <button class="q-alternative-btn" onclick="toggleBankTransfer()">Phương án thanh toán khác ▼</button>
+  </div>
+
+  <div id="bankTransfer" class="q-bank-transfer">
+    <p><strong>Hướng dẫn chuyển khoản:</strong></p>
+    <ol>
+      <li>Mở ứng dụng ngân hàng trên điện thoại hoặc máy tính</li>
+      <li>Chọn chức năng chuyển khoản</li>
+      <li>Nhập thông tin tài khoản ngân hàng bên dưới</li>
+      <li>Nhập số tiền <strong>₫5.121.000</strong></li>
+      <li>Nội dung chuyển khoản: <strong>DH20230615001</strong></li>
+      <li>Kiểm tra và xác nhận giao dịch</li>
+    </ol>
+
+    <div class="q-bank-info">
+      <p><strong>Thông tin tài khoản:</strong></p>
+      <p>Ngân hàng: <strong>Vietcombank</strong></p>
+      <p>Số tài khoản: <strong>0123456789</strong></p>
+      <p>Tên tài khoản: <strong>Công ty TNHH Opulentia</strong></p>
+      <p>Chi nhánh: <strong>Hồ Chí Minh</strong></p>
+    </div>
+
+    <div class="q-instructions">
+      <p><strong>Lưu ý quan trọng:</strong></p>
+      <ul>
+        <li>Vui lòng chuyển khoản chính xác số tiền <strong>₫5.121.000</strong></li>
+        <li>Nội dung chuyển khoản phải ghi rõ <strong>ID đơn hàng</strong></li>
+        <li>Thời gian xử lý: 5-15 phút sau khi chuyển khoản</li>
+        <li>Kiểm tra lại thông tin tài khoản trước khi chuyển tiền</li>
+      </ul>
+    </div>
+  </div>
+
+<!--  <a href="/support" class="q-support-link">Cần hỗ trợ? Liên hệ chúng tôi</a>-->
+
+  <script>
+    // Countdown timer
+    function startTimer(duration, display) {
+      let timer = duration, minutes, seconds;
+      const interval = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+          clearInterval(interval);
+          display.textContent = "Hết hạn";
+          document.querySelector('.q-status').className = 'q-status q-expired';
+          document.querySelector('.q-status').textContent = 'Mã đã hết hạn';
+        }
+      }, 1000);
+    }
+
+    // Copy order ID function
+    function copyOrderId() {
+      const orderId = 'DH20230615001';
+      navigator.clipboard.writeText(orderId).then(() => {
+        // alert('Đã copy ID đơn hàng: ' + orderId);
+      }).catch(err => {
+        // console.error('Lỗi khi copy: ', err);
+      });
+    }
+
+    // Toggle bank transfer section
+    function toggleBankTransfer() {
+      const bankTransfer = document.getElementById('bankTransfer');
+      const btn = document.querySelector('.q-alternative-btn');
+
+      bankTransfer.classList.toggle('active');
+      if (bankTransfer.classList.contains('active')) {
+        btn.innerHTML = 'Phương án thanh toán khác ▲';
+      } else {
+        btn.innerHTML = 'Phương án thanh toán khác ▼';
+      }
+    }
+
+    window.onload = function () {
+      const fiveMinutes = 60 * 5,
+              display = document.querySelector('#q-countdown');
+      startTimer(fiveMinutes, display);
+    };
+
+    // Simulate payment status check
+    // document.getElementById('q-checkStatus').addEventListener('click', function() {
+    //   alert('Đang kiểm tra trạng thái thanh toán...');
+    // });
+  </script>
+</div>
+</body>
+</html>

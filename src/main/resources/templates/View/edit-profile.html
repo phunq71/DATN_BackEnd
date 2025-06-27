@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<style>
+    /* Sidebar */
+    .e-sidebar {
+        min-height: 100vh;
+        background-color: #fff;
+    }
+
+    .e-sidebar-nav a {
+        color: #000;
+        text-decoration: none;
+        display: block;
+        padding: 10px 20px;
+        transition: background 0.2s ease;
+        font-size: 15px;
+        border-radius: 4px;
+    }
+
+    .e-sidebar-nav a:hover,
+    .e-sidebar-nav a.active {
+        background-color: #f2f2f2;
+        font-weight: 500;
+    }
+
+    .e-sub-link {
+        padding-left: 40px;
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    .e-toggle {
+        cursor: pointer;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 4px;
+        background-color: transparent;
+    }
+
+    .e-toggle:hover {
+        background-color: #f8f9fa;
+    }
+
+    .e-toggle i.fas.fa-chevron-down {
+        display: none;
+    }
+
+    .e-profile-pic {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border: 2px solid #ddd;
+    }
+
+    .e-form-label {
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: inline-block;
+    }
+
+    .e-btn-black {
+        background-color: #000;
+        color: white;
+        padding: 8px 25px;
+        border: none;
+        border-radius: 4px;
+    }
+
+    .e-btn-black:hover {
+        background-color: #333;
+        color: white;
+    }
+
+    .e-form-section {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
+
+    .e-form-icon {
+        width: 24px;
+        display: inline-block;
+        text-align: center;
+        margin-right: 8px;
+        color: #000;
+    }
+
+    .e-input-group {
+        margin-bottom: 20px;
+    }
+
+    /* New form control styles */
+    .e-form-control {
+        display: block;
+        width: 100%;
+        padding: 8px 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #000;
+        background-color: transparent;
+        background-clip: padding-box;
+        border: none;
+        border-bottom: 1px solid #ced4da;
+        transition: box-shadow 0.15s ease-in-out;
+    }
+
+    .e-form-control:focus {
+        border-bottom: 1px solid #ced4da; /* Giữ nguyên border */
+        box-shadow: 0 2px 0 0 #000; /* Thêm shadow phía dưới */
+        outline: 0;
+    }
+
+    .e-form-control:hover {
+        background-color: #f8f9fa;
+        border-bottom: 1.5px solid #000;
+    }
+
+    /* Select styles */
+    .e-form-select {
+        display: block;
+        width: 100%;
+        padding: 8px 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #000;
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid #ced4da;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0 center;
+        background-size: 16px 12px;
+    }
+
+    .e-form-select:hover {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #000;
+    }
+
+    .e-form-select:focus {
+        outline: 0;
+        border-bottom: 2px solid #000;
+    }
+
+    /* Radio button styles */
+    .form-check-input {
+        margin-top: 0.3em;
+    }
+
+    .form-check-label {
+        margin-left: 5px;
+    }
+
+    /* Date input style */
+    input[type="date"].e-form-control {
+        padding-right: 0;
+    }
+
+    /* Avatar upload */
+    .col-md-4.text-center input[type="file"] {
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    .text-muted.small {
+        font-size: 13px;
+    }
+
+    /* Tiêu đề */
+    h4 {
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    p {
+        margin-bottom: 25px;
+        font-size: 14px;
+        color: #555;
+    }
+
+    /* Fix spacing toàn bộ input nhóm */
+    label.e-form-label,
+    label.form-label {
+        margin-bottom: 6px;
+    }
+
+    /* Đường kẻ dọc ngăn cách bên trái và phải */
+    .e-form-section .col-md-8 {
+        border-right: 1px solid #ddd;
+        padding-right: 30px;
+    }
+
+    .all {
+        color: #000;
+        margin-top: 50px;
+    }
+
+    .main-content {
+        margin-top: 50px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 20px;
+        max-width: 1200px;
+        background-color: #fff;
+        /*border: 1px solid #ddd;*/
+        padding-bottom: 0;
+        margin-bottom: 0;
+        height: 650px;
+    }
+
+    .e-form-section:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+
+    form {
+        margin-bottom: 0;
+    }
+
+    /*.form-control:focus,*/
+    /*.e-address-text:focus,*/
+    /*.form-select:focus {*/
+    /*    outline: none !important;*/
+    /*    box-shadow: none !important;*/
+    /*    background-color: transparent;*/
+    /*}*/
+
+    .e-address-select select:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .form-check-input:checked {
+        background-color: #000000;
+        border-color: #171717;
+    }
+
+    #chooseImageBtn {
+        padding: 8px 16px;
+        background-color: #000000;
+        color: white;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    #chooseImageBtn:hover {
+        background-color: #707070;
+    }
+
+    .btn, .form-control{
+        border-radius: 0 !important;
+    }
+</style>
+
+
+<div class="container-fluid all">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 e-sidebar p-4">
+            <div class="text-center mb-4">
+                <div class="mt-2 fw-bold" style="font-size: 40px;">Thuong142</div>
+            </div>
+
+            <nav class="e-sidebar-nav">
+                <!-- Menu lớn: Bảo mật -->
+                <a class="e-toggle d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#securityMenu" role="button" aria-expanded="false">
+                    <span><i class="fas fa-shield-alt me-2"></i>Bảo mật</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="collapse ps-3" id="securityMenu">
+                    <a href="#" class="e-sub-link">Đổi mật khẩu</a>
+                    <a href="#" class="e-sub-link">Đổi email/SĐT</a>
+                </div>
+
+                <a href="#" class="active"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a>
+                <a href="#"><i class="fas fa-user-slash me-2"></i>Vô hiệu hóa tài khoản</a>
+
+                <!-- Menu lớn: Thứ hạng -->
+                <a class="e-toggle d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#rankingMenu" role="button" aria-expanded="false">
+                    <span><i class="fas fa-medal me-2"></i>Thứ hạng</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="collapse ps-3" id="rankingMenu">
+                    <a href="#" class="e-sub-link">Thứ hạng</a>
+                    <a href="#" class="e-sub-link">Ưu đãi</a>
+                    <a href="#" class="e-sub-link">Chính sách</a>
+                    <a href="#" class="e-sub-link">Kho voucher</a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 p-4 main-content">
+            <h4>Thông tin cá nhân</h4>
+
+            <form>
+                <div class="e-form-section row">
+                    <div class="col-md-8">
+                        <div class="e-input-group">
+                            <label class="e-form-label">Tên đăng nhập</label>
+                            <input type="text" class="e-form-control" value="Thuong142">
+                        </div>
+
+                        <div class="e-input-group">
+                            <label class="e-form-label">Tên</label>
+                            <input type="text" class="e-form-control" value="Nguyen Thi Hoai Thuong">
+                        </div>
+
+                        <div class="e-input-group">
+                            <label class="e-form-label">Giới tính</label><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="male">
+                                <label class="form-check-label" for="male">Nam</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="female" checked>
+                                <label class="form-check-label" for="female">Nữ</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="other">
+                                <label class="form-check-label" for="other">Khác</label>
+                            </div>
+                        </div>
+
+                        <div class="e-input-group">
+                            <label class="e-form-label">Ngày sinh</label>
+                            <input type="date" class="e-form-control">
+                        </div>
+
+                        <!-- Địa chỉ -->
+                        <div class="e-input-group">
+                            <label class="e-form-label">Địa chỉ</label>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Tỉnh/Thành phố</label>
+                                    <select class="e-form-select">
+                                        <option value="" disabled selected>Chọn</option>
+                                        <option value="">Vũng Tàu</option>
+                                        <option value="hanoi">Hà Nội</option>
+                                        <option value="hcm">TP Hồ Chí Minh</option>
+                                        <option value="danang">Đà Nẵng</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Quận/Huyện</label>
+                                    <select class="e-form-select"><option>Chọn</option></select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Phường/Xã</label>
+                                    <select class="e-form-select"><option>Chọn</option></select>
+                                </div>
+                            </div>
+                            <label class="form-label">Địa chỉ (số nhà, tên đường)</label>
+                            <input type="text" class="e-form-control" placeholder="Nhập địa chỉ cụ thể">
+                        </div>
+
+                        <button type="submit" class="btn e-btn-black mt-3">Lưu</button>
+                    </div>
+
+                    <!-- Avatar -->
+                    <div class="col-md-4 text-center">
+                        <img src="https://jbagy.me/wp-content/uploads/2025/03/anh-avatar-vo-tri-meo-1-768x1024.jpg" class="e-profile-pic mb-3" alt="avatar">
+<!--                        <button id="chooseImageBtn" class="">Chọn ảnh mới</button>-->
+                        <input type="file" id="fileInput" accept="image/*" class="form-control">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chooseImageBtn = document.getElementById('chooseImageBtn');
+        const fileInput = document.getElementById('fileInput');
+
+        // Khi nhấn nút "Chọn ảnh mới", kích hoạt input file
+        chooseImageBtn.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        // Xử lý khi chọn file
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    // Cập nhật ảnh đại diện
+                    document.querySelector('.e-profile-pic').src = event.target.result;
+                };
+
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    });
+</script>
+</body>
+</html>

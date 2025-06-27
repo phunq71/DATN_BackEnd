@@ -40,7 +40,31 @@ public class HomeController {
 	public String cart() {
 		return "View/Cart";
 	}
-//
+
+	@GetMapping("/checkout")
+	public String checkout() {
+		return "View/checkout";
+	}
+
+	@GetMapping("/qrPay")
+	public String qrPay() {
+		return "View/qrPay";
+	}
+
+	@GetMapping("/allOrders")
+	public String allOrders() {
+		return "View/allOrders";
+	}
+
+	@GetMapping("/edit-profile")
+	public String editProfile() {
+		return "View/edit-profile";
+	}
+	@GetMapping("/orderDetail")
+	public String orderDetail() {
+		return "View/orderDetail";
+	}
+	//
 //	@GetMapping("/bottom-navigation")
 //	public String bottomNavigation() {
 //		return "Layout/bottom-navigation";
