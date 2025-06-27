@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đánh giá sản phẩm</title>
+
+</head>
+<body>
+<style>
+  .review {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    margin-top: 80px;
+    margin-bottom: 100px;
+  }
+
+  .rv-review-card {
+    width: 100%;
+    max-width: 80%;
+    background-color: white;
+    padding: 20px;
+    color: #333;
+
+  }
+
+  .rv-product-info {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 15px;
+  }
+
+  .rv-product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-right: 15px;
+  }
+
+  .rv-product-details {
+    flex: 1;
+  }
+
+  .rv-product-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
+
+  .rv-product-color, .rv-product-size {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 3px;
+  }
+
+  .rv-rating-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .rv-rating-label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .rv-stars {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .rv-star {
+    font-size: 24px;
+    color: #ccc;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+  }
+
+  .rv-star:hover, .rv-star.rv-active {
+    color: #ffc107;
+  }
+
+  .rv-star:active {
+    transform: scale(1.3);
+  }
+
+  .rv-image-upload {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .rv-image-upload-label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .rv-image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .rv-image-preview, .rv-add-image-btn {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+  }
+
+  .rv-add-image-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    border: 2px dashed #999;
+    cursor: pointer;
+    color: #999;
+    font-size: 24px;
+    transition: background-color 0.2s;
+  }
+
+  .rv-add-image-btn:hover {
+    background-color: #e0e0e0;
+  }
+
+  .rv-add-image-btn.rv-hidden {
+    display: none;
+  }
+
+  .rv-review-text {
+    margin-bottom: 20px;
+  }
+
+  .rv-review-label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .rv-textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    resize: vertical;
+    font-family: Arial, sans-serif;
+  }
+
+  .rv-submit-btn {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 30%;
+    transition: background-color 0.2s;
+  }
+
+  .rv-submit-btn:hover {
+    background-color: #333;
+  }
+
+
+  .back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: none;
+  }
+
+  .back-button i {
+    color: #191b1f;
+    font-size: 24px;
+    transform: scaleX(-1); /* Lật ngang icon */
+  }
+
+  .back-button:hover {
+    background-color: #f0f0f0; /* Màu hover nhẹ nhàng */
+    transform: translateY(-2px) scale(1.05); /* Thêm hiệu ứng phóng to nhẹ */
+  }
+
+  .back-button:active {
+    background-color: #e1f2ff;
+    transform: translateY(0) scale(0.98); /* Hiệu ứng nhấn xuống */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* Hiệu ứng bóng bên trong */
+  }
+
+  .c-cart-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+</style>
+<div class="review">
+
+  <div class="rv-review-card">
+    <div class="c-cart-title">
+      <button class="back-button" title="Quay lại">
+        <i class="fa-solid fa-share"></i>
+      </button>
+      Đánh giá</div>
+  <!-- Row 1: Product Info -->
+  <div class="rv-product-info">
+    <img src="https://image.hm.com/assets/hm/fc/11/fc11cb1d40fd52a00d3cd74e3bb5faeab85fc0c6.jpg" alt="Product Image" class="rv-product-image">
+    <div class="rv-product-details">
+      <div class="rv-product-name">Áo khoác dạ nam</div>
+      <div class="rv-product-color">Màu: Đen/Xám</div>
+      <div class="rv-product-size">Size: M</div>
+    </div>
+  </div>
+
+  <!-- Row 2: Rating -->
+  <div class="rv-rating-section">
+    <label class="rv-rating-label">Đánh giá của bạn</label>
+    <div class="rv-stars">
+      <span class="rv-star" data-value="1">★</span>
+      <span class="rv-star" data-value="2">★</span>
+      <span class="rv-star" data-value="3">★</span>
+      <span class="rv-star" data-value="4">★</span>
+      <span class="rv-star" data-value="5">★</span>
+    </div>
+  </div>
+
+  <!-- Row 3: Image Upload -->
+  <div class="rv-image-upload">
+    <label class="rv-image-upload-label">Thêm ảnh (tối đa 5)</label>
+    <div class="rv-image-preview-container">
+      <div class="rv-add-image-btn" id="rvAddImageBtn">+</div>
+    </div>
+    <input type="file" id="rvImageUpload" accept="image/*" style="display: none;" multiple>
+  </div>
+
+  <!-- Row 4: Review Text -->
+  <div class="rv-review-text">
+    <label class="rv-review-label">Nhận xét của bạn</label>
+    <textarea class="rv-textarea" placeholder="Hãy chia sẻ cảm nhận về sản phẩm..."></textarea>
+  </div>
+
+  <button class="rv-submit-btn">GỬI ĐÁNH GIÁ</button>
+</div>
+</div>
+<script>
+  // Star rating functionality
+  const rvStars = document.querySelectorAll('.rv-star');
+  let rvCurrentRating = 0;
+
+  rvStars.forEach(star => {
+    star.addEventListener('click', function() {
+      const value = parseInt(this.getAttribute('data-value'));
+      rvCurrentRating = value;
+
+      rvStars.forEach((s, index) => {
+        if (index < value) {
+          s.classList.add('rv-active');
+        } else {
+          s.classList.remove('rv-active');
+        }
+      });
+    });
+
+    star.addEventListener('mouseover', function() {
+      const value = parseInt(this.getAttribute('data-value'));
+
+      rvStars.forEach((s, index) => {
+        if (index < value) {
+          s.style.color = '#ffc107';
+        } else {
+          s.style.color = '#ccc';
+        }
+      });
+    });
+
+    star.addEventListener('mouseout', function() {
+      rvStars.forEach((s, index) => {
+        if (index < rvCurrentRating) {
+          s.style.color = '#ffc107';
+        } else {
+          s.style.color = '#ccc';
+        }
+      });
+    });
+  });
+
+  // Image upload functionality
+  const rvAddImageBtn = document.getElementById('rvAddImageBtn');
+  const rvImageUpload = document.getElementById('rvImageUpload');
+  const rvImagePreviewContainer = document.querySelector('.rv-image-preview-container');
+  let rvUploadedImages = 0;
+  const rvMaxImages = 5;
+
+  rvAddImageBtn.addEventListener('click', function() {
+    rvImageUpload.click();
+  });
+
+  rvImageUpload.addEventListener('change', function(e) {
+    const files = e.target.files;
+    const remainingSlots = rvMaxImages - rvUploadedImages;
+
+    // if (files.length > remainingSlots) {
+    //   alert(`Bạn chỉ có thể thêm tối đa ${remainingSlots} ảnh nữa. Chúng tôi sẽ chỉ lấy ${remainingSlots} ảnh đầu tiên.`);
+    // }
+
+    for (let i = 0; i < Math.min(files.length, remainingSlots); i++) {
+      const file = files[i];
+      if (file.type.match('image.*')) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.className = 'rv-image-preview';
+          rvImagePreviewContainer.insertBefore(img, rvAddImageBtn);
+          rvUploadedImages++;
+
+          if (rvUploadedImages >= rvMaxImages) {
+            rvAddImageBtn.classList.add('rv-hidden');
+          }
+        }
+
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Reset input to allow selecting the same file again
+    rvImageUpload.value = '';
+  });
+</script>
+</body>
+</html>

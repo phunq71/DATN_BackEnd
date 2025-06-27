@@ -69,6 +69,11 @@ public class HomeController {
 	public String RProduct() {
 		return "View/ReturnProduct";
 	}
+
+	@GetMapping("/review")
+	public String review() {
+		return "View/review";
+	}
 	//
 //	@GetMapping("/bottom-navigation")
 //	public String bottomNavigation() {
