@@ -64,6 +64,11 @@ public class HomeController {
 	public String orderDetail() {
 		return "View/orderDetail";
 	}
+
+	@GetMapping("/return")
+	public String RProduct() {
+		return "View/ReturnProduct";
+	}
 	//
 //	@GetMapping("/bottom-navigation")
 //	public String bottomNavigation() {
