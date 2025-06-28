@@ -314,7 +314,6 @@
     body {
         font-family: 'Arial', sans-serif;
         margin: 0;
-        padding: 20px;
         background-color: #f5f5f5;
         color: #333;
     }
@@ -1714,7 +1713,7 @@
             openFilterBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 filterModal.style.display = 'block';
-                preventBodyScroll(true);
+                //preventBodyScroll(true);
                 updateFilterBadge(); // Cập nhật badge khi mở modal
             });
         }
@@ -1821,7 +1820,7 @@
             document.body.style.overflow = 'auto';
 
             const selectedCount = countSelectedFilters();
-            alert(`Bộ lọc đã được áp dụng với ${selectedCount} thuộc tính được chọn!`);
+          //  alert(`Bộ lọc đã được áp dụng với ${selectedCount} thuộc tính được chọn!`);
         });
 
         // Thêm CSS cho badge
