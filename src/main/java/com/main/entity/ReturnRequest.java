@@ -1,7 +1,6 @@
 package com.main.entity;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.Order;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -39,10 +38,6 @@ public class ReturnRequest {
 
     @Column(length = 500, nullable = false)
     private String note;
-
-    @ManyToOne
-    @JoinColumn(name = "StaffID", nullable = false)
-    private Staff staff;
 
     @OneToMany(mappedBy = "returnRequest")
     private List<ReturnItem> returnItems;

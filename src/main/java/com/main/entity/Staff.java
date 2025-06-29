@@ -60,7 +60,7 @@ public class Staff implements Serializable {
     private List<Transaction> approver_transactions;
 
     @OneToMany(mappedBy = "staff")
-    private List<ReturRequest> returRequests;
+    private List<ReturnRequest> returRequests;
 
     @OneToMany(mappedBy = "staff")
     private List<Order> orders;

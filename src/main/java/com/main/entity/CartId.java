@@ -1,15 +1,15 @@
 package com.main.entity;
 
-import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsedVoucherID implements Serializable {
-    private Voucher voucher;
-    private Customer customer;
+public class CartId implements Serializable {
+    private String customer;
+    private Integer item;
 }
