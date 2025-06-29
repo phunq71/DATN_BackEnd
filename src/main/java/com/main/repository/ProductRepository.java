@@ -1,9 +1,9 @@
 package com.main.repository;
 
-import com.main.entity.Account;
+import com.main.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, String> {
+public interface ProductRepository  extends JpaRepository<Product, String> {
 }
