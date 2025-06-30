@@ -21,10 +21,10 @@ public class HomeController {
 //	}
 
 
-	@GetMapping("/index")
-	public String index() {
-		return "View/index";
-	}
+//	@GetMapping("/index")
+//	public String index() {
+//		return "View/index";
+//	}
 //
 //	@GetMapping("/viewAll")
 //	public String viewAll() {
