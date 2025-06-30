@@ -30,6 +30,9 @@ public class InventorySlip implements Serializable {
     @JoinColumn(name = "ToFID")
     private Facility toFacility;
 
+    @Column(name = "Status", nullable = false)
+    private String status;
+
     @Column(name = "CreateDate", nullable = false)
     private LocalDateTime createDate;
 
@@ -46,7 +49,7 @@ public class InventorySlip implements Serializable {
     @Column(name = "Note", length = 500)
     private String note;
 
-    @OneToMany(mappedBy = "Inventory")
+    @OneToMany(mappedBy = "inventorySlip")
     private List<InventorySlipDetail> inventorySlipDetails;
 }
 

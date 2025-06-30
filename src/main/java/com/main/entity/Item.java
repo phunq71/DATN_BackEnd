@@ -18,12 +18,13 @@ public class Item implements Serializable {
     @Column(name = "ItemID")
     private Integer itemId;
 
-    @Column(name = "VariantID", nullable = false, length = 13)
-    private String variantId;
+    @ManyToOne
+    @JoinColumn(name = "VarianID")
+    private Variant variant;
 
     @ManyToOne
     @JoinColumn(name = "SizeID")
-    private Size sizes;
+    private Size size;
 
     @OneToMany(mappedBy = "item")
     private List<InventorySlipDetail> inventorySlipDetails;

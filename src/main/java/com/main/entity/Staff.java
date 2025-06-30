@@ -41,10 +41,10 @@ public class Staff implements Serializable {
     private LocalDate dob;
 
     @ManyToOne
-    @JoinColumn(name = "facilityId")
+    @JoinColumn(name = "FacilityId")
     private Facility facility;
 
-    @OneToMany(mappedBy = "staff")
+    @OneToMany(mappedBy = "manager")
     private List<Facility> facilities;
 
     @OneToMany(mappedBy = "staff")

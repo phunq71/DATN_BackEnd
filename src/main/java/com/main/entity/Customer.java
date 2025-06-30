@@ -51,7 +51,8 @@ public class Customer implements Serializable {
     @OneToMany(mappedBy = "customer")
     private List<Review> reviews;
 
-    @OneToOne(mappedBy = "customer")
+    @OneToOne
+    @JoinColumn(name = "CustomerID")
     private Account account;
 
 }

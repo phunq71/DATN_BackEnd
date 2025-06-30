@@ -21,8 +21,7 @@ public class Review implements Serializable {
     private Integer reviewID;
 
     @ManyToOne
-    @JoinColumn(name = "customerID")
-    @Column(nullable = false)
+    @JoinColumn(name = "CustomerID")
     private Customer customer;
 
     @OneToOne

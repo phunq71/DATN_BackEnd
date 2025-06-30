@@ -2,12 +2,17 @@ package com.main.entity;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "Used_vouchers")
-@IdClass(UsedVoucherID.class)
 public class UsedVoucher implements Serializable {
     @EmbeddedId
     private UsedVoucherID usedVoucherID;
