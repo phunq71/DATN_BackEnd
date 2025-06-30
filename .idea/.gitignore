@@ -7,3 +7,7 @@
 /dataSources/
 /dataSources.local.xml
 /target/
+
+# Ignore environment-specific properties files
+application-dev.properties
+application-prod.properties
