@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 public class CartDTO {
     private String customerID;
-    private String itemID;
+    private int itemID;
     private int quantity;
     private LocalDateTime latestDate;
 }

@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Data
 public class ItemCartDTO {
-    private CartId cartId;
     private Integer itemID;
     private String productName;
     private String variantID;
@@ -22,4 +21,17 @@ public class ItemCartDTO {
     private String sizeCode;
     private BigDecimal price;
     private String mainImage;
+
+    private AvailableOptionDTO availableOption;
+
+    public ItemCartDTO(Integer itemID, String productName, String variantID, String color, Integer sizeID, String sizeCode, BigDecimal price, String mainImage) {
+        this.itemID = itemID;
+        this.productName = productName;
+        this.variantID = variantID;
+        Color = color;
+        this.sizeID = sizeID;
+        this.sizeCode = sizeCode;
+        this.price = price;
+        this.mainImage = mainImage;
+    }
 }

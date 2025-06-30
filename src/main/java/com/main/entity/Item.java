@@ -19,7 +19,7 @@ public class Item implements Serializable {
     private Integer itemId;
 
     @ManyToOne
-    @JoinColumn(name = "VarianID")
+    @JoinColumn(name = "VariantID")
     private Variant variant;
 
     @ManyToOne
