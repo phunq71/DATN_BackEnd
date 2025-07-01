@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<style>
+    .color-options {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 0;
+        position: absolute;
+        overflow: hidden;
+        height: 0;
+        opacity: 0;
+        transition: all 0.3s ease;
+        left: 4%;
+        bottom:20%;
+    }
+
+    .color-circle {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px solid #eee;
+        cursor: pointer;
+        transform: translateY(-30px);
+        transition: transform 0.3s ease;
+    }
+
+    .product-wrapper:hover .color-options {
+        height: auto;
+        opacity: 1;
+    }
+
+    .product-wrapper:hover .color-circle {
+        transform: translateY(0);
+    }
+
+    .banner-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        animation: fadeInDown 1s ease;
+    }
+
+    .banner-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        animation: fadeInUp 1s ease;
+    }
+    .banner-section img{
+        width: 100%;
+        height: auto;
+    }
+    .discount-badge {
+        background-color: #ff4757;
+        color: white;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-size: 1.8rem;
+        font-weight: bold;
+        animation: pulse 2s infinite;
+        box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+    }
+
+    /* Products section */
+    .products-section {
+        padding: 20px 0;
+        background-color: #f8f9fa;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        color: #ffff;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 10px;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: #ff4757;
+    }
+
+    /* Product grid styles */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /*mới thêm để mỗi khối sp cao 100% ô lưới*/
+    .product-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .product-wrapper {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        /*giãn đều nội dung*/
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .product-image {
+        height: 300px;
+        width: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .product-wrapper:hover .product-image {
+        transform: scale(1.05);
+    }
+
+    .new-label {
+        position: absolute;
+        top: 15px;
+        left: 10px;
+        background-color: #000;
+        color: #fff;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 2;
+        transform: rotate(-15deg);
+        transition: all 0.3s ease;
+        border-radius: 3px;
+    }
+
+    .discount-label {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: red;
+        color: white;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        z-index: 2;
+        border-radius: 3px;
+    }
+
+    .product-wrapper:hover .discount-label {
+        font-size: large;
+        padding: 10px 20px;
+    }
+
+    .product-wrapper:hover .new-label {
+        padding: 5px 20px;
+    }
+
+    .product-info {
+        position: relative;
+        bottom: -20px;
+        left: 0;
+        right: 0;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        transform: translateY(100%);
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 1;
+        color: #000;
+    }
+
+
+    .product-wrapper:hover .product-info {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .price-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 14px;
+    }
+
+    .sale-price {
+        font-weight: bold;
+        color: #ff4757;
+        font-size: 16px;
+    }
+
+    .favorite-btn {
+        position: absolute;
+        bottom: 80px;
+        right: 4%;
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #333;
+        font-size: larger;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        z-index: 2;
+        transform: translateY(300%);
+    }
+
+    .product-wrapper:hover .favorite-btn {
+        transform: translateY(0);
+    }
+
+    .favorite-btn:hover {
+        color: #ff4757;
+        transform: scale(1.2) !important;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .banner-title {
+            font-size: 2rem;
+        }
+        .banner-subtitle {
+            font-size: 1.2rem;
+        }
+        .discount-badge {
+            font-size: 1.2rem;
+            padding: 8px 15px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+        }
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+    }
+
+    @media (max-width: 480px) {
+        .banner-title {
+            font-size: 1.5rem;
+        }
+        .banner-subtitle {
+            font-size: 1rem;
+        }
+        .discount-badge {
+            font-size: 1rem;
+        }
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+    }
+
+    /*tên danh mục*/
+
+    .breadcrumb-wrapper {
+        text-align: left;
+        width: 100%;
+        margin-left: 350px;
+        margin-top: 30px;
+    }
+
+    .breadcrumb-full-underline {
+        display: inline-block;
+        border-bottom: 4px solid #070707;
+
+    }
+
+    .breadcrumb-text {
+        font-size: 40px;
+        font-weight: bold;
+        color: #222;
+        text-decoration: none;
+    }
+
+    .breadcrumb-text:hover {
+        color: #484747;
+    }
+
+    .separator {
+        margin: 0 6px;
+        color: #555;
+    }
+
+
+</style>
+
+
+<!--modal filter-->
+<style>
+    /* General Styles */
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        background-color: #f5f5f5;
+        color: #333;
+    }
+
+    /* Filter Button */
+    .filter-button {
+        background-color: #fff;
+        color: #333;
+        border: 1px solid #ddd;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .filter-button:hover {
+        background-color: #f0f0f0;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.3s;
+        overflow: hidden;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        animation: slideIn 0.3s;
+        max-height: 80vh;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 24px;
+        color: #333;
+    }
+
+    .close {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover {
+        color: #333;
+    }
+
+    .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+        padding: 10px 0;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        /*padding-top: 15px;*/
+        border-top: 1px solid #eee;
+    }
+
+    /* Filter Sections */
+    .filter-section {
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
+    .filter-section:last-child {
+        border-bottom: none;
+    }
+
+    .filter-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        font-size: 18px;
+        margin: 0 0 10px 0;
+        padding: 5px 0;
+    }
+
+    .filter-title i {
+        transition: transform 0.3s ease;
+    }
+
+    .filter-options {
+        display: none;
+        padding-left: 10px;
+    }
+
+    .filter-options.show {
+        display: block;
+        animation: fadeIn 0.3s;
+    }
+
+    /* Filter Options */
+    .filter-option {
+        display: block;
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        user-select: none;
+    }
+
+    .filter-option input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .filter-option:hover input ~ .checkmark {
+        background-color: #f0f0f0;
+    }
+
+    .filter-option input:checked ~ .checkmark {
+        background-color: #333;
+        border-color: #333;
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    .filter-option input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    .filter-option .checkmark:after {
+        left: 7px;
+        top: 3px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    /* Size Options */
+    .size-options {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .size-option {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .size-option:hover {
+        background-color: #f0f0f0;
+    }
+
+    .size-option.active {
+        background-color: #333;
+        color: white;
+        border-color: #333;
+    }
+
+    /* Color Options */
+    .color-option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        cursor: pointer;
+        padding-left: 30px;
+        position: relative;
+    }
+
+    .color-option input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .color-box {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        margin-right: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .color-option input:checked ~ .color-box {
+        outline: 2px solid #333;
+        outline-offset: 2px;
+    }
+
+    /* Price Range */
+    .price-range {
+        padding: 10px 0;
+    }
+
+    .price-values {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .range-slider {
+        position: relative;
+        height: 5px;
+        background-color: #ddd;
+        border-radius: 5px;
+        margin: 20px 0;
+    }
+
+    .range-slider input[type="range"] {
+        position: absolute;
+        width: 100%;
+        height: 5px;
+        background: none;
+        pointer-events: none;
+        -webkit-appearance: none;
+        z-index: 2;
+    }
+
+    .range-slider input[type="range"]::-webkit-slider-thumb {
+        height: 18px;
+        width: 18px;
+        border-radius: 50%;
+        background-color: #333;
+        pointer-events: auto;
+        -webkit-appearance: none;
+        cursor: pointer;
+    }
+
+    /* Rating Stars */
+    .rating-stars {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        color: #ffc107;
+        margin-left: 5px;
+    }
+
+    .rating-stars i.far {
+        color: #ddd;
+    }
+
+    /* PromotionRepository Option */
+    .promotion-option {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        cursor: pointer;
+        padding-left: 30px;
+        position: relative;
+    }
+
+    .promotion-option input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* Buttons */
+    .reset-btn, .apply-btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .reset-btn {
+        background-color: #fff;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+    .reset-btn:hover {
+        background-color: #f0f0f0;
+    }
+
+    .apply-btn {
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #333;
+    }
+
+    .apply-btn:hover {
+        background-color: #555;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .filter-badge{
+        text-align: center;
+        font-weight: bold;
+    }
+</style>
+<div class="reels-row">
+    <section class="banner-section">
+        <img src="https://theme.hstatic.net/1000306633/1001194548/14/slideshow_2.jpg?v=383"
+             alt="Khuyến mãi thời trang" class="banner-img">
+        <div class="banner-overlay">
+            <div class="section-header">
+                <div class="breadcrumb-wrapper">
+                    <div class="breadcrumb-full-underline">
+                        <a th:href="@{'/opulentia/' + ${parentCategory} + '/null/0'}" class="breadcrumb-text">
+                            <span th:text="${parentCategoryName}">Danh mục cha</span>
+                        </a>
+                        <span th:if="${childCategoryName != null}">
+                            <span class="separator"> › </span>
+                            <a th:href="@{'/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/0'}" class="breadcrumb-text">
+                                <span th:text="${childCategoryName}">Danh mục con</span>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--        <button id="openFilterBtn" class="filter-button">-->
+        <!--            <i class="fas fa-filter"></i> Bộ lọc-->
+        <!--        </button>-->
+
+
+    </section>
+
+    <section class="products-section">
+        <div class="products-grid">
+            <div class="product-container" th:each="product : ${products}">
+                <a th:href="@{'/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + '?idPro=' + ${product.productID}}" style="text-decoration: none;">
+                    <div class="product-wrapper">
+                        <img th:src="@{'/uploads/' + ${product.mainImageUrl}}" alt="Product" class="product-image">
+                        <div class="new-label">NEW</div>
+                        <div class="discount-label">-10%</div>
+                        <button class="favorite-btn"><i class="far fa-heart"></i></button>
+
+                        <div class="color-options">
+                            <div class="color-circle" style="background-color: #201714;"></div>
+                            <div class="color-circle" style="background-color: #e1d5bc;"></div>
+                            <div class="color-circle" style="background-color: #656565;"></div>
+                        </div>
+
+                        <div class="product-info">
+                            <div th:text="${product.productName}">Tên sản phẩm</div>
+                            <div class="price-container">
+                        <span class="sale-price"
+                              th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 3, 'POINT')} + 'đ'">900.000đ</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <style>
+            /* Container căn giữa */
+            .pagination-container {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                margin: 20px 0;
+            }
+
+            /* Thanh phân trang */
+            .pagination {
+                display: inline-flex;
+                font-family: Arial, sans-serif;
+                padding: 0;
+                margin: 0;
+                border: 1px solid #ddd;
+                background-color: white; /* Nền trắng cho toàn bộ thanh */
+            }
+
+            .pagination a {
+                color: black;
+                padding: 8px 12px;
+                text-decoration: none;
+                border-right: 1px solid #ddd;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 16px;
+            }
+
+            .pagination a:last-child {
+                border-right: none;
+            }
+
+            .pagination a.active {
+                background-color: black;
+                color: white;
+            }
+
+            .pagination a:hover:not(.active) {
+                background-color: #ddd;
+            }
+
+            .pagination i {
+                font-size: 14px;
+            }
+
+            .pagination .gap {
+                padding: 8px 4px;
+                background: #f5f5f5;
+                display: flex;
+                align-items: center;
+                color: #7f8c8d;
+            }
+        </style>
+        <div class="pagination-container">
+            <div class="pagination">
+
+                <!-- First page -->
+                <a th:if="${currentPage > 0}"
+                   th:href="@{'/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + 0}"
+                   title="First">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+
+                <!-- Previous page -->
+                <a th:if="${currentPage > 0}"
+                   th:href="@{('/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + (${currentPage - 1}))}"
+                   title="Previous">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+
+                <!-- Page numbers -->
+                <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+    <a th:href="@{('/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + ${i})}"
+       th:text="${i + 1}"
+       th:classappend="${i == currentPage} ? 'active'">
+    </a>
+</span>
+
+                <!-- Next page -->
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{('/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + (${currentPage + 1}))}"
+                   title="Next">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+
+                <!-- Last page -->
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{('/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + (${totalPages - 1}))}"
+                   title="Last">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+
+            </div>
+        </div>
+
+    </section>
+</div>
+
+
+<!-- Modal Filter -->
+<div id="filterModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Bộ lọc sản phẩm</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <!-- Giới tính -->
+            <div class="filter-section">
+                <h3 class="filter-title">Giới tính <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="gender" value="Nam">
+                        <span class="checkmark"></span> Nam
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="gender" value="Nữ">
+                        <span class="checkmark"></span> Nữ
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="gender" value="Unisex">
+                        <span class="checkmark"></span> Unisex
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="gender" value="Trẻ em">
+                        <span class="checkmark"></span> Trẻ em
+                    </label>
+                </div>
+            </div>
+
+            <!-- Size -->
+            <div class="filter-section">
+                <h3 class="filter-title">Kích cỡ <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <div class="size-options">
+                        <label class="size-option">S</label>
+                        <label class="size-option">M</label>
+                        <label class="size-option">L</label>
+                        <label class="size-option">XL</label>
+                        <label class="size-option">XXL</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Màu sắc -->
+            <div class="filter-section">
+                <h3 class="filter-title">Màu sắc <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <label class="color-option">
+                        <input type="checkbox" name="color" value="Đen">
+                        <span class="color-box" style="background-color: #000;"></span> Đen
+                    </label>
+                    <label class="color-option">
+                        <input type="checkbox" name="color" value="Trắng">
+                        <span class="color-box" style="background-color: #fff; border: 1px solid #ddd;"></span> Trắng
+                    </label>
+                    <label class="color-option">
+                        <input type="checkbox" name="color" value="Xám">
+                        <span class="color-box" style="background-color: #808080;"></span> Xám
+                    </label>
+                    <label class="color-option">
+                        <input type="checkbox" name="color" value="Đỏ">
+                        <span class="color-box" style="background-color: #ff0000;"></span> Đỏ
+                    </label>
+                    <label class="color-option">
+                        <input type="checkbox" name="color" value="Xanh dương">
+                        <span class="color-box" style="background-color: #0000ff;"></span> Xanh dương
+                    </label>
+                </div>
+            </div>
+
+            <!-- Mức giá -->
+            <div class="filter-section">
+                <h3 class="filter-title">Mức giá <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <div class="price-range">
+                        <div class="price-values">
+                            <span id="minPrice">100.000đ</span>
+                            <span id="maxPrice">5.000.000đ</span>
+                        </div>
+                        <div class="range-slider">
+                            <input type="range" min="100000" max="5000000" value="100000" class="slider" id="priceMin">
+                            <input type="range" min="100000" max="5000000" value="5000000" class="slider" id="priceMax">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thương hiệu -->
+            <div class="filter-section">
+                <h3 class="filter-title">Thương hiệu <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="brand" value="Nike">
+                        <span class="checkmark"></span> Nike
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="brand" value="Adidas">
+                        <span class="checkmark"></span> Adidas
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="brand" value="Puma">
+                        <span class="checkmark"></span> Puma
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="brand" value="Gucci">
+                        <span class="checkmark"></span> Gucci
+                    </label>
+                </div>
+            </div>
+
+            <!-- Đánh giá -->
+            <div class="filter-section">
+                <h3 class="filter-title">Đánh giá <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="rating" value="3">
+                        <span class="checkmark"></span>
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i> & up
+                        </div>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="rating" value="4">
+                        <span class="checkmark"></span>
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i> & up
+                        </div>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="rating" value="5">
+                        <span class="checkmark"></span>
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Khuyến mãi -->
+            <!--            <div class="filter-section">-->
+            <!--                <label class="promotion-option">-->
+            <!--                    <input type="checkbox" name="promotion">-->
+            <!--                    <span class="checkmark"></span> Sản phẩm khuyến mãi-->
+            <!--                </label>-->
+            <!--            </div>-->
+        </div>
+        <div class="modal-footer">
+            <button class="reset-btn">Đặt lại</button>
+            <button class="apply-btn">Áp dụng</button>
+        </div>
+    </div>
+</div>
+<!--
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Tìm phần tử giỏ hàng bằng class
+        const cartItem = document.querySelector('.fn-item.fn-item-cart');
+
+        if (cartItem) {
+            // Thêm ID openFilterBtn
+            cartItem.id = 'openFilterBtn';
+
+            // Thay đổi icon từ giỏ hàng sang filter
+            const icon = cartItem.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-shopping-cart');
+                icon.classList.add('fa-filter');
+            }
+
+            // Thêm title/tooltip
+            cartItem.title = "Bộ lọc sản phẩm";
+
+            // Xử lý click để mở modal filter
+            const filterModal = document.getElementById('filterModal');
+            if (filterModal) {
+                cartItem.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    filterModal.style.display = 'block';
+                    preventBodyScroll(true);
+                });
+            }
+
+            // Có thể thêm style nếu cần
+            cartItem.style.cursor = 'pointer';
+        }
+
+        // Hàm ngăn scroll body
+        function preventBodyScroll(prevent) {
+            if (prevent) {
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.width = '100%';
+            } else {
+                document.body.style.overflow = 'auto';
+                document.body.style.position = 'static';
+            }
+        }
+
+        const filterModal = document.getElementById('filterModal');
+        const closeBtn = document.querySelector('.close');
+
+
+        closeBtn.addEventListener('click', function() {
+            filterModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === filterModal) {
+                filterModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Đóng/mở các section filter
+        const filterTitles = document.querySelectorAll('.filter-title');
+
+        filterTitles.forEach(title => {
+            title.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const options = this.nextElementSibling;
+
+                options.classList.toggle('show');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        });
+
+        // Xử lý size option
+        const sizeOptions = document.querySelectorAll('.size-option');
+
+        sizeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+
+        // Xử lý price range slider
+        const priceMin = document.getElementById('priceMin');
+        const priceMax = document.getElementById('priceMax');
+        const minPriceDisplay = document.getElementById('minPrice');
+        const maxPriceDisplay = document.getElementById('maxPrice');
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+        }
+
+        priceMin.addEventListener('input', function() {
+            if (parseInt(this.value) > parseInt(priceMax.value)) {
+                priceMax.value = this.value;
+                maxPriceDisplay.textContent = formatPrice(priceMax.value);
+            }
+            minPriceDisplay.textContent = formatPrice(this.value);
+        });
+
+        priceMax.addEventListener('input', function() {
+            if (parseInt(this.value) < parseInt(priceMin.value)) {
+                priceMin.value = this.value;
+                minPriceDisplay.textContent = formatPrice(priceMin.value);
+            }
+            maxPriceDisplay.textContent = formatPrice(this.value);
+        });
+
+        // Đặt giá trị ban đầu
+        minPriceDisplay.textContent = formatPrice(priceMin.value);
+        maxPriceDisplay.textContent = formatPrice(priceMax.value);
+
+        // Reset button
+        const resetBtn = document.querySelector('.reset-btn');
+
+        resetBtn.addEventListener('click', function() {
+            // Reset checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Reset size options
+            sizeOptions.forEach(option => {
+                option.classList.remove('active');
+            });
+
+            // Reset price range
+            priceMin.value = 100000;
+            priceMax.value = 5000000;
+            minPriceDisplay.textContent = formatPrice(priceMin.value);
+            maxPriceDisplay.textContent = formatPrice(priceMax.value);
+        });
+
+        // Apply button
+        const applyBtn = document.querySelector('.apply-btn');
+
+        applyBtn.addEventListener('click', function() {
+            // Ở đây bạn có thể thêm logic để áp dụng bộ lọc
+            // Ví dụ: thu thập tất cả các giá trị đã chọn và gửi đi
+
+            // Đóng modal sau khi áp dụng
+            filterModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+
+            alert('Bộ lọc đã được áp dụng!');
+        });
+    });
+</script>
+-->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tìm phần tử giỏ hàng bằng class
+        const cartItem = document.querySelector('.fn-item.fn-item-cart');
+
+        if (cartItem) {
+            // Thêm ID openFilterBtn
+            cartItem.id = 'openFilterBtn';
+
+            // Thay đổi icon từ giỏ hàng sang filter
+            const icon = cartItem.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-shopping-cart');
+                icon.classList.add('fa-filter');
+            }
+
+            // Thêm title/tooltip
+            cartItem.title = "Bộ lọc sản phẩm";
+
+            // Thêm badge counter
+            const badge = document.createElement('span');
+            badge.className = 'filter-badge';
+            badge.textContent = '0';
+            cartItem.appendChild(badge);
+
+            // Có thể thêm style nếu cần
+            cartItem.style.cursor = 'pointer';
+            cartItem.style.position = 'relative';
+        }
+
+        // Hàm đếm số thuộc tính được chọn
+        function countSelectedFilters() {
+            let count = 0;
+
+            // Đếm checkbox được chọn (giới tính, màu sắc, thương hiệu, đánh giá, khuyến mãi)
+            count += document.querySelectorAll('input[type="checkbox"]:checked').length;
+
+            // Đếm size được chọn
+            count += document.querySelectorAll('.size-option.active').length;
+
+            // Kiểm tra price range có khác mặc định không
+            const priceMin = document.getElementById('priceMin');
+            const priceMax = document.getElementById('priceMax');
+            if (parseInt(priceMin.value) !== 100000 || parseInt(priceMax.value) !== 5000000) {
+                count += 1;
+            }
+
+            return count;
+        }
+
+        // Hàm cập nhật badge
+        function updateFilterBadge() {
+            const badge = document.querySelector('.filter-badge');
+            if (badge) {
+                const count = countSelectedFilters();
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'block' : 'none';
+            }
+        }
+
+        // Cập nhật badge khi có thay đổi
+        document.querySelectorAll('input[type="checkbox"], .size-option, #priceMin, #priceMax').forEach(element => {
+            element.addEventListener('change', updateFilterBadge);
+        });
+
+        // Hàm ngăn scroll body
+        function preventBodyScroll(prevent) {
+            if (prevent) {
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.width = '100%';
+            } else {
+                document.body.style.overflow = 'auto';
+                document.body.style.position = 'static';
+            }
+        }
+
+        const filterModal = document.getElementById('filterModal');
+        const closeBtn = document.querySelector('.close');
+
+        // Xử lý click để mở modal filter
+        const openFilterBtn = document.getElementById('openFilterBtn');
+        if (openFilterBtn && filterModal) {
+            openFilterBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                filterModal.style.display = 'block';
+                //preventBodyScroll(true);
+                updateFilterBadge(); // Cập nhật badge khi mở modal
+            });
+        }
+
+        closeBtn.addEventListener('click', function() {
+            filterModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            updateFilterBadge(); // Cập nhật badge khi đóng modal
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === filterModal) {
+                filterModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                updateFilterBadge(); // Cập nhật badge khi đóng modal
+            }
+        });
+
+        // Đóng/mở các section filter
+        const filterTitles = document.querySelectorAll('.filter-title');
+
+        filterTitles.forEach(title => {
+            title.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const options = this.nextElementSibling;
+
+                options.classList.toggle('show');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        });
+
+        // Xử lý size option
+        const sizeOptions = document.querySelectorAll('.size-option');
+
+        sizeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                this.classList.toggle('active');
+                updateFilterBadge(); // Cập nhật badge khi thay đổi size
+            });
+        });
+
+        // Xử lý price range slider
+        const priceMin = document.getElementById('priceMin');
+        const priceMax = document.getElementById('priceMax');
+        const minPriceDisplay = document.getElementById('minPrice');
+        const maxPriceDisplay = document.getElementById('maxPrice');
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+        }
+
+        priceMin.addEventListener('input', function() {
+            if (parseInt(this.value) > parseInt(priceMax.value)) {
+                priceMax.value = this.value;
+                maxPriceDisplay.textContent = formatPrice(priceMax.value);
+            }
+            minPriceDisplay.textContent = formatPrice(this.value);
+            updateFilterBadge(); // Cập nhật badge khi thay đổi giá
+        });
+
+        priceMax.addEventListener('input', function() {
+            if (parseInt(this.value) < parseInt(priceMin.value)) {
+                priceMin.value = this.value;
+                minPriceDisplay.textContent = formatPrice(priceMin.value);
+            }
+            maxPriceDisplay.textContent = formatPrice(this.value);
+            updateFilterBadge(); // Cập nhật badge khi thay đổi giá
+        });
+
+        // Đặt giá trị ban đầu
+        minPriceDisplay.textContent = formatPrice(priceMin.value);
+        maxPriceDisplay.textContent = formatPrice(priceMax.value);
+
+        // Reset button
+        const resetBtn = document.querySelector('.reset-btn');
+
+        resetBtn.addEventListener('click', function() {
+            // Reset checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Reset size options
+            sizeOptions.forEach(option => {
+                option.classList.remove('active');
+            });
+
+            // Reset price range
+            priceMin.value = 100000;
+            priceMax.value = 5000000;
+            minPriceDisplay.textContent = formatPrice(priceMin.value);
+            maxPriceDisplay.textContent = formatPrice(priceMax.value);
+
+            updateFilterBadge(); // Cập nhật badge khi reset
+        });
+
+        // Apply button
+        const applyBtn = document.querySelector('.apply-btn');
+
+        applyBtn.addEventListener('click', function() {
+            // Đóng modal sau khi áp dụng
+            filterModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+
+            const selectedCount = countSelectedFilters();
+            //  alert(`Bộ lọc đã được áp dụng với ${selectedCount} thuộc tính được chọn!`);
+        });
+
+        // Thêm CSS cho badge
+        const style = document.createElement('style');
+        style.textContent = `
+            .filter-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background-color: #ff0000;
+                color: white;
+                border-radius: 50%;
+                width: 18px;
+                height: 18px;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                display: none;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Khởi tạo badge lần đầu
+        updateFilterBadge();
+    });
+</script>
+<!--Hiệu ứng cho nut favorite-->
+<script>
+    // Xử lý nút yêu thích
+    $('.favorite-btn').click(function (e) {
+        e.stopPropagation();
+        const icon = $(this).find('i');
+        if (icon.hasClass('far')) {
+            icon.removeClass('far').addClass('fas');
+            $(this).css('color', '#ff4757');
+        } else {
+            icon.removeClass('fas').addClass('far');
+            $(this).css('color', '#333');
+        }
+    });
+</script>
+<!--Hiệu ứng rớt từng ô màu-->
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lặp qua tất cả các product-wrapper
+        document.querySelectorAll('.product-wrapper').forEach(wrapper => {
+            const colorCircles = wrapper.querySelectorAll('.color-circle');
+
+            // Nếu có các color-circle
+            if (colorCircles.length > 0) {
+                // Thêm style động cho mỗi circle
+                colorCircles.forEach((circle, index) => {
+                    const delay = (index + 1) * 0.1; // 0.1s, 0.2s, 0.3s,...
+                    circle.style.transitionDelay = `${delay}s`;
+                });
+
+                // Thêm style cho wrapper (tùy chọn)
+                const maxDelay = (colorCircles.length) * 0.1;
+                wrapper.style.setProperty('--max-transition-delay', `${maxDelay}s`);
+            }
+        });
+    });
+</script>
+</body>
+</html>

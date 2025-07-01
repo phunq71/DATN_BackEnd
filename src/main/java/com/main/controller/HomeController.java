@@ -26,10 +26,10 @@ public class HomeController {
 //		return "View/index";
 //	}
 //
-//	@GetMapping("/viewAll")
-//	public String viewAll() {
-//		return "View/highlightProducts";
-//	}
+	@GetMapping("/viewAll")
+	public String viewAll() {
+		return "View/highlightProducts";
+	}
 //
 //	@GetMapping("/detail")
 //	public String detail() {
