@@ -22,9 +22,12 @@ public class ItemCartDTO {
     private BigDecimal price;
     private String mainImage;
 
-    private AvailableOptionDTO availableOption;
+    private int quantity;
+    private Boolean isInStock;
+    private Long stockQuantity=0L;
+    private boolean isChosen=false; //cart được chọn
 
-    public ItemCartDTO(Integer itemID, String productName, String variantID, String color, Integer sizeID, String sizeCode, BigDecimal price, String mainImage) {
+    public ItemCartDTO(Integer itemID, String productName, String variantID, String color, Integer sizeID, String sizeCode, BigDecimal price, String mainImage, Boolean isInStock, Long stockQuantity) {
         this.itemID = itemID;
         this.productName = productName;
         this.variantID = variantID;
@@ -33,5 +36,7 @@ public class ItemCartDTO {
         this.sizeCode = sizeCode;
         this.price = price;
         this.mainImage = mainImage;
+        this.isInStock = isInStock;
+        this.stockQuantity = stockQuantity;
     }
 }

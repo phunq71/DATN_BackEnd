@@ -1,9 +1,8 @@
 package com.main.serviceImpl;
 
-import com.main.dto.AvailableOptionDTO;
 import com.main.dto.CartDTO;
 import com.main.dto.ItemCartDTO;
-import com.main.dto.SizeDTO;
+import com.main.dto.MiniCartDTO;
 import com.main.repository.CartRepository;
 import com.main.service.CartService;
 import org.springframework.stereotype.Service;
@@ -21,23 +20,30 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<ItemCartDTO> getItemCarts(List<CartDTO> carts) {
-        List<ItemCartDTO> itemCarts = new ArrayList<>();
+    public List<List<ItemCartDTO>> getItemCarts(List<CartDTO> carts) {
+        List<List<ItemCartDTO>> listItemCarts = new ArrayList<>();
         carts.forEach(cart -> {
-            ItemCartDTO itemCartDTO = cartRepository.getItemCart(cart.getItemID());
-            itemCarts.add(itemCartDTO);
-        });
-        AvailableOptionDTO availableOptionDTO = new AvailableOptionDTO();
-        itemCarts.forEach(cart -> {
-            List<SizeDTO> sizeDTOs = new ArrayList<>();
-           cartRepository.getSizeByVariantID(cart.getVariantID()).forEach(size -> {
-               sizeDTOs.add(new SizeDTO(size.getSizeID(), size.getCode()));
-           });
-           availableOptionDTO.setColors(cartRepository.getColorByVariantID(cart.getVariantID()));
-           availableOptionDTO.setSizes(sizeDTOs);
-            cart.setAvailableOption(availableOptionDTO);
-        });
+            List<ItemCartDTO> itemCarts = new ArrayList<>();
+            itemCarts=cartRepository.getItemsBySameProduct(cart.getItemID());
+            itemCarts.forEach(itemCartDTO -> {
+                if(itemCartDTO.getItemID().equals(cart.getItemID())){
+                    itemCartDTO.setQuantity(cart.getQuantity());
+                    itemCartDTO.setChosen(true);
+                }
+            });
+            listItemCarts.add(itemCarts);
 
-        return itemCarts;
+        });
+        return listItemCarts;
     }
+
+    @Override
+    public List<MiniCartDTO> getMiniCarts(List<CartDTO> carts) {
+        List<MiniCartDTO> miniCarts = new ArrayList<>();
+        carts.forEach(cart -> {
+            miniCarts.add(cartRepository.getMiniCarts(cart.getItemID()));
+        });
+        return miniCarts;
+    }
+
 }

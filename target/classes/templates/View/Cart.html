@@ -214,24 +214,24 @@
         white-space: nowrap;
     }
 
-    .c-delete-single {
-        color: #000000;
-        font-weight: 500;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        transition: color 0.2s;
-        font-size: 0.95rem;
-        padding: 1rem 2rem;
-        border-radius: 4px;
-        white-space: nowrap;
-        
-    }
+    /*.c-delete-single {*/
+    /*    color: #000000;*/
+    /*    font-weight: 500;*/
+    /*    background: transparent;*/
+    /*    border: none;*/
+    /*    cursor: pointer;*/
+    /*    transition: color 0.2s;*/
+    /*    font-size: 0.95rem;*/
+    /*    padding: 1rem 2rem;*/
+    /*    border-radius: 4px;*/
+    /*    white-space: nowrap;*/
+    /*    z-index: 1000;*/
+    /*}*/
 
-    .c-delete-single:hover {
-        background-color: #fce8e8;
-        color: #e74c3c;
-    }
+    /*.c-delete-single:hover {*/
+    /*    background-color: #fce8e8;*/
+    /*    color: #e74c3c;*/
+    /*}*/
 
     .c-checkout {
         padding: 1.5rem;
@@ -471,6 +471,64 @@
          background-color: #e1f2ff;
          transform: translateY(0) scale(0.98); /* Hiệu ứng nhấn xuống */
          box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* Hiệu ứng bóng bên trong */
+     }
+
+
+     select option:disabled {
+         color: #ccc;
+         background-color: #f5f5f5;
+     }
+
+     .disabled-row {
+         background-color: rgba(245, 245, 245, 0.6) !important;
+         color: #999 !important;
+     }
+
+     .disabled-row .c-product-info,
+     .disabled-row .c-price,
+     .disabled-row .c-item-total {
+         color: #999 !important;
+     }
+
+     .disabled-row select:disabled,
+     .disabled-row input:disabled,
+     .disabled-row .c-quantity-btn {
+         opacity: 0.6;
+         cursor: not-allowed !important;
+         background-color: #eee !important;
+     }
+
+     /* Style cho nút delete trong row disabled - KHÔNG ghi đè hover */
+     .disabled-row .c-delete-single {
+         /*opacity: 1 !important;*/
+         color: #000000;
+         background-color: transparent;
+         cursor: pointer;
+     }
+
+     /* Thêm hiệu ứng hover riêng cho nút delete trong row disabled */
+     .disabled-row .c-delete-single:hover {
+         background-color: #fce8e8 !important;
+         color: #e74c3c !important;
+     }
+
+     .c-delete-single {
+         color: #000000;
+         font-weight: 500;
+         background: transparent;
+         border: none;
+         cursor: pointer;
+         transition: color 0.2s;
+         font-size: 0.95rem;
+         padding: 1rem 2rem;
+         border-radius: 4px;
+         white-space: nowrap;
+         z-index: 1000;
+     }
+
+     .c-delete-single:hover {
+         background-color: #fce8e8;
+         color: #e74c3c;
      }
 </style>
 
@@ -758,16 +816,16 @@
         <div class="c-checkout">
             <div class="c-checkout-actions">
                 <div class="c-select-all-container">
-                    <input type="checkbox" id="c-select-all-checkout" checked class="c-cart-checkbox">
-                    <label for="c-select-all-checkout">Tất cả (7 sản phẩm)</label>
+                    <input type="checkbox" id="c-select-all-checkout" class="c-cart-checkbox">
+                    <label for="c-select-all-checkout">Tất cả (<span id="total-quantity">7</span> sản phẩm)</label>
                 </div>
-                <button class="c-delete-all">Xóa</button>
+                <button class="c-delete-all" onclick="deleteCheckedItem()">Xóa</button>
             </div>
 
             <div class="c-checkout-summary">
                 <div class="c-total-info">
                     <div class="c-total-label">Tổng cộng:</div>
-                    <div class="c-total-amount">₫7.600.000</div>
+                    <div class="c-total-amount" id="total-amount">₫7.600.000</div>
                 </div>
                 <a href="/checkout" class="c-checkout-btn">Mua Hàng (6)</a>
             </div>

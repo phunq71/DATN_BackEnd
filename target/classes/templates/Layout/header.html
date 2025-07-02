@@ -413,49 +413,8 @@
 
     <script>
 
-        // giohang
-        const cart = [];
-
-        function addToCart(product) {
-            const existing = cart.find(item => item.name === product.name);
-            if (existing) {
-                existing.quantity += 1;
-            } else {
-                product.quantity = 1;
-                cart.push(product);
-            }
-            updateMiniCart();
-        }
-
-        function updateMiniCart() {
-            const cartItems = document.getElementById("cart-items");
-            cartItems.innerHTML = "";
-
-            cart.forEach((item) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-            <td>
-                <div class="cart-item-content">
-                    <img src="${item.image}" />
-                    <span>${item.name}</span>
-                </div>
-            </td>
-            <td>${item.price.toLocaleString()} đ</td>
-        `;
-                cartItems.appendChild(row);
-            });
-
-            document.querySelector('.cart-count-badge').innerText = cart.length;
-        }
-
-
-        // Thêm sản phẩm mẫu
-        addToCart({ name: "Áo len polo", price: 320000, image: "https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/477335/item/vngoods_65_477335_3x4.jpg?width=369" });
-        addToCart({ name: "Quần Jeans dáng rộng", price: 125000, image: "https://api.fastretailing.com/ugc/v1/uq/vn/SR_IMAGES/ugc_stylehint_uq_vn_photo_250513_1621093_c-600-800" });
-        addToCart({ name: "Quần Jeans dáng Baggy", price: 429000, image: "https://api.fastretailing.com/ugc/v1/uq/vn/SR_IMAGES/ugc_stylehint_uq_vn_photo_250607_1641961_c-600-800" });
-        addToCart({ name: "Áo Polo Dệt Kim 4", price: 387000, image: "https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/474894/item/vngoods_69_474894_3x4.jpg?width=294" });
-
     </script>
+    <script src="/js/header.js"></script>
 
 </header>
 
