@@ -71,3 +71,6 @@ function updateMiniCart() {
     document.querySelector('.cart-count-badge').innerText = miniCarts.length;
 }
 
+function formatPrice(price) {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+}

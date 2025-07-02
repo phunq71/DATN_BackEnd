@@ -535,7 +535,7 @@
 <div class="c-cart-container">
 
     <div class="c-cart-title">
-        <button class="back-button" title="Quay lại">
+        <button class="back-button" title="Quay lại" onclick="history.back()">
             <i class="fa-solid fa-share"></i>
         </button>
         Giỏ hàng của bạn</div>
@@ -553,262 +553,262 @@
                 </tr>
                 </thead>
                 <tbody id="cart-container">
-                <!-- Sản phẩm 1 -->
-                <tr class="c-cart-item">
-                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>
-                    <td>
-                        <div class="c-product-info">
-                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/hero-image-sp.jpg" alt="Áo thun Uniqlo" class="c-product-image">
-                            <div>
-                                <strong>Áo thun Uniqlo U cổ tròn dáng rộng chất liệu cotton thoáng mát</strong>
-                                <div class="c-variant-container">
-                                    <select class="c-variant-select">
-                                        <option>Màu đen</option>
-                                        <option>Màu trắng</option>
-                                        <option>Màu xám</option>
-                                        <option>Màu xanh navy</option>
-                                    </select>
-                                    <select class="c-variant-select">
-                                        <option>Size M</option>
-                                        <option>Size S</option>
-                                        <option>Size L</option>
-                                        <option>Size XL</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="c-price">₫250.000</td>
-                    <td class="c-actions">
-                        <div class="c-quantity-container">
-                            <button class="c-quantity-btn">-</button>
-                            <input type="number" class="c-quantity-input" value="1" min="1">
-                            <button class="c-quantity-btn">+</button>
-                        </div>
-                    </td>
-                    <td class="c-item-total">₫250.000</td>
-                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
+<!--                &lt;!&ndash; Sản phẩm 1 &ndash;&gt;-->
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/hero-image-sp.jpg" alt="Áo thun Uniqlo" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Áo thun Uniqlo U cổ tròn dáng rộng chất liệu cotton thoáng mát</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu trắng</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                        <option>Màu xanh navy</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size M</option>-->
+<!--                                        <option>Size S</option>-->
+<!--                                        <option>Size L</option>-->
+<!--                                        <option>Size XL</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫250.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫250.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
 
-                <!-- Sản phẩm 2 -->
-                <tr class="c-cart-item">
-                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>
-                    <td>
-                        <div class="c-product-info">
-                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/women/kv-dresses-women-01-sp.jpg" alt="Quần jeans Levi's" class="c-product-image">
-                            <div>
-                                <strong>Quần jeans Levi's 501 Original Fit màu xanh đậm</strong>
-                                <div class="c-variant-container">
-                                    <select class="c-variant-select">
-                                        <option>Màu xanh</option>
-                                        <option>Màu đen</option>
-                                        <option>Màu xám</option>
-                                        <option>Màu trắng</option>
-                                    </select>
-                                    <select class="c-variant-select">
-                                        <option>Size 32</option>
-                                        <option>Size 30</option>
-                                        <option>Size 34</option>
-                                        <option>Size 36</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="c-price">₫800.000</td>
-                    <td class="c-actions">
-                        <div class="c-quantity-container">
-                            <button class="c-quantity-btn">-</button>
-                            <input type="number" class="c-quantity-input" value="1" min="1">
-                            <button class="c-quantity-btn">+</button>
-                        </div>
-                    </td>
-                    <td class="c-item-total">₫800.000</td>
-                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
+<!--                &lt;!&ndash; Sản phẩm 2 &ndash;&gt;-->
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/women/kv-dresses-women-01-sp.jpg" alt="Quần jeans Levi's" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Quần jeans Levi's 501 Original Fit màu xanh đậm</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu xanh</option>-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                        <option>Màu trắng</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size 32</option>-->
+<!--                                        <option>Size 30</option>-->
+<!--                                        <option>Size 34</option>-->
+<!--                                        <option>Size 36</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫800.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫800.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
 
-                <!-- Sản phẩm 3 -->
-                <tr class="c-cart-item">
-                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>
-                    <td>
-                        <div class="c-product-info">
-                            <img src="https://image.uniqlo.com/UQ/ST3/us/imagesgoods/475647/item/usgoods_00_475647_3x4.jpg?width=600" alt="Áo khoác" class="c-product-image">
-                            <div>
-                                <strong>Áo khoác nam Ultra Light Down màu xám nhạt</strong>
-                                <div class="c-variant-container">
-                                    <select class="c-variant-select">
-                                        <option>Màu xám</option>
-                                        <option>Màu đen</option>
-                                        <option>Màu be</option>
-                                        <option>Màu navy</option>
-                                    </select>
-                                    <select class="c-variant-select">
-                                        <option>Size L</option>
-                                        <option>Size M</option>
-                                        <option>Size XL</option>
-                                        <option>Size XXL</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="c-price">₫1.200.000</td>
-                    <td class="c-actions">
-                        <div class="c-quantity-container">
-                            <button class="c-quantity-btn">-</button>
-                            <input type="number" class="c-quantity-input" value="1" min="1">
-                            <button class="c-quantity-btn">+</button>
-                        </div>
-                    </td>
-                    <td class="c-item-total">₫1.200.000</td>
-                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
+<!--                &lt;!&ndash; Sản phẩm 3 &ndash;&gt;-->
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/us/imagesgoods/475647/item/usgoods_00_475647_3x4.jpg?width=600" alt="Áo khoác" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Áo khoác nam Ultra Light Down màu xám nhạt</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu be</option>-->
+<!--                                        <option>Màu navy</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size L</option>-->
+<!--                                        <option>Size M</option>-->
+<!--                                        <option>Size XL</option>-->
+<!--                                        <option>Size XXL</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫1.200.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫1.200.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
 
-                <!-- Sản phẩm 4 -->
-                <tr class="c-cart-item">
-                    <td><input type="checkbox" class="c-cart-checkbox"></td>
-                    <td>
-                        <div class="c-product-info">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwPdFdJSyqGh8rnfp4OFbw0bqabdyVyl0SpfSQnQRXocuLFEe94IGYj9dmEk3fwocLY1E&usqp=CAU" alt="Giày thể thao" class="c-product-image">
-                            <div>
-                                <strong>Giày thể thao Nike Air Max 270 React màu trắng đen</strong>
-                                <div class="c-variant-container">
-                                    <select class="c-variant-select">
-                                        <option>Màu trắng</option>
-                                        <option>Màu đen</option>
-                                        <option>Màu xám</option>
-                                        <option>Màu xanh</option>
-                                    </select>
-                                    <select class="c-variant-select">
-                                        <option>Size 42</option>
-                                        <option>Size 40</option>
-                                        <option>Size 41</option>
-                                        <option>Size 43</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="c-price">₫2.500.000</td>
-                    <td class="c-actions">
-                        <div class="c-quantity-container">
-                            <button class="c-quantity-btn">-</button>
-                            <input type="number" class="c-quantity-input" value="1" min="1">
-                            <button class="c-quantity-btn">+</button>
-                        </div>
-                    </td>
-                    <td class="c-item-total">₫2.500.000</td>
-                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
+<!--                &lt;!&ndash; Sản phẩm 4 &ndash;&gt;-->
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox"></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwPdFdJSyqGh8rnfp4OFbw0bqabdyVyl0SpfSQnQRXocuLFEe94IGYj9dmEk3fwocLY1E&usqp=CAU" alt="Giày thể thao" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Giày thể thao Nike Air Max 270 React màu trắng đen</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu trắng</option>-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                        <option>Màu xanh</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size 42</option>-->
+<!--                                        <option>Size 40</option>-->
+<!--                                        <option>Size 41</option>-->
+<!--                                        <option>Size 43</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫2.500.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫2.500.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
 
-                <!-- Thêm nhiều sản phẩm để demo scroll -->
-                <tr class="c-cart-item">
-                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>
-                    <td>
-                        <div class="c-product-info">
-                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/hero-image-sp.jpg" alt="Áo thun Uniqlo" class="c-product-image">
-                            <div>
-                                <strong>Áo thun nam cổ tròn màu xanh navy</strong>
-                                <div class="c-variant-container">
-                                    <select class="c-variant-select">
-                                        <option>Màu xanh navy</option>
-                                        <option>Màu trắng</option>
-                                        <option>Màu đen</option>
-                                        <option>Màu xám</option>
-                                    </select>
-                                    <select class="c-variant-select">
-                                        <option>Size L</option>
-                                        <option>Size M</option>
-                                        <option>Size XL</option>
-                                        <option>Size XXL</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="c-price">₫350.000</td>
-                    <td class="c-actions">
-                        <div class="c-quantity-container">
-                            <button class="c-quantity-btn">-</button>
-                            <input type="number" class="c-quantity-input" value="2" min="1">
-                            <button class="c-quantity-btn">+</button>
-                        </div>
-                    </td>
-                    <td class="c-item-total">₫700.000</td>
-                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
+<!--                &lt;!&ndash; Thêm nhiều sản phẩm để demo scroll &ndash;&gt;-->
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/hero-image-sp.jpg" alt="Áo thun Uniqlo" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Áo thun nam cổ tròn màu xanh navy</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu xanh navy</option>-->
+<!--                                        <option>Màu trắng</option>-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size L</option>-->
+<!--                                        <option>Size M</option>-->
+<!--                                        <option>Size XL</option>-->
+<!--                                        <option>Size XXL</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫350.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="2" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫700.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
 
-                <tr class="c-cart-item">
-                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>
-                    <td>
-                        <div class="c-product-info">
-                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/women/kv-dresses-women-01-sp.jpg" alt="Quần jeans" class="c-product-image">
-                            <div>
-                                <strong>Quần jeans nữ dáng skinny màu đen</strong>
-                                <div class="c-variant-container">
-                                    <select class="c-variant-select">
-                                        <option>Màu đen</option>
-                                        <option>Màu xanh</option>
-                                        <option>Màu trắng</option>
-                                        <option>Màu xám</option>
-                                    </select>
-                                    <select class="c-variant-select">
-                                        <option>Size 28</option>
-                                        <option>Size 26</option>
-                                        <option>Size 30</option>
-                                        <option>Size 32</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="c-price">₫650.000</td>
-                    <td class="c-actions">
-                        <div class="c-quantity-container">
-                            <button class="c-quantity-btn">-</button>
-                            <input type="number" class="c-quantity-input" value="1" min="1">
-                            <button class="c-quantity-btn">+</button>
-                        </div>
-                    </td>
-                    <td class="c-item-total">₫650.000</td>
-                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/women/kv-dresses-women-01-sp.jpg" alt="Quần jeans" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Quần jeans nữ dáng skinny màu đen</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu xanh</option>-->
+<!--                                        <option>Màu trắng</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size 28</option>-->
+<!--                                        <option>Size 26</option>-->
+<!--                                        <option>Size 30</option>-->
+<!--                                        <option>Size 32</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫650.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫650.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
 
-                <tr class="c-cart-item">
-                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>
-                    <td>
-                        <div class="c-product-info">
-                            <img src="https://image.uniqlo.com/UQ/ST3/us/imagesgoods/475647/item/usgoods_00_475647_3x4.jpg?width=600" alt="Áo khoác" class="c-product-image">
-                            <div>
-                                <strong>Áo khoác nữ dạ dáng dài màu be</strong>
-                                <div class="c-variant-container">
-                                    <select class="c-variant-select">
-                                        <option>Màu be</option>
-                                        <option>Màu đen</option>
-                                        <option>Màu xám</option>
-                                        <option>Màu camel</option>
-                                    </select>
-                                    <select class="c-variant-select">
-                                        <option>Size M</option>
-                                        <option>Size S</option>
-                                        <option>Size L</option>
-                                        <option>Size XL</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="c-price">₫1.500.000</td>
-                    <td class="c-actions">
-                        <div class="c-quantity-container">
-                            <button class="c-quantity-btn">-</button>
-                            <input type="number" class="c-quantity-input" value="1" min="1">
-                            <button class="c-quantity-btn">+</button>
-                        </div>
-                    </td>
-                    <td class="c-item-total">₫1.500.000</td>
-                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/us/imagesgoods/475647/item/usgoods_00_475647_3x4.jpg?width=600" alt="Áo khoác" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Áo khoác nữ dạ dáng dài màu be</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu be</option>-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                        <option>Màu camel</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size M</option>-->
+<!--                                        <option>Size S</option>-->
+<!--                                        <option>Size L</option>-->
+<!--                                        <option>Size XL</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫1.500.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫1.500.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
                 </tbody>
             </table>
         </div>

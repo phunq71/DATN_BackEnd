@@ -545,6 +545,7 @@ function calculateTotal() {
 }
 
 function deleteCheckedItem(){
+    if(checkedItems.length>0){
     Swal.fire({
         title: 'Xóa các hàng được chọn',
         text: 'Bạn có chắc chắn muốn xóa hết các sản phẩm được chọn ra khỏi giỏ hàng',
@@ -554,7 +555,8 @@ function deleteCheckedItem(){
         cancelButtonText: 'Hủy, không xóa nữa',
         confirmButtonColor: '#000000',
         cancelButtonColor: '#656565'
-    }).then(async (result) =>{
+    })
+        .then(async (result) =>{
         if (result.isConfirmed) {
             // Sắp xếp giảm dần để khi xóa không ảnh hưởng đến index của các phần tử khác
             checkedItems.sort((a, b) => b - a);
@@ -571,7 +573,13 @@ function deleteCheckedItem(){
         } else if (result.isDismissed) {
 
         }
-    });
+    });}
+    else Swal.fire({
+        title: 'Không có sản phẩm nào được chọn',
+        icon: 'info',
+        confirmButtonColor: '#000000'
+        }
+    )
 }
 
 function updateTotalQuantity() {
