@@ -495,7 +495,7 @@ function initCart() {
         });
 
     });
-
+    document.dispatchEvent(new Event('cartUpdated'));
     updateTotalAmount();
     updateTotalQuantity();
 }

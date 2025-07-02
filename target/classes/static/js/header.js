@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     updateMiniCart();
 });
 
+document.addEventListener('cartUpdated', async function() {
+    console.log("bắt sự kiện cập nhật");
+    miniCarts = await getMiniCart(carts);
+    updateMiniCart();
+});
+
 let miniCarts=[];
 
 function getCartsFromLocalStorage(){
@@ -35,20 +41,33 @@ function updateMiniCart() {
     const cartItems = document.getElementById("cart-items");
     cartItems.innerHTML = "";
 
-    miniCarts.forEach((item) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>
-                <div class="cart-item-content">
-                    <img src="/uploads/${item.image}" alt="${item.name}" />
-                    <span>${item.name}</span>
-                </div>
+    // Kiểm tra nếu giỏ hàng trống
+    if (miniCarts.length === 0) {
+        const emptyRow = document.createElement("tr");
+        emptyRow.innerHTML = `
+            <td colspan="2" class="empty-minicart-message">
+                Giỏ hàng trống
             </td>
-            <td>${formatPrice(item.price)}</td>
         `;
-        cartItems.appendChild(row);
-    });
+        cartItems.appendChild(emptyRow);
+    } else {
+        // Hiển thị sản phẩm nếu có
+        miniCarts.forEach((item) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>
+                    <div class="cart-item-content">
+                        <img src="/uploads/${item.image}" alt="${item.name}" />
+                        <span>${item.name}</span>
+                    </div>
+                </td>
+                <td>${formatPrice(item.price)}</td>
+            `;
+            cartItems.appendChild(row);
+        });
+    }
 
+    // Cập nhật số lượng sản phẩm
     document.querySelector('.cart-count-badge').innerText = miniCarts.length;
 }
 
