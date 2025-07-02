@@ -698,44 +698,57 @@
         .lg-register-form-white .lg-rs-form-control option {
             color: #000 !important;
         }
+
     </style>
 
     <div class="auth">
         <div class="lg-container" id="lgFormContainer">
             <!-- Left: Login -->
             <div class="lg-left">
-                <!-- Login Form -->
-                <!-- <div class="lg-form lg-login-form">
-        <h2>Đăng nhập</h2>
-        <input type="text" placeholder="Email">
-        <input type="password" placeholder="Mật khẩu">
-        <button class="lg-btn">Đăng nhập</button>
-      </div> -->
+
                 <div class="lg-form lg-login-form">
                     <h2 class="lg-title">ĐĂNG NHẬP</h2>
-                    <form th:action="@{/login}" method="post" autocomplete="off">
+                    <form th:action="@{/auth/login}" method="post" autocomplete="off">
                         <div class="social-login d-flex justify-content-center gap-3 mb-3">
-                            <a href="#"><img
-                                    src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_(2019).svg"
-                                    width="32"></a> <a href="#"><img
-                                    src="https://cdn-icons-png.flaticon.com/512/300/300221.png" width="32"></a>
+                            <a href="/oauth2/authorization/google" class="oauth-link">
+                                <img src="https://i.pinimg.com/originals/74/65/f3/7465f30319191e2729668875e7a557f2.png" alt="Google Login" />
+                            </a>
+                            <a href="/oauth2/authorization/facebook" class="oauth-link">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook Login" />
+                            </a>
                         </div>
                         <div class="lg-divider">hoặc</div>
                         <div class="lg-form-group">
-                            <input type="email" id="email" name="email" class="lg-form-control" placeholder=" "
-                                required> <label for="email" class="lg-form-label">Email</label>
+                            <input type="email" id="email" name="username" class="lg-form-control" placeholder=" "
+                                required th:value="${param.username != null ? param.username : ''}"> <label for="email" class="lg-form-label">Email</label>
                         </div>
                         <div class="lg-form-group lg-password-wrapper">
                             <input type="password" id="password" name="password" class="lg-form-control" placeholder=" "
                                 required> <label for="password" class="lg-form-label">Mật khẩu</label> <span
-                                toggle="#password" class="lg-toggle-password"><i class="fa-solid fa-eye"></i></span>
+                                toggle="#password" class="lg-toggle-password"><i class="fa-solid fa-eye-slash"></i></span>
                         </div>
                         <div class="remember-forgot">
                             <div class="remember-me">
-                                <input type="checkbox" id="remember"><label for="remember">Ghi nhớ đăng nhập</label>
+                                <input type="checkbox" id="remember-me" name="remember-me" style="cursor: pointer;">
+                                <label for="remember-me">Ghi nhớ đăng nhập</label>
                             </div>
-                            <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                            <a href="/auth/forgot-password" class="forgot-password">Quên mật khẩu?</a>
                         </div>
+                        <div th:if="${error}" style="
+                                background: none;
+                                color: #940303; /* đỏ đô */
+                                padding: 0;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                font-size: 17px;
+                                font-weight: 600;
+                                margin-bottom: 10px;
+                            ">
+                            <i class="fas fa-exclamation-circle" style="font-size: 18px;"></i>
+                            <span th:text="${error}">Thông báo nằm ở đây</span>
+                        </div>
+
                         <button type="submit" class="lg-btn-submit default mb-3">ĐĂNG
                             NHẬP</button>
                     </form>
@@ -940,17 +953,27 @@
                 const icon = this.querySelector('i');
                 if (passwordInput.type === 'password') {
                     passwordInput.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    passwordInput.type = 'password';
                     icon.classList.remove('fa-eye-slash');
                     icon.classList.add('fa-eye');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
                 }
             });
         });
 
 
+        // Giữ lụa chọn remember-me
+        const checkbox = document.getElementById('remember-me');
+        checkbox.addEventListener('change', () => {
+            localStorage.setItem('rememberMeChecked', checkbox.checked);
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const checked = localStorage.getItem('rememberMeChecked') === 'true';
+            if (checked) checkbox.checked = true;
+        });
 
         // document.querySelectorAll('.lg-rs-form-control').forEach(input => {
         //     // Xử lý khi thay đổi giá trị

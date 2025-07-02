@@ -23,11 +23,21 @@ public class Account implements Serializable {
     @Column(name = "AccountID", length = 12)
     private String accountId;
 
-    @Column(name = "Email", length = 50, nullable = false, unique = true)
+    @Column(name = "Email", length = 50, nullable = false)
     private String email;
 
-    @Column(name = "Password", length = 50, nullable = false)
+    @Column(name = "provider")
+    private String provider; // "google", "facebook", ...
+
+    @Column(name = "provider_id")
+    private String providerId; // id duy nhất từ OAuth provider
+
+
+    @Column(name = "Password", nullable = false)
     private String password;
+
+    @Column(length = 10, nullable = false)
+    private String role;
 
     @Column(name = "Status", nullable = false)
     private Boolean status;

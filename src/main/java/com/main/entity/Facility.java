@@ -22,8 +22,11 @@ public class Facility implements Serializable {
     @Column(name = "FacilityName", nullable = false, length = 100)
     private String facilityName;
 
-    @Column(name = "Address", nullable = false, length = 150)
+    @Column(name = "Address", nullable = true, length = 150)
     private String address;
+
+    @Column(name = "AddressIdGHN", nullable = true, length = 100)
+    private String addressIdGHN;
 
     // Quan hệ tự thân: nhiều Facility con có thể có 1 parent
     @ManyToOne
@@ -35,7 +38,7 @@ public class Facility implements Serializable {
 
     // Quản lý bởi 1 người (giả sử là Account)
     @ManyToOne
-    @JoinColumn(name = "Manager", nullable = false)
+    @JoinColumn(name = "Manager", nullable = true)
     private Staff manager;
 
     @OneToMany(mappedBy = "facility")

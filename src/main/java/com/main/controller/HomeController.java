@@ -1,7 +1,15 @@
 package com.main.controller;
 
+import com.main.service.AccountService;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class HomeController {
@@ -21,11 +29,23 @@ public class HomeController {
 //	}
 
 
-//	@GetMapping("/index")
-//	public String index() {
-//		return "View/index";
-//	}
-//
+	@GetMapping("/index")
+	public String index(@RequestParam(value = "msg", required = false) String msg, Model model, HttpServletRequest request) {
+		if ("logout".equals(msg)) {
+			request.getSession(true);
+			model.addAttribute("status", "success");
+			model.addAttribute("messageLayout", "Đăng xuất thành công");
+		} else if ("login".equals(msg)) {
+			model.addAttribute("status", "success");
+			model.addAttribute("messageLayout", "Đăng nhập thành công");
+		}
+		return "View/index";
+	}
+
+
+
+
+
 //	@GetMapping("/viewAll")
 //	public String viewAll() {
 //		return "View/highlightProducts";
@@ -56,10 +76,10 @@ public class HomeController {
 //		return "View/allOrders";
 //	}
 //
-//	@GetMapping("/edit-profile")
-//	public String editProfile() {
-//		return "View/edit-profile";
-//	}
+	@GetMapping("/edit-profile")
+	public String editProfile() {
+		return "View/edit-profile";
+	}
 //	@GetMapping("/orderDetail")
 //	public String orderDetail() {
 //		return "View/orderDetail";

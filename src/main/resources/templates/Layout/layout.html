@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="dynamic(view)"
-	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
 >
 <head>
     <meta charset="UTF-8">
@@ -16,18 +15,68 @@
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
 
+<!-- SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <style>
     body{
         font-family: 'Arial', sans-serif;
     }
+    .alert-container {
+        position: fixed;
+        top: 16px;
+        right: 100px;
+        max-width: 280px;
+        background-color: #333;
+        padding: 10px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.5s ease; /* cần nếu không dùng JS */
+    }
+
+    .logout-progress-bar {
+        height: 2px;
+        background-color: #fff;
+        margin-top: 8px;
+        border-radius: 1px;
+        animation: shrink 3s linear forwards;
+    }
+
+    @keyframes shrink {
+        from { width: 100%; }
+        to { width: 0%; }
+    }
+
+
 </style>
 <body>
 	<header class="container" th:replace="~{Layout/header :: header}"></header>
     <main th:replace="${view}"></main>
 	<div th:replace="~{Layout/bottom-navigation :: b-nav}"></div>
     <footer th:replace="~{Layout/footer :: footer}"></footer>
+    <div th:if="${messageLayout}"
+         th:id="'logout-alert'"
+         class="alert-container"
+         th:style="'color:' + (${status} == 'success' ? '#388e3c' : '#b22222') + '; font-weight:600;'">
 
-	
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas"
+               th:classappend="${status} == 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'"
+               style="font-size: 16px;"></i>
+            <span th:text="${messageLayout}">Nội dung thông báo</span>
+        </div>
+
+        <div class="logout-progress-bar"></div>
+    </div>
+
+
+
+
 </body>
 <script>
     window.addEventListener("DOMContentLoaded", () => {
@@ -38,5 +87,15 @@
             reelsContainer.appendChild(footer);
         }
     });
+    setTimeout(() => {
+        const alertBox = document.getElementById('logout-alert');
+        if (alertBox) {
+            alertBox.style.transition = 'opacity 0.5s ease';
+            alertBox.style.opacity = '0';
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 500); // chờ hiệu ứng mờ xong rồi mới ẩn hẳn
+        }
+    }, 3000);
 </script>
 </html>
