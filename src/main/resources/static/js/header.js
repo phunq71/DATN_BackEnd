@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', async function() {
     getCartsFromLocalStorage();
     miniCarts = await getMiniCart(carts);
-    console.log('miniCart',miniCarts);
+    // console.log('miniCart',miniCarts);
     updateMiniCart();
 });
 
 document.addEventListener('cartUpdated', async function() {
-    console.log("bắt sự kiện cập nhật");
+    // console.log("bắt sự kiện cập nhật");
     miniCarts = await getMiniCart(carts);
     updateMiniCart();
 });
@@ -27,7 +27,7 @@ function getCartsFromLocalStorage(){
 function getMiniCart(carts){
         return axios.post("/opulentia/rest/cart/miniCart", carts)
             .then(response => {
-                console.log(response.data);
+                // console.log(response.data);
                 return response.data; // ✅ TRẢ DỮ LIỆU RA NGOÀI
             })
             .catch(error => {
@@ -74,3 +74,5 @@ function updateMiniCart() {
 function formatPrice(price) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 }
+
+

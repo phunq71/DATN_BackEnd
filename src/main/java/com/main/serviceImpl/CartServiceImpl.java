@@ -46,4 +46,9 @@ public class CartServiceImpl implements CartService {
         return miniCarts;
     }
 
+    @Override
+    public List<CartDTO> getCartsByCustomerId(String customerId) {
+        return cartRepository.getCartsByCustomerId(customerId);
+    }
+
 }

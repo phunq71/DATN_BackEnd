@@ -3,10 +3,10 @@
 
 
 document.addEventListener('DOMContentLoaded', async function() {
-    getCartsFromLocalStorage();
-    console.log(carts);
+   // getCartsFromLocalStorage();
+    // console.log(carts);
     itemCarts = await getItem(carts);
-    console.log(itemCarts);
+    // console.log(itemCarts);
     initCart();
 });
 
@@ -33,23 +33,25 @@ function getCartsFromLocalStorage(){
     let dataCarts = dataCartString ? JSON.parse(dataCartString) : [];
 
 // Nếu chưa có gì trong localStorage thì set dữ liệu mẫu
-    if (!dataCarts || dataCarts.length < 1) {
-        localStorage.setItem('carts', JSON.stringify(carts));
-    }
-    else{
-        carts= JSON.parse(localStorage.getItem('carts'));
-    }
+//     if (!dataCarts || dataCarts.length < 1) {
+//         localStorage.setItem('carts', JSON.stringify(carts));
+//     }
+//     else{
+//         carts= JSON.parse(localStorage.getItem('carts'));
+//     }
 
 }
+
+
 
 function getItem(carts) {
     return axios.post("/opulentia/rest/cart", carts)
         .then(response => {
-            console.log(response.data);
+            // console.log(response.data);
             return response.data; // ✅ TRẢ DỮ LIỆU RA NGOÀI
         })
         .catch(error => {
-            console.log(error);
+            // console.log(error);
             return []; // 👈 nếu lỗi thì trả mảng rỗng hoặc giá trị mặc định
         });
 }
@@ -97,68 +99,6 @@ function getSizesForColor(productGroup, variantID) {
         }));
 }
 
-// // Function to create a cart item row
-// function createCartItemRow(chosenProduct, productGroup) {
-//     const row = document.createElement('tr');
-//     row.className = 'c-cart-item';
-//     row.dataset.itemId = chosenProduct.itemID;
-//
-//     // Get all colors and sizes for this product
-//     const colors = getProductColors(productGroup);
-//     const currentVariantID = chosenProduct.variantID;
-//     const sizes = getSizesForColor(productGroup, currentVariantID);
-//
-//     // Find the current size
-//     const currentSize = sizes.find(s => s.itemID === chosenProduct.itemID);
-//
-//     // Create row HTML
-//     row.innerHTML = `
-//             <td><input type="checkbox" class="c-cart-checkbox" checked></td>
-//             <td>
-//                 <div class="c-product-info">
-//                     <img src="/uploads/${chosenProduct.mainImage}" alt="${chosenProduct.productName}" class="c-product-image">
-//                     <div>
-//                         <strong>${chosenProduct.productName}</strong>
-//                         <div class="c-variant-container">
-//                             <select class="c-variant-select c-color-select">
-//                                 ${colors.map(color =>
-//         `<option value="${color.variantID}"
-//                                      ${color.variantID === currentVariantID ? 'selected' : ''}
-//                                      ${!color.hasStock ? 'disabled' : ''}>
-//                                         ${color.color}${!color.hasStock ? ' (hết hàng)' : ''}
-//                                     </option>`
-//     ).join('')}
-//                             </select>
-//                             <select class="c-variant-select c-size-select">
-//                                 ${sizes.map(size =>
-//         `<option value="${size.itemID}"
-//                                      ${size.itemID === chosenProduct.itemID ? 'selected' : ''}
-//                                      ${!size.isInStock ? 'disabled' : ''}>
-//                                         Size ${size.sizeCode}${!size.isInStock ? ' (hết hàng)' : ''}
-//                                     </option>`
-//     ).join('')}
-//                             </select>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </td>
-//             <td class="c-price">${formatPrice(chosenProduct.price)}</td>
-//             <td class="c-actions">
-//                 <div class="c-quantity-container">
-//                     <button class="c-quantity-btn minus">-</button>
-//                     <input type="number" class="c-quantity-input" value="${chosenProduct.quantity || 1}" min="1">
-//                     <button class="c-quantity-btn plus">+</button>
-//                 </div>
-//             </td>
-//             <td class="c-item-total">${formatPrice(chosenProduct.price * (chosenProduct.quantity || 1))}</td>
-//             <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
-//         `;
-//
-//     return row;
-// }
-
-
-// Function to create a cart item row
 // Function to create a cart item row
 function createCartItemRow(chosenProduct, productGroup) {
     const row = document.createElement('tr');
@@ -466,13 +406,13 @@ function initCart() {
             });
 
             deleteItemBtn.addEventListener('click', async () =>{
-                console.log(chosenProduct);
+                // console.log(chosenProduct);
                 const itemIndex = carts.findIndex(item => parseInt(item.itemID) === parseInt(chosenProduct.itemID));
-                console.log(itemIndex);
-                console.log(carts)
+                // console.log(itemIndex);
+                // console.log(carts)
                 carts.splice(itemIndex, 1);
                 localStorage.setItem('carts', JSON.stringify(carts));
-                console.log('cart sau khi slice', carts)
+                // console.log('cart sau khi slice', carts)
                 itemCarts= await getItem(carts);
                 initCart();
             });
@@ -496,7 +436,7 @@ function initCart() {
                     }
                 });
 
-                console.log('checkedItems', checkedItems);
+                // console.log('checkedItems', checkedItems);
                 updateTotalAmount();
             });
         });
@@ -530,7 +470,7 @@ function findItemByID(itemID) {
         for (const item of group) {
             // Nếu itemID trùng khớp, trả về item đó
             if (item.itemID === itemID) {
-                console.log(item);
+                // console.log(item);
                 return item;
             }
         }

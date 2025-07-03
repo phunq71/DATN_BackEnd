@@ -1,5 +1,6 @@
 package com.main.repository;
 
+import com.main.dto.CartDTO;
 import com.main.dto.ItemCartDTO;
 import com.main.dto.MiniCartDTO;
 import com.main.entity.Cart;
@@ -41,4 +42,9 @@ public interface CartRepository extends JpaRepository<Cart, CartId> {
             "WHERE i.itemId=:itemID AND img.isMainImage=true")
     public MiniCartDTO getMiniCarts(@Param("itemID") int itemID);
 
+    @Query("""
+    SELECT c.id.customer, c.id.item, c.quantity, c.latestDate FROM Cart c
+    WHERE c.id.customer = :customerId
+    """)
+    public List<CartDTO> getCartsByCustomerId(@Param("customerId") String customerId);
 }
