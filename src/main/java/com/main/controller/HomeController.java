@@ -2,8 +2,12 @@ package com.main.controller;
 
 import com.main.entity.Product;
 import com.main.repository.ProductRepository;
+import com.main.security.CustomOAuth2User;
+import com.main.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +47,26 @@ ProductRepository productRepository;
             model.addAttribute("status", "success");
             model.addAttribute("messageLayout", "Đăng nhập thành công");
         }
-        return "View/index";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            System.out.println("⚠️ Không có thông tin đăng nhập");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof CustomOAuth2User oAuthUser) {
+            System.out.println("✅ OAuth2 - ID: " + oAuthUser.getAccountId());
+        } else if (principal instanceof CustomUserDetails userDetails) {
+            System.out.println("✅ Login thường - ID: " + userDetails.getAccountId());
+        } else if (principal instanceof String s && s.equals("anonymousUser")) {
+            System.out.println("⚠️ Chưa đăng nhập");
+        } else {
+            System.out.println("❓ Không rõ loại người dùng: " + principal.getClass());
+        }
+       return "View/index";
+
+
     }
 
     @GetMapping("/index2")
