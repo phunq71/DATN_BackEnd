@@ -31,6 +31,13 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 return;
             }
 
+            String redirectUri = (String) request.getSession().getAttribute("redirect_uri");
+            if (redirectUri != null) {
+                response.sendRedirect(redirectUri);
+                request.getSession().removeAttribute("redirect_uri"); // clear sau khi dùng
+                return;
+            }
+
             // Nếu không có URL trước đó, phân quyền theo vai trò
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             for (GrantedAuthority authority : authorities) {
@@ -40,14 +47,15 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                     response.sendRedirect("http://localhost:5173/home");
                     return;
                 } else if (role.equals("ROLE_USER")) {
-                    response.sendRedirect("/index?msg=login");
+                    response.sendRedirect("/index?login");
                     return;
                 }
             }
 
         } catch (Exception ex) {
             logger.error("❌ Lỗi trong onAuthenticationSuccess: {}", ex.getMessage(), ex);
-            response.sendRedirect("/auth?error=server_error"); // Có thể hiển thị thông báo ở trang auth
+            response.sendRedirect("/auth?error=server_error");
+            System.out.println("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT 👅");// Có thể hiển thị thông báo ở trang auth
         }
     }
 }

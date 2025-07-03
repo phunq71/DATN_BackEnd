@@ -1,15 +1,13 @@
 package com.main.service;
 
-import com.main.entity.Cart;
-import com.main.entity.CartId;
+import com.main.dto.CartDTO;
+import com.main.dto.ItemCartDTO;
+import com.main.dto.MiniCartDTO;
 
 import java.util.List;
 
 public interface CartService {
-    public List<Cart> findAll();
-    public Cart findById(CartId id);
-    public CartId create(Cart cart);
-    public Cart update(CartId id,Cart cart);
-    public void deleteById(CartId id);
-    public boolean existById(CartId id);
+    public List<List<ItemCartDTO>> getItemCarts(List<CartDTO> carts);
+
+    public List<MiniCartDTO> getMiniCarts(List<CartDTO> carts);
 }

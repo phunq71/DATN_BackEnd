@@ -1,15 +1,15 @@
 package com.main.controller;
 
-import com.main.service.AccountService;
-import jakarta.servlet.RequestDispatcher;
+import com.main.entity.Product;
+import com.main.repository.ProductRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 public class HomeController {
@@ -27,25 +27,32 @@ public class HomeController {
 //	public String footer() {
 //		return "Layout/footer";
 //	}
+    @Autowired
+ProductRepository productRepository;
 
+    @GetMapping({"/viewAll"})
+    public String viewAll() {
+        List<Product> products = productRepository.findByParentCategoryOnly2("A0001");
+        System.out.println(products.size());
+        return "View/highlightProducts";
+    }
 
-	@GetMapping("/index")
-	public String index(@RequestParam(value = "msg", required = false) String msg, Model model, HttpServletRequest request) {
-		if ("logout".equals(msg)) {
-			request.getSession(true);
-			model.addAttribute("status", "success");
-			model.addAttribute("messageLayout", "Đăng xuất thành công");
-		} else if ("login".equals(msg)) {
-			model.addAttribute("status", "success");
-			model.addAttribute("messageLayout", "Đăng nhập thành công");
-		}
-		return "View/index";
-	}
+    @GetMapping("/index")
+    public String index(@RequestParam(value="login", required = false) String login,  Model model) {
+        if (login != null) {
+            model.addAttribute("status", "success");
+            model.addAttribute("messageLayout", "Đăng nhập thành công");
+        }
+        return "View/index";
+    }
 
-
-
-
-
+    @GetMapping("/index2")
+    public String index( Model model, HttpServletRequest request) {
+        model.addAttribute("status", "success");
+        model.addAttribute("messageLayout", "Đăng xuất thành công");
+        return "View/index";
+    }
+//
 //	@GetMapping("/viewAll")
 //	public String viewAll() {
 //		return "View/highlightProducts";

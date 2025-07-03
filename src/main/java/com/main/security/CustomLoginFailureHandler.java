@@ -31,7 +31,6 @@ public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
-
         // Lấy username đã nhập
         String username = request.getParameter("username");
 
