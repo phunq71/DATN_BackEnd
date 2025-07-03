@@ -8,7 +8,6 @@
 
 </head>
 <body>
-
 <style>
     * {
         margin: 0;
@@ -37,6 +36,7 @@
 
     .product-info {
         padding: 2rem;
+        /*padding-top: 10rem;*/
     }
 
     .product-images {
@@ -95,7 +95,6 @@
 
     .product-info h1 {
         font-size: 1.8rem;
-        margin-bottom: 1.5rem;
         font-weight: 500;
     }
 
@@ -160,7 +159,7 @@
     }
 
     .price {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         font-weight: bold;
         margin: 1rem 0;
     }
@@ -196,8 +195,9 @@
     }
 
     /* Responsive design */
-    @media (max-width: 768px) {
+    @media (max-width: 808px) {
         .product-slider {
+
             flex-direction: column;
             height: auto;
         }
@@ -273,37 +273,15 @@
         padding-bottom: 15px;
     }
 
-    .description-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        padding: 10px 0;
-    }
 
     .description-title {
         font-size: 18px;
         font-weight: bold;
     }
 
-    .toggle-icon {
-        font-size: 20px;
-    }
-
-    .description-content {
-        display: none;
-        padding: 10px 0;
-        line-height: 1.6;
-    }
-
-    .description-content.show {
-        display: block;
-    }
-
     .review-otherProducts{
         display: flex;
         width: 100%;
-        height: 100vh;
     }
 
     .review{
@@ -335,7 +313,6 @@
         margin: 20px auto;
         padding: 0 15px;
         overflow-y: auto;
-        max-height: 70vh;
     }
 
     .ot-products-list {
@@ -448,7 +425,6 @@
     /* Phần đánh giá */
     .rating-section {
         max-width: 100%;
-        overflow-y: auto;
         max-height: 70vh;
         padding-right: 5px;
     }
@@ -775,6 +751,59 @@
         transform: translateY(0) scale(0.98); /* Hiệu ứng nhấn xuống */
         box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* Hiệu ứng bóng bên trong */
     }
+    .size-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+    /* Hiển thị "MALE", "FEMALE", "UNISEX" */
+    .selected-size {
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Link bảng size */
+    .size-guide-link {
+        display: inline-block;      /* Đảm bảo vùng click và hiệu ứng */
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #333;
+        background-color: #f0f0f0;
+        border: 1px solid #bbb;
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .size-guide-link:hover {
+        background-color: #333;
+        color: #fff;
+        border-color: #333;
+    }
+    /*thẻ <a> không phá css*/
+    .product-link {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 8px;
+    }
+
+    .product-link:hover {
+        transform: scale(1.03);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        z-index: 2;
+    }
+
+
+
 </style>
 <!--style cho zoom ảnh-->
 <style>
@@ -828,41 +857,62 @@
         z-index: 1001;
     }
 </style>
-
 <div class="product-slider">
     <!-- Phần hình ảnh (50%) -->
     <div class="product-images">
+<!--        <div style="width: 100%; height: 10vh;"></div>-->
         <div class="image-slider">
-            <!-- Hình ảnh sẽ được thêm bằng JavaScript -->
+            <th:block th:each="variant, colorStat : ${listV}">
+                <th:block th:each="image, imgStat : ${listImage}">
+                    <img th:src="@{'/uploads/' + ${image.imageUrlDTO}}"
+                         th:alt="'Ảnh ' + ${imgStat.index}"
+                         th:classappend="${colorStat.index == 0 and imgStat.index == 0} ? 'active' : ''"
+                         th:attr="data-color-index=${colorStat.index}, data-image-index=${imgStat.index}"/>
+                </th:block>
+            </th:block>
         </div>
-        <button class="back-button" title="Quay lại">
-            <i class="fa-solid fa-share"></i>
-        </button>
-    </div>
 
+    </div>
     <!-- Phần thông tin (50%) -->
     <div class="product-info">
-        <h1>AirSense Jacket | Wool Like</h1>
-
+        <h1 th:text="${product.getProductName()}"></h1>
         <div class="color-selector">
-            <span>Color: </span>
-            <span class="selected-color">WHITE</span>
+            <span style="font-weight: 500; margin-right: 6px;">Color:</span>
+            <span th:text="${colorVariant}" style="padding: 4px 10px; background-color: #eee; border-radius: 6px; font-weight: 500; color: #333;"></span>
             <div class="color-options">
-                <!-- Color options sẽ được thêm bằng JavaScript -->
+                <th:block th:each="variant, iterStat : ${listV}">
+                   <a th:href="@{/opulentia/${product.category.parent}/${product.category.categoryId}/{productId}/{variantId}(productId=${product.getProductID()}, variantId=${variant.variantId})}">
+                        <div class="color-option"
+                             th:classappend="${iterStat.index == 0}"
+                             th:attr="data-color-index=${iterStat.index}"
+                             th:style="'background-image: url(/uploads/' + ${variant.mainImage} + ')'">
+                        </div>
+                    </a>
+                </th:block>
             </div>
         </div>
-
         <div class="size-selector">
             <div class="size-container">
-                <div class="size-option out-of-stock" data-size="S">S</div>
-                <div class="size-option" data-size="M">M</div>
-                <div class="size-option" data-size="L">L</div>
-                <div class="size-option" data-size="XL">XL</div>
-                <div class="size-option" data-size="XXL">XXL</div>
+                <div th:each="size, iter : ${listI}"
+                     th:class="'size-option' + (${size.getSize().getCode() == null} ? ' out-of-stock' : '')"
+                     th:attr="data-size=${size.getSize().getCode() != null ? size.getSize().getCode() : 'N/A'}"
+                     th:text="${size.getSize().getCode() != null ? size.getSize().getCode() : 'Hết hàng'}">
+                </div>
             </div>
-            <span>Size: </span>
-            <span class="selected-size">MEN XS</span>
-            <a href="#" class="size-guide">Check my size</a>
+            <div class="size-container">
+                <span>Size:</span>
+                <span class="selected-size" th:text="${product.getTargetCustomer()}"></span>
+                <a class="size-guide-link"
+                   th:if="${product.getTargetCustomer() == 'MALE'}"
+                   th:href="@{https://www.vietcargo.vn/wp-content/uploads/2023/05/Size-ao-thun-My-khac-gi-Viet-Nam.jpg}" target="_blank">Xem bảng size nam</a>
+                <a class="size-guide-link"
+                   th:if="${product.getTargetCustomer() == 'FEMALE'}"
+                   th:href="@{https://dongphucdongnai.vn/upload/baiviet/bangsizeaonu0-2852.jpg}" target="_blank">Xem bảng size nữ</a>
+                <a class="size-guide-link"
+                   th:if="${product.getTargetCustomer() == 'UNISEX'}"
+                   th:href="@{https://file.hstatic.net/200000265901/file/z6732954876758_eb3a4ca6ccf412e0934870881ef74242_1024x1024.jpg}" target="_blank">Xem bảng size unisex</a>
+            </div>
+
         </div>
 
         <div class="rating">
@@ -879,13 +929,10 @@
             <input type="number" class="qty-input" value="1" min="1">
             <button class="qty-btn plus">+</button>
         </div>
-
-        <div class="price">1.471.000 VND</div>
+        <div class="price" th:text="${priceVariant}"></div>
 
         <div class="stock-status">Low stock</div>
-
         <button class="add-to-cart">ADD TO CART</button>
-
         <a href="#" class="find-in-store">Find stock in store</a>
     </div>
 </div>
@@ -893,16 +940,14 @@
 
 <!-- Phần mô tả sản phẩm -->
 <div class="product-description">
-    <div class="description-header" onclick="toggleDescription()">
+    <div>
         <div class="description-title">Mô tả</div>
-        <div class="toggle-icon">+</div>
     </div>
-    <div class="description-content">
-        <p>Đây là phần mô tả chi tiết về sản phẩm. Bạn có thể thêm bất kỳ thông tin nào về sản phẩm ở đây.</p>
-        <p>- Chất liệu: 100% cotton</p>
-        <p>- Màu sắc: Đen, Trắng, Xám</p>
-        <p>- Kích thước: S, M, L, XL</p>
-        <p>- Hướng dẫn bảo quản: Giặt ở nhiệt độ thường, không sử dụng chất tẩy</p>
+    <div class="">
+        <span>Về sản phẩm: </span>
+        <span th:text="${product.description}"></span> <br><br>
+        <span>Về biến thể: </span>
+        <span th:text="${descriptionVariant}"></span>
     </div>
 </div>
 
@@ -961,7 +1006,6 @@
                 </div>
                 <div>2</div>
             </div>
-
             <div class="rating-bar">
                 <div>1 sao</div>
                 <div class="progress-container">
@@ -969,11 +1013,9 @@
                 </div>
                 <div>1</div>
             </div>
-
             <!-- Phần đánh giá chi tiết của khách hàng -->
             <div class="customer-reviews">
                 <h3>Đánh giá của khách hàng</h3>
-
                 <div class="review-item">
                     <div class="review-header">
                         <div class="reviewer-name">Nguyễn Văn A</div>
@@ -991,7 +1033,6 @@
                         <img src="https://down-vn.img.susercontent.com/file/vn-11134103-7ra0g-macethugpwp13c.webp" alt="Review 2" class="review-image">
                     </div>
                 </div>
-
                 <div class="review-item">
                     <div class="review-header">
                         <div class="reviewer-name">Trần Thị B</div>
@@ -1092,136 +1133,75 @@
         </div>
         <section class="ot-products-section">
             <div class="ot-products-list">
-                <!-- Product 1 -->
-                <div class="ot-product-container">
-                    <div class="ot-product-wrapper">
-                        <div class="ot-product-info">
-                            <div class="ot-labels-container">
-                                <div class="ot-new-label">NEW</div>
-                                <div class="ot-discount-label">-10%</div>
-                            </div>
-                            <div class="ot-product-title">Áo Polo H&M</div>
-                            <div class="ot-color-options">
-                                <div class="ot-color-circle" style="background-color: #201714;"></div>
-                                <div class="ot-color-circle" style="background-color: #e1d5bc;"></div>
-                                <div class="ot-color-circle" style="background-color: #656565;"></div>
-                            </div>
-                            <div class="ot-price-container">
-                                <span class="ot-sale-price">900.000đ</span>
-                                <span class="ot-original-price">1.000.000đ</span>
-                            </div>
-                            <button class="ot-favorite-btn"><i class="ot-far ot-fa-heart"></i></button>
-                        </div>
-                        <div class="ot-product-image-container">
-                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
-                                 alt="Áo Polo H&M" class="ot-product-image">
-                        </div>
-                    </div>
-                </div>
+                <!-- Product -->
+                <th:block th:each="products, iterStat : ${listProduct}">
+                    <th:block th:if="${products.productID != product.productID and iterStat.index < 5}">
+                        <a th:href="@{/opulentia/${products.category.parent}/${products.category.categoryId}/{productId}/{variantId}(productId=${products.getProductID()}, variantId=${products.variants[0].variantID})}" class="product-link">
+                            <div class="ot-product-container">
+                                <div class="ot-product-wrapper">
+                                    <div class="ot-product-info">
+                                        <div class="ot-labels-container">
+                                            <div class="ot-new-label">NEW</div>
+                                            <div class="ot-discount-label">-10%</div>
+                                        </div>
+                                        <div class="ot-product-title" th:text="${products.productName}"></div>
 
-                <!-- Product 2 -->
-                <div class="ot-product-container">
-                    <div class="ot-product-wrapper">
-                        <div class="ot-product-info">
-                            <div class="ot-labels-container">
-                                <div class="ot-new-label">HOT</div>
-                            </div>
-                            <div class="ot-product-title">Áo thun in hình Loose Fit</div>
-                            <div class="ot-color-options">
-                                <div class="ot-color-circle" style="background-color: #ffffff;"></div>
-                                <div class="ot-color-circle" style="background-color: #1abc9c;"></div>
-                            </div>
-                            <div class="ot-price-container">
-                                <span class="ot-sale-price">1.200.000đ</span>
-                            </div>
-                            <button class="ot-favorite-btn"><i class="ot-far ot-fa-heart"></i></button>
-                        </div>
-                        <div class="ot-product-image-container">
-                            <img src="https://image.hm.com/assets/hm/fc/11/fc11cb1d40fd52a00d3cd74e3bb5faeab85fc0c6.jpg"
-                                 alt="Áo thun in hình Loose Fit" class="ot-product-image">
-                        </div>
-                    </div>
-                </div>
+                                        <!-- Color options -->
+                                        <div class="ot-color-options">
+                                            <th:block th:each="variant : ${products.variants}">
+                                                <th:block th:switch="${variant.getColor()}">
+                                                    <div class="ot-color-circle" th:case="'Đen'" style="background-color: #000000;"></div>
+                                                    <div class="ot-color-circle" th:case="'Nâu'" style="background-color: #8B4513;"></div>
+                                                    <div class="ot-color-circle" th:case="'Xám'" style="background-color: #808080;"></div>
+                                                    <div class="ot-color-circle" th:case="'Trắng'" style="background-color: #FFFFFF; border: 1px solid #ccc;"></div>
+                                                    <div class="ot-color-circle" th:case="'Xanh biển'" style="background-color: #1E90FF;"></div>
+                                                    <div class="ot-color-circle" th:case="'Xanh Navy'" style="background-color: #000080;"></div>
+                                                    <div class="ot-color-circle" th:case="'Xanh dương'" style="background-color: #4682B4;"></div>
+                                                    <div class="ot-color-circle" th:case="'Xanh đậm'" style="background-color: #005f73;"></div>
+                                                    <div class="ot-color-circle" th:case="'Da lạnh'" style="background-color: #fbe8eb;"></div>
+                                                    <div class="ot-color-circle" th:case="'Nâu đất'" style="background-color: #A0522D;"></div>
+                                                    <div class="ot-color-circle" th:case="'Ngũ sắc'" style="background: linear-gradient(45deg, red, yellow, green, blue, purple);"></div>
+                                                    <div class="ot-color-circle" th:case="'Nâu sáng'" style="background-color: #D2B48C;"></div>
+                                                    <div class="ot-color-circle" th:case="'Hồng kem'" style="background-color: #f8c8dc;"></div>
+                                                    <div class="ot-color-circle" th:case="'Đen xám'" style="background: linear-gradient(to right, #000000, #808080);"></div>
+                                                    <div class="ot-color-circle" th:case="'Kem'" style="background-color: #fffdd0;"></div>
+                                                    <div class="ot-color-circle" th:case="'Đỏ'" style="background-color: #ff4d4d;"></div>
+                                                    <div class="ot-color-circle" th:case="'Hồng'" style="background-color: #ff69b4;"></div>
+                                                    <div class="ot-color-circle" th:case="'Xanh sẫm'" style="background-color: #003366;"></div>
+                                                    <div class="ot-color-circle" th:case="'Xanh dương (sọc)'" style="background: repeating-linear-gradient(45deg, #4682B4, #4682B4 5px, white 5px, white 10px);"></div>
+                                                    <div class="ot-color-circle" th:case="'Đen & Trắng (sọc)'" style="background: repeating-linear-gradient(45deg, black, black 5px, white 5px, white 10px);"></div>
+                                                    <div class="ot-color-circle" th:case="*" style="background-color: #ccc;"></div>
+                                                </th:block>
+                                            </th:block>
+                                        </div>
 
-                <!-- Product 3 -->
-                <div class="ot-product-container">
-                    <div class="ot-product-wrapper">
-                        <div class="ot-product-info">
-                            <div class="ot-labels-container">
-                                <div class="ot-discount-label">-20%</div>
-                            </div>
-                            <div class="ot-product-title">Quần short kiểu may đo Loose Fit</div>
-                            <div class="ot-color-options">
-                                <div class="ot-color-circle" style="background-color: #e1d5bc;"></div>
-                                <div class="ot-color-circle" style="background-color: #f1c40f;"></div>
-                                <div class="ot-color-circle" style="background-color: #e67e22;"></div>
-                                <div class="ot-color-circle" style="background-color: #95a5a6;"></div>
-                            </div>
-                            <div class="ot-price-container">
-                                <span class="ot-sale-price">200.000đ</span>
-                                <span class="ot-original-price">250.000đ</span>
-                            </div>
-                            <button class="ot-favorite-btn"><i class="ot-far ot-fa-heart"></i></button>
-                        </div>
-                        <div class="ot-product-image-container">
-                            <img src="https://image.hm.com/assets/hm/28/c4/28c47288852c92a93b7129b59c60c37d84c06d1a.jpg"
-                                 alt="Quần short kiểu may đo Loose Fit" class="ot-product-image">
-                        </div>
-                    </div>
-                </div>
+                                        <div class="ot-price-container"
+                                             th:if="${products.variants != null and #lists.size(products.variants) > 0}">
+                                            <span class="ot-sale-price">900.000đ</span>
+                                            <span class="ot-original-price"
+                                                  th:text="${products.variants[0].price}"></span>
+                                        </div>
+                                    </div>
 
-                <!-- Product 4 -->
-                <div class="ot-product-container">
-                    <div class="ot-product-wrapper">
-                        <div class="ot-product-info">
-                            <div class="ot-labels-container">
-                                <div class="ot-new-label">NEW</div>
-                                <div class="ot-discount-label">-15%</div>
+                                    <div class="ot-product-image-container">
+                                        <img th:each="img : ${products.variants[0].images}"
+                                             th:if="${img.isMainImage}"
+                                             th:src="@{'/uploads/' + ${img.imageUrl}}"
+                                             class="ot-product-image"
+                                             alt="Ảnh sản phẩm">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="ot-product-title">Áo ba lỗ Loose Fit</div>
-                            <div class="ot-color-options">
-                                <div class="ot-color-circle" style="background-color: #ffffff;"></div>
-                                <div class="ot-color-circle" style="background-color: #16a085;"></div>
-                                <div class="ot-color-circle" style="background-color: #000000;"></div>
-                            </div>
-                            <div class="ot-price-container">
-                                <span class="ot-sale-price">1.500.000đ</span>
-                                <span class="ot-original-price">1.800.000đ</span>
-                            </div>
-                            <button class="ot-favorite-btn"><i class="ot-far ot-fa-heart"></i></button>
-                        </div>
-                        <div class="ot-product-image-container">
-                            <img src="https://image.hm.com/assets/hm/49/7b/497baceee10bcacd2973a7a21b1775c4b1c6ae88.jpg"
-                                 alt="Áo ba lỗ Loose Fit" class="ot-product-image">
-                        </div>
-                    </div>
-                </div>
+                        </a>
+                    </th:block>
+                </th:block>
 
-                <!-- Product 5 -->
-                <div class="ot-product-container">
-                    <div class="ot-product-wrapper">
-                        <div class="ot-product-info">
-                            <div class="ot-product-title">Quần Short Thể Thao</div>
-                            <div class="ot-color-options">
-                                <div class="ot-color-circle" style="background-color: #27ae60;"></div>
-                                <div class="ot-color-circle" style="background-color: #2980b9;"></div>
-                            </div>
-                            <div class="ot-price-container">
-                                <span class="ot-sale-price">350.000đ</span>
-                            </div>
-                            <button class="ot-favorite-btn"><i class="ot-far ot-fa-heart"></i></button>
-                        </div>
-                        <div class="ot-product-image-container">
-                            <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg"
-                                 alt="Quần Short Thể Thao" class="ot-product-image">
-                        </div>
-                    </div>
-                </div>
                 <div class="viewAll">
                     <h5>Xem tất cả</h5>
                 </div>
             </div>
         </section>
+
     </div>
 </div>
 
@@ -1311,8 +1291,6 @@
         <button class="apply-btn" onclick="applyFilters()">Áp dụng</button>
     </div>
 </div>
-
-
 <!--Modal zoom ảnh-->
 <!-- Thêm modal phóng to -->
 <div class="image-zoom-modal">
@@ -1321,284 +1299,93 @@
         <img class="zoom-modal-image" src="" alt="">
     </div>
 </div>
-
+<!--thuận vừa sửa logic image silde trong js-->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Dữ liệu sản phẩm
-        const productData = {
-            colors: [
-                {
-                    name: "WHITE",
-                    mainImage: "https://image.hm.com/assets/hm/51/ba/51ba40d8f0d80713246fad69ab3b99732af9bf36.jpg",
-                    secondaryImages: [
-                        "https://image.hm.com/assets/hm/57/f5/57f56e6bafb4b3b0c2162397ffce180277d6d817.jpg",
-                        "https://image.hm.com/assets/hm/ea/3a/ea3a6295ca1d7694da633353b5d4c1392a1d85d1.jpg",
-                        "https://image.hm.com/assets/hm/5c/b6/5cb6b6b4231f8e35bc091519200b8aee8a72e962.jpg",
-                        "https://image.hm.com/assets/hm/34/2c/342cf61191155b58769531bc31362195f26990ab.jpg"
-                    ]
-                },
-                {
-                    name: "BLACK",
-                    mainImage: "https://image.hm.com/assets/hm/49/d5/49d532391fbb7ce88640c726644cc24b552aab27.jpg",
-                    secondaryImages: [
-                        "https://image.hm.com/assets/hm/0d/01/0d0106ad470fd9c0d973a559e35ae70fd21696a9.jpg",
-                        "https://image.hm.com/assets/hm/61/67/61670f1b50ebbee319a3b5fe648f11feb0475336.jpg",
-                        "https://image.hm.com/assets/hm/54/8e/548e83b569cd006a398e6ffc9e2cf21e1bf0acb5.jpg",
-                        "https://image.hm.com/assets/hm/09/06/0906537cdc265369952536bdd44bb41940aca873.jpg",
-                        "https://image.hm.com/assets/hm/5b/30/5b30a0ea8c3f68ba5ee78b9fc89677d97d8e2ed5.jpg"
-                    ]
-                },
-                {
-                    name: "DARK GRAY",
-                    mainImage: "https://image.hm.com/assets/hm/bd/ca/bdca880c800fd893362646021b45a2bc8d4ce6a8.jpg",
-                    secondaryImages: [
-                        "https://image.hm.com/assets/hm/bd/ca/bdca880c800fd893362646021b45a2bc8d4ce6a8.jpg",
-                        "https://image.hm.com/assets/hm/5e/47/5e47831cd605e47a2ca36d60b55a20399567e61e.jpg",
-                        "https://image.hm.com/assets/hm/35/05/35055597bd6b3d98a38d0e27d2acf39f69c32072.jpg",
-                        "https://image.hm.com/assets/hm/be/ae/beaef270b4de6527d636de9a305ba331d14f4a6b.jpg",
-                        "https://image.hm.com/assets/hm/8e/6f/8e6f72b18865f9ac5109f16b11cd52cb9f8d8711.jpg",
-                        "https://image.hm.com/assets/hm/02/5c/025c37ac03f8b8f9cbe0f48b522d030d0b7ea153.jpg"
-                    ]
-                },
-                {
-                    name: "MINT",
-                    mainImage: "https://image.hm.com/assets/hm/ab/9e/ab9e23eb0c1d65fefb0c82d969f2152a04bba7d5.jpg",
-                    secondaryImages: [
-                        "https://image.hm.com/assets/hm/6e/78/6e784ba00fc77382eb988a6b9f17a931889de81e.jpg",
-                        "https://image.hm.com/assets/hm/25/17/2517c9aa5de91cdf51ae88a5f50ed0e8d7ffefd8.jpg",
-                        "https://image.hm.com/assets/hm/e6/0f/e60fa947204ef8ec15cae3096ab3ab932bfa9f03.jpg",
-                        "https://image.hm.com/assets/hm/34/ff/34ffe0ffda9ebcd9db071730747afa8a20aa14af.jpg",
-                        "https://image.hm.com/assets/hm/e6/29/e62943d01387c5e0269bdbde70ebfa3518d5b379.jpg"
-                    ]
-                }
-            ]
-        };
-
-        // Biến toàn cục
-        let currentColorIndex = 0;
+    document.addEventListener('DOMContentLoaded', function () {
         let currentImageIndex = 0;
-        let colorOptions = [];
-        let isDragging = false;
-        let startPosX = 0;
-        let currentTranslateX = 0;
-        let prevTranslateX = 0;
-        let animationID = 0;
+        let currentColorIndex = 0;
         const slider = document.querySelector('.image-slider');
+        const allImages = slider.querySelectorAll('img'); // sửa tên biến cho khớp
 
-        // Khởi tạo trang
-        function initPage() {
-            createColorOptions();
-            loadAllImages();
-            initFirstColor();
-            setupEventListeners();
-        }
+        function showImage(colorIndex, imageIndex) {
+            allImages.forEach(img => img.classList.remove('active'));
 
-        // Tạo các lựa chọn màu sắc
-        function createColorOptions() {
-            const colorOptionsContainer = document.querySelector('.color-options');
-
-            productData.colors.forEach((color, index) => {
-                const colorOption = document.createElement('div');
-                colorOption.className = 'color-option';
-                if (index === 0) colorOption.classList.add('selected');
-                colorOption.style.backgroundImage = `url(${color.mainImage})`;
-                colorOption.dataset.colorIndex = index;
-
-                colorOption.addEventListener('click', function() {
-                    selectColor(index);
-                });
-
-                colorOptionsContainer.appendChild(colorOption);
-                colorOptions.push(colorOption);
-            });
-        }
-
-        // Tải tất cả hình ảnh vào DOM nhưng ẩn đi
-        function loadAllImages() {
-            const imageSlider = document.querySelector('.image-slider');
-
-            productData.colors.forEach((color, colorIndex) => {
-                // Thêm ảnh chính
-                const mainImg = document.createElement('img');
-                mainImg.src = color.mainImage;
-                mainImg.alt = `AirSense Jacket - ${color.name}`;
-                mainImg.dataset.colorIndex = colorIndex;
-                mainImg.dataset.imageIndex = 0;
-                imageSlider.appendChild(mainImg);
-
-                // Thêm các ảnh phụ
-                color.secondaryImages.forEach((imgSrc, imgIndex) => {
-                    const img = document.createElement('img');
-                    img.src = imgSrc;
-                    img.alt = `AirSense Jacket - ${color.name}`;
-                    img.dataset.colorIndex = colorIndex;
-                    img.dataset.imageIndex = imgIndex + 1;
-                    imageSlider.appendChild(img);
-                });
-            });
-        }
-
-        // Khởi tạo màu đầu tiên
-        function initFirstColor() {
-            selectColor(0);
-        }
-
-        // Chọn màu
-        function selectColor(colorIndex) {
-            currentColorIndex = colorIndex;
-            currentImageIndex = 0;
-
-            // Cập nhật UI
-            updateSelectedColorUI();
-            showCurrentImage();
-        }
-
-        // Cập nhật UI khi chọn màu
-        function updateSelectedColorUI() {
-            // Cập nhật tên màu
-            document.querySelector('.selected-color').textContent = productData.colors[currentColorIndex].name;
-
-            // Cập nhật ô màu được chọn
-            colorOptions.forEach((option, index) => {
-                if (index === currentColorIndex) {
-                    option.classList.add('selected');
-                } else {
-                    option.classList.remove('selected');
-                }
-            });
-        }
-
-        // Hiển thị ảnh hiện tại
-        function showCurrentImage() {
-            // Ẩn tất cả ảnh
-            document.querySelectorAll('.image-slider img').forEach(img => {
-                img.classList.remove('active');
-            });
-
-            // Hiển thị ảnh được chọn
-            const activeImage = document.querySelector(`.image-slider img[data-color-index="${currentColorIndex}"][data-image-index="${currentImageIndex}"]`);
+            const activeImage = slider.querySelector(`img[data-color-index="${colorIndex}"][data-image-index="${imageIndex}"]`);
             if (activeImage) {
                 activeImage.classList.add('active');
             }
         }
 
-        // Thiết lập event listeners cho kéo và lăn chuột
-        function setupEventListeners() {
-            // Mouse events
-            slider.addEventListener('mousedown', dragStart);
-            slider.addEventListener('mousemove', drag);
-            slider.addEventListener('mouseup', dragEnd);
-            slider.addEventListener('mouseleave', dragEnd);
-
-            // Touch events
-            slider.addEventListener('touchstart', touchStart);
-            slider.addEventListener('touchmove', touchMove);
-            slider.addEventListener('touchend', touchEnd);
-
-            // Wheel event for mouse wheel scrolling
-            slider.addEventListener('wheel', handleWheel, { passive: false });
+        function selectColor(colorIndex) {
+            currentColorIndex = colorIndex;
+            currentImageIndex = 0;
+            showImage(currentColorIndex, currentImageIndex);
         }
 
-        // Drag functions
-        function dragStart(e) {
-            e.preventDefault();
-            isDragging = true;
-            startPosX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
-            slider.style.cursor = 'grabbing';
-            cancelAnimationFrame(animationID);
-        }
-
-        function drag(e) {
-            if (!isDragging) return;
-            e.preventDefault();
-            const currentPosition = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
-            const diff = currentPosition - startPosX;
-
-            // Only trigger navigation if drag distance is significant
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) {
-                    // Dragged right - go to previous image
-                    navigateImage(-1);
-                    isDragging = false;
-                    slider.style.cursor = 'grab';
-                } else {
-                    // Dragged left - go to next image
-                    navigateImage(1);
-                    isDragging = false;
-                    slider.style.cursor = 'grab';
-                }
-            }
-        }
-
-        function dragEnd() {
-            isDragging = false;
-            slider.style.cursor = 'grab';
-        }
-
-        // Touch functions
-        function touchStart(e) {
-            dragStart(e.touches[0]);
-        }
-
-        function touchMove(e) {
-            drag(e.touches[0]);
-        }
-
-        function touchEnd() {
-            dragEnd();
-        }
-
-        // Mouse wheel function
-        function handleWheel(e) {
-            e.preventDefault();
-            if (e.deltaY > 0) {
-                // Wheel down - next image
-                navigateImage(1);
-            } else {
-                // Wheel up - previous image
-                navigateImage(-1);
-            }
-        }
-
-        // Navigate between images
         function navigateImage(direction) {
-            const totalImages = 1 + productData.colors[currentColorIndex].secondaryImages.length;
-            currentImageIndex = (currentImageIndex + direction + totalImages) % totalImages;
-            showCurrentImage();
+            const colorImages = slider.querySelectorAll(`img[data-color-index="${currentColorIndex}"]`);
+            const total = colorImages.length;
+
+            currentImageIndex = (currentImageIndex + direction + total) % total;
+            showImage(currentColorIndex, currentImageIndex);
         }
 
-        // Khởi tạo trang
-        initPage();
-    });
+        // Mouse & touch drag
+        let isDragging = false;
+        let startX = 0;
 
-
-
-    document.querySelectorAll('.qty-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const input = this.parentNode.querySelector('.qty-input');
-            let value = parseInt(input.value);
-
-            if (this.classList.contains('minus') && value > 1) {
-                value--;
-            } else if (this.classList.contains('plus')) {
-                value++;
-            }
-
-            input.value = value;
+        slider.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            startX = e.clientX;
         });
-    });
 
+        slider.addEventListener('mousemove', function (e) {
+            if (!isDragging) return;
+            const diff = e.clientX - startX;
+            if (Math.abs(diff) > 50) {
+                navigateImage(diff > 0 ? -1 : 1);
+                isDragging = false;
+            }
+        });
 
-    document.querySelector('.description-header').addEventListener('click', function() {
-        const content = this.nextElementSibling;
-        const icon = this.querySelector('.toggle-icon');
+        slider.addEventListener('mouseup', () => isDragging = false);
+        slider.addEventListener('mouseleave', () => isDragging = false);
 
-        content.classList.toggle('show');
-        icon.textContent = content.classList.contains('show') ? '-' : '+';
+        slider.addEventListener('touchstart', function (e) {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+        });
+
+        slider.addEventListener('touchmove', function (e) {
+            if (!isDragging) return;
+            const diff = e.touches[0].clientX - startX;
+            if (Math.abs(diff) > 50) {
+                navigateImage(diff > 0 ? -1 : 1);
+                isDragging = false;
+            }
+        });
+
+        slider.addEventListener('touchend', () => isDragging = false);
+
+        // Wheel navigation
+        slider.addEventListener('wheel', function (e) {
+            e.preventDefault();
+            navigateImage(e.deltaY > 0 ? 1 : -1);
+        }, { passive: false });
+
+        // Color option click
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function () {
+                const index = parseInt(option.dataset.colorIndex);
+                selectColor(index);
+            });
+        });
+
+        // Show first image
+        showImage(0, 0);
     });
 
 </script>
-
 <!--Xử lý chọn size-->
 <script>
     document.querySelectorAll('.size-option:not(.out-of-stock)').forEach(option => {
@@ -1715,7 +1502,6 @@
         });
     });
 </script>
-
 <!--script zoom ảnh-->
 <script>
     document.addEventListener('DOMContentLoaded', function() {

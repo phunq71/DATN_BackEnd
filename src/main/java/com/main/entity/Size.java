@@ -1,6 +1,7 @@
 package com.main.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class Size implements Serializable {
 
     @Column(length = 5)
     private String code;
-
+    @JsonIgnore //Thêm vào tránh vòng lặp
     @OneToMany(mappedBy = "size")
     private List<Item> items;
 }

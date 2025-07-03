@@ -28,9 +28,6 @@ public class Staff implements Serializable {
     @Column(length = 55, nullable = false)
     private String fullname;
 
-    @Column(length = 10, nullable = false)
-    private String role;
-
     @Column(length = 10, nullable = false, unique = true)
     private String phone;
 

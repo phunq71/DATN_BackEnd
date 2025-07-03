@@ -1,5 +1,6 @@
 package com.main.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +17,7 @@ public class Image implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ImageID")
     private Integer imageId;
-
+    @JsonIgnore //Thuận thêm xử lý ở ProductDetailDTO
     @ManyToOne
     @JoinColumn(name = "VariantID", referencedColumnName = "VariantID", insertable = false, updatable = false)
     private Variant variant;
