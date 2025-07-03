@@ -5,7 +5,7 @@ import com.main.security.CustomAuthenticationSuccessHandler;
 import com.main.security.CustomLoginFailureHandler;
 import com.main.security.CustomOAuth2UserService;
 import com.main.security.OAuth2RefererSavingFilter;
-import com.main.serviceImpl.CustomUserDetailsService;
+import com.main.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

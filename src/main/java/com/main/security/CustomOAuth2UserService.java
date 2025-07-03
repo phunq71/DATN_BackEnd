@@ -5,7 +5,6 @@ import com.main.entity.Customer;
 import com.main.entity.Membership;
 import com.main.repository.AccountRepository;
 import com.main.repository.CustomerRepository;
-
 import com.main.repository.MembershipRepository;
 import com.main.service.CustomerService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -38,14 +36,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         try {
             OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(request);
 
-            // Lấy provider: google, facebook, ...
-            String provider = request.getClientRegistration().getRegistrationId(); // ví dụ "google"
-            String providerId = oAuth2User.getName(); // ID do Google/Facebook cấp
-
+            String provider = request.getClientRegistration().getRegistrationId(); // "google" hoặc "facebook"
+            String providerId = oAuth2User.getName(); // ID được cấp từ Google/Facebook
             String email = oAuth2User.getAttribute("email");
             String name = oAuth2User.getAttribute("name");
-            String picture;
 
+            String picture;
             if ("google".equals(provider)) {
                 picture = oAuth2User.getAttribute("picture");
             } else if ("facebook".equals(provider)) {
@@ -55,14 +51,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 picture = "https://example.com/default-avatar.png";
             }
 
-            // Tìm theo provider + providerId
             Optional<Account> existingAccount = accountRepo.findByProviderAndProviderId(provider, providerId);
-
             Account account;
+
             if (existingAccount.isPresent()) {
                 account = existingAccount.get();
 
-                // ✅ Nếu ảnh thay đổi thì cập nhật luôn
                 Customer customer = customerRepo.findById(account.getAccountId()).orElse(null);
                 if (customer != null && picture != null && !picture.equals(customer.getImageAvt())) {
                     customer.setImageAvt(picture);
@@ -70,12 +64,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 }
 
             } else {
-                // Tạo account mới
                 account = new Account();
                 String generatedId = customerService.generateCustomerId();
                 account.setAccountId(generatedId);
                 account.setEmail(email);
-                account.setPassword("oauth");
+                account.setPassword("oauth"); // dấu hiệu là tài khoản OAuth
                 account.setRole("USER");
                 account.setStatus(true);
                 account.setCreateAt(LocalDate.now());
@@ -83,28 +76,22 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 account.setProviderId(providerId);
                 accountRepo.save(account);
 
-                // Tạo customer mới
                 Customer customer = new Customer();
                 customer.setCustomerId(generatedId);
                 customer.setFullName(name);
                 customer.setAddress("N/A");
                 customer.setPhone("N/A");
                 customer.setImageAvt(picture);
-
-                // ✅ Kiểm tra membership trước khi dùng get()
-                Optional<Membership> mb = membershipRepository.findById("MB01");
-                customer.setMembership(mb.orElse(null)); // Tránh .get() gây crash
-
+                customer.setMembership(membershipRepository.findById("MB01").orElse(null));
                 customerRepo.save(customer);
             }
 
-            return oAuth2User;
+            // ✅ Trả về CustomOAuth2User chứa accountId
+            return new CustomOAuth2User(oAuth2User, account.getAccountId());
 
         } catch (Exception e) {
             log.error("❌ Lỗi khi xử lý OAuth2 user: {}", e.getMessage(), e);
-                throw new OAuth2AuthenticationException(e.getMessage());
+            throw new OAuth2AuthenticationException("OAuth2 login failed");
         }
     }
 }
-
-

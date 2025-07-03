@@ -1,4 +1,4 @@
-package com.main.serviceImpl;
+package com.main.security;
 
 import com.main.entity.Account;
 import com.main.repository.AccountRepository;
@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
          Account account = accRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return org.springframework.security.core.userdetails.User.builder()
-                .username(account.getEmail())
+                .username(account.getAccountId())
                 .password(account.getPassword())
                 .roles(account.getRole())
                 .disabled(!account.getStatus())
