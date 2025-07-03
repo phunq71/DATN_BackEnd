@@ -35,6 +35,10 @@ public class OAuth2RefererSavingFilter extends OncePerRequestFilter {
                     referer = referer.replace("index2", "index");
                 }
 
+                if (referer.endsWith("/index") || referer.equals("index")) {
+                    referer = referer.replace("index", "index?login");
+                }
+
                 // Tránh lưu nếu referer là chính trang /auth
                 if (!referer.contains("/auth")) {
                     session.setAttribute("redirect_uri", referer);
