@@ -20,7 +20,7 @@ public class Customer implements Serializable {
     @Column(name = "FullName", nullable = false, length = 55)
     private String fullName;
 
-    @Column(name = "Phone", nullable = false, length = 10, unique = true)
+    @Column(name = "Phone", nullable = false, length = 10)
     private String phone;
 
     @Column(name = "Gender")
@@ -29,10 +29,13 @@ public class Customer implements Serializable {
     @Column(name = "Address", nullable = false, length = 150)
     private String address;
 
+    @Column(name = "AddressIdGHN", nullable = true, length = 100)
+    private String addressIdGHN;
+
     @Column(name = "Dob")
     private LocalDate dob;
 
-    @Column(name = "ImageAvt", nullable = false, length = 50)
+    @Column(name = "ImageAvt", nullable = false, length = 255)
     private String imageAvt;
 
     @ManyToOne

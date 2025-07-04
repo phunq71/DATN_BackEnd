@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class ReturnItem {
 
     @Id
+    @Column(name = "RIID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer returnItemId;
 

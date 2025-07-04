@@ -17,12 +17,7 @@ public class ItemMapper {
         dto.setItemID(item.getItemId());
         dto.setVariantID(item.getVariant().getVariantID());
         dto.setSizeID(item.getSize().getSizeID());
-        // Nếu Item chỉ có 1 Size:
         dto.setSizes(Collections.singletonList(item.getSize()));
-
-        // Nếu Item có List<Size>:
-        // dto.setSizes(item.getSizes());
-
         return dto;
     }
 

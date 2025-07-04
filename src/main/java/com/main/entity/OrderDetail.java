@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 public class OrderDetail {
 
     @Id
+    @Column(name = "ODID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderDetailID;
 
@@ -35,12 +37,12 @@ public class OrderDetail {
     private BigDecimal totalPrice;
 
     @ManyToOne
-    @JoinColumn(name = "PPID", nullable = false)
+    @JoinColumn(name = "PPID")
     private PromotionProduct promotionProduct;
 
     @OneToOne(mappedBy = "orderDetail")
     private ReturnItem returnItem;
 
-    @OneToOne(mappedBy = "orderDetail")
-    private Review review;
+    @OneToMany(mappedBy = "orderDetail")
+    private List<Review> reviews;
 }

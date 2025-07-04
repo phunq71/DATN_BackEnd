@@ -45,11 +45,11 @@ public class Order {
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "StaffID", nullable = false)
+    @JoinColumn(name = "StaffID")
     private Staff staff;
 
     @ManyToOne
-    @JoinColumn(name = "VoucherID", nullable = false)
+    @JoinColumn(name = "VoucherID")
     private Voucher voucher;
 
     @ManyToOne
@@ -58,6 +58,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order")
     private List<OrderDetail> orderDetails;
+
 
     @OneToOne(mappedBy = "order")
     private ReturnRequest returnRequest;

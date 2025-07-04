@@ -24,7 +24,7 @@ public class Review implements Serializable {
     @JoinColumn(name = "CustomerID")
     private Customer customer;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ODID", nullable = false)
     private OrderDetail orderDetail;
 

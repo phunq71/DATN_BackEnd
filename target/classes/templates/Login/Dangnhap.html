@@ -262,8 +262,9 @@
 <body>
 <div class="container">
     <div class="left">
+<!--Form đăng nhập-->
         <h2>ĐĂNG NHẬP</h2>
-        <form action="#" method="post" autocomplete="off">
+        <form action="/auth/login" method="POST" autocomplete="off">
             <div class="social-login">
                 <a href="#">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/1280px-Facebook_f_logo_%282019%29.svg.png" alt="Facebook">
@@ -275,6 +276,7 @@
             <div class="social-or">
                 <div class="divider">or</div>
             </div>
+<!--Email cho đăng nhập-->
             <label for="email">Địa chỉ email *</label>
             <input
                     type="email"
@@ -284,7 +286,7 @@
                     required
                     autocomplete="username"
             />
-
+<!--Mật khẩu cho đăng nhập            -->
             <label for="password">Mật khẩu *</label>
             <div class="password-wrapper">
                 <input

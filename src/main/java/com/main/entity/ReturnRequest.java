@@ -16,6 +16,7 @@ import java.util.List;
 public class ReturnRequest {
 
     @Id
+    @Column(name = "RRID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer returnRequestID;
 

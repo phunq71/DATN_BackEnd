@@ -1,10 +1,8 @@
 package com.main.controller;
 import com.main.dto.Image_DetailDTO;
 import com.main.dto.Variant_DetailDTO;
-import com.main.entity.Category;
-import com.main.entity.Item;
-import com.main.entity.Product;
-import com.main.entity.Variant;
+import com.main.entity.*;
+import com.main.repository.OrderDetailRepository;
 import com.main.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +26,8 @@ public class ProductDetailController {
     ItemService itemService;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    OrderDetailRepository orderDetailRepository;
     @GetMapping("/opulentia")
     public String ProductDetailPAGE(Model model) {
         return "View/productDetail";

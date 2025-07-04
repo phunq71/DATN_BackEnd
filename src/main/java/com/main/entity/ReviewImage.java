@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class ReviewImage {
     @Id
+    @Column( name = "RIID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer reviewImageID;
 

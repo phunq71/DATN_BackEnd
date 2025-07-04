@@ -37,7 +37,7 @@ public class Voucher implements Serializable {
 
     private LocalDateTime endDate;
 
-    @Column(precision = 24, scale = 2)
+    @Column(name = "Claim_conditions", precision = 24, scale = 2)
     private BigDecimal claimConditions;
 
     @ManyToOne

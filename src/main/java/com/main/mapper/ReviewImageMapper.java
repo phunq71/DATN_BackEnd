@@ -9,7 +9,6 @@ public class ReviewImageMapper {
     public static ReviewImage_ReviewDTO toDTO(ReviewImage image) {
         if (image == null) return null;
         ReviewImage_ReviewDTO dto = new ReviewImage_ReviewDTO();
-        dto.setReviewImageID(image.getReviewImageID());
         dto.setImageUrl(image.getImageUrl());
         return dto;
     }

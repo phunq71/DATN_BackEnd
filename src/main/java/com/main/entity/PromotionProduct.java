@@ -15,6 +15,7 @@ import java.util.List;
 public class PromotionProduct {
 
     @Id
+    @Column(name = "PPID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer promotionProductID;
 
