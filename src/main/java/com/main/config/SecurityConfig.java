@@ -55,7 +55,7 @@ public class SecurityConfig {
                                 "/test/**", "/.well-known/**", "/uploads/**","/oauth2/**",
                                 "/api/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**", "/edit-profile").hasRole("USER")
+                        .requestMatchers("/opulentia_user/**", "/edit-profile").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(e -> e

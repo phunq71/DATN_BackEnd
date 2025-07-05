@@ -1,25 +1,26 @@
-// const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-// const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
+// <<<<<<< HEAD
+// // const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+// // const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 //
-// axios.interceptors.request.use(config => {
-//     const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+// //
+// // axios.interceptors.request.use(config => {
+// //     const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+// //
+// //     if (token) {
+// //         config.headers.Authorization = `Bearer ${token}`;
+// //         console.log("📤 Gửi request với token:", token); // 👈 In ra token ở đây
+// //     } else {
+// //         console.warn("⚠️ Không tìm thấy token trong localStorage hoặc sessionStorage");
+// //     }
+// //
+// //     return config;
+// // }, error => {
+// //     return Promise.reject(error);
+// // });
 //
-//     if (token) {
-//         config.headers.Authorization = `Bearer ${token}`;
-//         console.log("📤 Gửi request với token:", token); // 👈 In ra token ở đây
-//     } else {
-//         console.warn("⚠️ Không tìm thấy token trong localStorage hoặc sessionStorage");
-//     }
 //
-//     return config;
-// }, error => {
-//     return Promise.reject(error);
-// });
-
-
-// axios.post("/api/auth/login", { email, password }, { withCredentials: true });
-// axios.defaults.withCredentials = true; // nếu dùng toàn cục
+// // axios.post("/api/auth/login", { email, password }, { withCredentials: true });
+// // axios.defaults.withCredentials = true; // nếu dùng toàn cục
 
 async function isLoggedIn() {
     try {
@@ -34,7 +35,7 @@ async function isLoggedIn() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const protectedPrefixes = ["/edit-profile"]; // Link cần bảo vệ, khi chưa login thì redirect
+    const protectedPrefixes = ["/opulentia_user"]; // Link cần bảo vệ, khi chưa login thì redirect
 
     document.querySelectorAll("a[href]").forEach(anchor => {
         anchor.addEventListener("click", async (event) => {
@@ -60,12 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-
-
-
-
-
-
-
-
-
+// =======
+// const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+// const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+// >>>>>>> d64357fc32bca51dd3229c1e30dd20b5c1cb91fe

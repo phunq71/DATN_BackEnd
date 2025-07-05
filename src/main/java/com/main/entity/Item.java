@@ -37,5 +37,10 @@ public class Item implements Serializable {
 
     @OneToMany(mappedBy = "item")
     private List<Cart> carts;
+
+    //Constructor để tạo item chỉ có id để map với CartId
+    public Item(Integer itemId) {
+        this.itemId = itemId;
+    }
 }
 

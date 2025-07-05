@@ -1,12 +1,24 @@
+
 document.addEventListener('DOMContentLoaded', async function() {
-    getCartsFromLocalStorage();
-    miniCarts = await getMiniCart(carts);
-    console.log('miniCart',miniCarts);
-    updateMiniCart();
+    auth = await isLogin();
+    if(!auth) {
+        console.log("chưa có đăng nhập nè");
+        getCartsFromLocalStorage();
+        miniCarts = await getMiniCart(carts);
+        updateMiniCart();
+    }
+    else {
+        console.log("đăng nhập rồi nè")
+        const itemCarts= await getItemCartsFromServer();
+        carts = getCartsFromItemCarts(itemCarts);
+        miniCarts = await getMiniCart(carts);
+        updateMiniCart();
+    }
 });
 
+let auth= false;
+
 document.addEventListener('cartUpdated', async function() {
-    console.log("bắt sự kiện cập nhật");
     miniCarts = await getMiniCart(carts);
     updateMiniCart();
 });
@@ -24,10 +36,49 @@ function getCartsFromLocalStorage(){
 
 }
 
+function isLogin(){
+    return axios.get("/opulentia/isLogin").then(response => {
+        return response.data;
+    }).catch(error => {
+        console.log(error);
+        return false;
+    });
+}
+
+function getItemCartsFromServer(){
+    return axios.get('/opulentia/user/rest/cart')
+        .then(response =>{
+            return response.data;
+        }
+    ).catch(error =>{
+        console.log(error);
+        return [];
+    });
+}
+
+function getCartsFromItemCarts(itemCarts) {
+    const result = [];
+
+    for (const group of itemCarts) {
+        for (const item of group) {
+            if (item.quantity > 0) {
+                result.push({
+                    customerID: null,
+                    itemID: item.itemID,
+                    quantity: item.quantity,
+                    latestDate: item.latestDate
+                });
+            }
+        }
+    }
+
+    return result;
+}
+
 function getMiniCart(carts){
         return axios.post("/opulentia/rest/cart/miniCart", carts)
             .then(response => {
-                console.log(response.data);
+                // console.log(response.data);
                 return response.data; // ✅ TRẢ DỮ LIỆU RA NGOÀI
             })
             .catch(error => {
@@ -74,3 +125,5 @@ function updateMiniCart() {
 function formatPrice(price) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 }
+
+
