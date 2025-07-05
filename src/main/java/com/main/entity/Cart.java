@@ -18,12 +18,12 @@ public class Cart implements Serializable {
 
     @ManyToOne
     @MapsId("customer")
-    @JoinColumn(name = "CustomerID", nullable = false)
+    @JoinColumn(name = "CustomerID")
     private Customer customer;
 
     @ManyToOne
     @MapsId("item")
-    @JoinColumn(name = "ItemID", nullable = false)
+    @JoinColumn(name = "ItemID")
     private Item item;
 
     @Column(nullable = false)
@@ -31,5 +31,6 @@ public class Cart implements Serializable {
 
     @Column(name = "LatestDate", nullable = false)
     private LocalDateTime latestDate;
+
 }
 

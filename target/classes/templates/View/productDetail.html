@@ -1189,10 +1189,7 @@
     });
     function loadReviews(page = 0) {
         axios.get(`/opulentia/${productId}?page=${page}`, {
-            headers: {
-                [header]: token,
-                'Content-Type': 'application/json'
-            }
+           
         })
             .then(res => {
                 const data = res.data;

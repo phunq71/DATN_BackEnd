@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface CustomerRepository extends JpaRepository<Customer, String > {
     @Query("SELECT MAX(c.customerId) FROM Customer c")
     String findMaxCustomerId();
+
+    Customer findByAccount_AccountId(String accountID);
+
 }

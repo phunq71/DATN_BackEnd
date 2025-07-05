@@ -2,7 +2,6 @@ package com.main.rest_controller;
 
 import com.main.dto.ReviewImage_ReviewDTO;
 import com.main.dto.Review_ReviewDTO;
-import com.main.repository.OrderDetailRepository;
 import com.main.repository.ReviewImageRepository;
 import com.main.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;

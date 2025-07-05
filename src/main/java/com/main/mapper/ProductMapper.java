@@ -54,13 +54,22 @@ public class ProductMapper {
                         variants.isEmpty() ? BigDecimal.ZERO : variants.get(0).getPrice()
                 );
 
+        String variantMainId = variants.stream()
+                .filter(Variant::getIsMainVariant)
+                .map(Variant::getVariantID)
+                .findFirst()
+                .orElse(
+                        variants.isEmpty() ? null : variants.get(0).getVariantID()
+                );
+
         //trả về dto
         return new ProductByCategory(
                 product.getProductID(),
                 product.getProductName(),
                 mainImageUrl,
                 price,
-                colors
+                colors,
+                variantMainId
         );
     }
 }

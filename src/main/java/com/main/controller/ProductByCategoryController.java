@@ -1,8 +1,10 @@
 package com.main.controller;
 
 import com.main.dto.ProductByCategory;
+import com.main.security.JwtService;
 import com.main.service.CategoryService;
 import com.main.service.ProductService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,8 @@ public class ProductByCategoryController {
 
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private JwtService jwtService;
 
     //hiển thị ds sp theo danh mục, có phân trang
     @GetMapping("/opulentia/{parent}/{child}/{page}")
@@ -44,6 +48,7 @@ public class ProductByCategoryController {
         model.addAttribute("childCategory", child);
         model.addAttribute("parentCategoryName", parentCategoryName);
         model.addAttribute("childCategoryName", childCategoryName);
+
 
         return "View/ProductByCategory";
     }

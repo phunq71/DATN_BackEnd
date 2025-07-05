@@ -58,4 +58,8 @@ public class Customer implements Serializable {
     @JoinColumn(name = "CustomerID")
     private Account account;
 
+    //Constructor để tạo customer chỉ có id để map với CartId
+    public Customer(String customerId) {
+        this.customerId = customerId;
+    }
 }

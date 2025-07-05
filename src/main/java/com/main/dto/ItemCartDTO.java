@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +23,7 @@ public class ItemCartDTO {
     private BigDecimal price;
     private String mainImage;
 
+    private LocalDateTime latestDate;
     private int quantity;
     private Boolean isInStock;
     private Long stockQuantity=0L;

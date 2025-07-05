@@ -2,13 +2,20 @@ package com.main.controller;
 
 import com.main.entity.Product;
 import com.main.repository.ProductRepository;
+import com.main.security.CustomOAuth2User;
+import com.main.security.CustomUserDetails;
+import com.main.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.net.http.HttpRequest;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -28,7 +35,9 @@ public class HomeController {
 //		return "Layout/footer";
 //	}
     @Autowired
-ProductRepository productRepository;
+    ProductRepository productRepository;
+    @Autowired
+    private JwtService jwtService;
 
     @GetMapping({"/viewAll"})
     public String viewAll() {
@@ -43,7 +52,26 @@ ProductRepository productRepository;
             model.addAttribute("status", "success");
             model.addAttribute("messageLayout", "Đăng nhập thành công");
         }
-        return "View/index";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            System.out.println("⚠️ Không có thông tin đăng nhập");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof CustomOAuth2User oAuthUser) {
+            System.out.println("✅ OAuth2 - ID: " + oAuthUser.getAccountId());
+        } else if (principal instanceof CustomUserDetails userDetails) {
+            System.out.println("✅ Login thường - ID: " + userDetails.getAccountId());
+        } else if (principal instanceof String s && s.equals("anonymousUser")) {
+            System.out.println("⚠️ Chưa đăng nhập");
+        } else {
+            System.out.println("❓ Không rõ loại người dùng: " + principal.getClass());
+        }
+       return "View/index";
+
+
     }
 
     @GetMapping("/index2")
@@ -58,10 +86,10 @@ ProductRepository productRepository;
 //		return "View/highlightProducts";
 //	}
 //
-//	@GetMapping("/detail")
-//	public String detail() {
-//		return "View/productDetail";
-//	}
+	@GetMapping("/detail")
+	public String detail() {
+		return "View/productDetail";
+	}
 //
 //	@GetMapping("/cart")
 //	public String cart() {
@@ -83,9 +111,12 @@ ProductRepository productRepository;
 //		return "View/allOrders";
 //	}
 //
-	@GetMapping("/edit-profile")
-	public String editProfile() {
-		return "View/edit-profile";
+    @GetMapping("/opulentia_user/edit-profile")
+    public String editProfile(HttpServletRequest request) {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        System.out.println("🔐 AUTH tại /edit-profile: " + auth);
+//        System.out.println("🔐 AUTHORITIES: " + auth.getAuthorities());
+        return "View/edit-profile";
 	}
 //	@GetMapping("/orderDetail")
 //	public String orderDetail() {

@@ -17,33 +17,22 @@ import java.util.Optional;
 
 @Controller
 public class ProductDetailController {
-    @Autowired
-    VariantService variantService;
-    @Autowired
-    ProductService productService;
-    @Autowired
-    ImageService imageService;
-    @Autowired
-    ItemService itemService;
-    @Autowired
-    CategoryService categoryService;
-    @Autowired
-    OrderDetailRepository orderDetailRepository;
-    @Autowired
-    private ItemRepository itemRepository;
 
-    //Yêu cầu /opulentia/{categoryParent}/{categoryID}/{productId} <--id sản phẩm>>.
-    @GetMapping("/opulentia/{categoryParent}/{categoryID}/{productId}")
-    public String ProductDetail(Model model,
-                                @PathVariable String productId) {
-        Optional<Product> product = productService.findByProductID(productId);
-        List<Variant_DetailDTO> listV = variantService.findByProduct(product.get());
-        model.addAttribute("product", product.get());
-        model.addAttribute("listV", listV);
-        return "View/productDetail";
+    private final ProductService productService;
+    private final VariantService variantService;
+    private final CategoryService categoryService;
+    private final ImageService imageService;
+    private final ItemService itemService;
+
+    public ProductDetailController(ProductService productService, VariantService variantService, CategoryService categoryService, ImageService imageService, ItemService itemService) {
+        this.productService = productService;
+        this.variantService = variantService;
+        this.categoryService = categoryService;
+        this.imageService = imageService;
+        this.itemService = itemService;
     }
-    // Yêu cầu /opulentia/<<danh mục cha>>/ <<danh mục con>>/ ?idPro = <<id sản phẩm>>/ ?idVar =”id biến thể
-    // Mẫu http://localhost:8989/opulentia/c1/c2/Pro0000011/pro0000011-02
+
+    // Sửa lại URL: thêm `/product` vào đầu
     @GetMapping("/opulentia/{categoryParent}/{categoryID}/{productId}/{variantID}")
     public String VariantDetail(Model model,
                                 @PathVariable String productId,
@@ -66,10 +55,11 @@ public class ProductDetailController {
         model.addAttribute("listV", listV);
         return "View/productDetail";
     }
-    //Hàm format về tiền VNĐ
+
     private String formatToVND(Number amount) {
         if (amount == null) return "0 VNĐ";
         NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
         return nf.format(amount) + " VNĐ";
     }
 }
+

@@ -201,7 +201,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        background-color: rgba(0, 0, 0, 0.9);
+        background-color: rgb(0, 0, 0, 0.9);
         padding: 15px;
         display: flex;
         flex-direction: column;
@@ -787,7 +787,8 @@
     <section class="products-section">
         <div class="products-grid">
             <div class="product-container" th:each="product : ${products}">
-                <a th:href="@{'/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + '?idPro=' + ${product.productID}}" style="text-decoration: none;">
+                <a th:href="@{'/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + ${product.productID}
+                                + '/' + ${product.variantMainID}}" style="text-decoration: none;">
                     <div class="product-wrapper">
                         <img th:src="@{'/uploads/' + ${product.mainImageUrl}}" alt="Product" class="product-image">
 <!--                        <div class="new-label">NEW</div>-->
