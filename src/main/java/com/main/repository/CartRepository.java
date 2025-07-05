@@ -6,9 +6,11 @@ import com.main.dto.MiniCartDTO;
 import com.main.entity.Cart;
 import com.main.entity.CartId;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -47,4 +49,9 @@ public interface CartRepository extends JpaRepository<Cart, CartId> {
     WHERE c.id.customer = :customerId
     """)
     public List<CartDTO> getCartsByCustomerId(@Param("customerId") String customerId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Cart c WHERE c.id.customer=:customerId")
+    public void clearCartsByCustomerId(@Param("customerId") String customerId);
 }

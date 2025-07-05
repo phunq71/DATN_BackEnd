@@ -81,10 +81,10 @@ ProductRepository productRepository;
 //		return "View/highlightProducts";
 //	}
 //
-//	@GetMapping("/detail")
-//	public String detail() {
-//		return "View/productDetail";
-//	}
+	@GetMapping("/detail")
+	public String detail() {
+		return "View/productDetail";
+	}
 //
 //	@GetMapping("/cart")
 //	public String cart() {

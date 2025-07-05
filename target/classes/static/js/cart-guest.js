@@ -3,10 +3,10 @@
 
 
 document.addEventListener('DOMContentLoaded', async function() {
-   // getCartsFromLocalStorage();
+   getCartsFromLocalStorage();
     // console.log(carts);
     itemCarts = await getItem(carts);
-    // console.log(itemCarts);
+    //console.log(itemCarts);
     initCart();
 });
 
@@ -30,15 +30,7 @@ function getCartsFromLocalStorage(){
 
     // Lấy dữ liệu từ localStorage
     let dataCartString = localStorage.getItem('carts');
-    let dataCarts = dataCartString ? JSON.parse(dataCartString) : [];
-
-// Nếu chưa có gì trong localStorage thì set dữ liệu mẫu
-//     if (!dataCarts || dataCarts.length < 1) {
-//         localStorage.setItem('carts', JSON.stringify(carts));
-//     }
-//     else{
-//         carts= JSON.parse(localStorage.getItem('carts'));
-//     }
+    carts= JSON.parse(localStorage.getItem('carts'));
 
 }
 
