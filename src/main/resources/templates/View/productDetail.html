@@ -186,13 +186,7 @@
         background: #333;
     }
 
-    .find-in-store {
-        text-decoration: underline;
-        color: #666;
-        text-align: center;
-        display: block;
-        cursor: pointer;
-    }
+
 
     /* Responsive design */
     @media (max-width: 808px) {
@@ -758,33 +752,6 @@
         flex-wrap: wrap;
     }
 
-    /* Hiển thị "MALE", "FEMALE", "UNISEX" */
-    .selected-size {
-        font-weight: 600;
-        color: #333;
-    }
-
-    /* Link bảng size */
-    .size-guide-link {
-        display: inline-block;      /* Đảm bảo vùng click và hiệu ứng */
-        font-size: 14px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #333;
-        background-color: #f0f0f0;
-        border: 1px solid #bbb;
-        padding: 6px 12px;
-        border-radius: 6px;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .size-guide-link:hover {
-        background-color: #333;
-        color: #fff;
-        border-color: #333;
-    }
     /*thẻ <a> không phá css*/
     .product-link {
         display: block;
@@ -799,10 +766,46 @@
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         z-index: 2;
     }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 30px;
+        padding: 10px 0;
+        user-select: none;
+    }
+
+    .pagination button {
+        padding: 8px 16px;
+        border: none;
+        background-color: #ffffff;
+        color: #333;
+        font-size: 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.25s ease;
+        font-weight: 500;
+    }
+
+    .pagination button:hover {
+        background-color: #f5f5f5;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .pagination button.active-page {
+        background-color: #333;
+        color: #fff;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
 </style>
 <!--style cho zoom ảnh-->
 <style>
     /* Style cho modal phóng to (thêm mới) */
+    /* Style cho modal phóng to */
     .image-zoom-modal {
         display: none;
         position: fixed;
@@ -810,32 +813,28 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
+        background-color: rgba(0, 0, 0, 0.9);
         z-index: 1000;
         justify-content: center;
         align-items: center;
-        cursor: grab;
-    }
-
-    .image-zoom-modal.grabbing {
-        cursor: grabbing;
+        cursor: pointer;
     }
 
     .zoom-modal-content {
         position: relative;
         max-width: 90%;
         max-height: 90%;
-        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .zoom-modal-image {
         max-width: 100%;
-        max-height: 80vh;
-        display: block;
-        margin: 0 auto;
-        transition: transform 0.3s;
-        transform-origin: center center;
-        cursor: grab;
+        max-height: 90vh;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+        cursor: default;
     }
 
     .zoom-modal-image.grabbing {
@@ -844,13 +843,31 @@
 
     .close-zoom-modal {
         position: absolute;
-        top: 15px;
-        right: 15px;
+        top: 20px;
+        right: 30px;
         color: white;
-        font-size: 30px;
+        font-size: 40px;
+        font-weight: bold;
         cursor: pointer;
         z-index: 1001;
+        transition: 0.3s;
     }
+
+    .close-zoom-modal:hover {
+        color: #ccc;
+    }
+
+    /* Thêm hiệu ứng khi hover ảnh review */
+    .review-image {
+        cursor: zoom-in;
+        transition: transform 0.2s;
+    }
+
+    .review-image:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
 </style>
 <div class="product-slider">
     <!-- Phần hình ảnh (50%) -->
@@ -893,22 +910,7 @@
                      th:text="${size.getSize().getCode() != null ? size.getSize().getCode() : 'Hết hàng'}">
                 </div>
             </div>
-            <div class="size-container">
-                <span>Size:</span>
-                <span class="selected-size" th:text="${product.getTargetCustomer()}"></span>
-                <a class="size-guide-link"
-                   th:if="${product.getTargetCustomer() == 'MALE'}"
-                   th:href="@{https://www.vietcargo.vn/wp-content/uploads/2023/05/Size-ao-thun-My-khac-gi-Viet-Nam.jpg}" target="_blank">Xem bảng size nam</a>
-                <a class="size-guide-link"
-                   th:if="${product.getTargetCustomer() == 'FEMALE'}"
-                   th:href="@{https://dongphucdongnai.vn/upload/baiviet/bangsizeaonu0-2852.jpg}" target="_blank">Xem bảng size nữ</a>
-                <a class="size-guide-link"
-                   th:if="${product.getTargetCustomer() == 'UNISEX'}"
-                   th:href="@{https://file.hstatic.net/200000265901/file/z6732954876758_eb3a4ca6ccf412e0934870881ef74242_1024x1024.jpg}" target="_blank">Xem bảng size unisex</a>
-            </div>
-
         </div>
-
         <div class="rating">
             <div class="rating-box">
                 <div style="color:#666">★ 4.5</div>
@@ -917,21 +919,15 @@
                 </div>
             </div>
         </div>
-
         <div class="quantity-field">
             <button class="qty-btn minus">-</button>
             <input type="number" class="qty-input" value="1" min="1">
             <button class="qty-btn plus">+</button>
         </div>
         <div class="price" th:text="${priceVariant}"></div>
-
-        <div class="stock-status">Low stock</div>
         <button class="add-to-cart">ADD TO CART</button>
-        <a href="#" class="find-in-store">Find stock in store</a>
     </div>
 </div>
-
-
 <!-- Phần mô tả sản phẩm -->
 <div class="product-description">
     <div>
@@ -1008,10 +1004,10 @@
                 <div>1</div>
             </div>
             <!-- Phần đánh giá chi tiết của khách hàng -->
+            <div class="pagination"></div>
             <div class="customer-reviews">
                 <h3>Đánh giá của khách hàng</h3>
                 <div class="customer-reviews"></div>
-                <div class="pagination"></div>
             </div>
         </div>
     </div>
@@ -1098,8 +1094,7 @@
 <div id="filterModal" class="filter-modal">
     <div class="modal-content">
         <h3>Lọc đánh giá</h3>
-
-        <div class="filter-group">
+        <div class="filter-group" onclick="handleSingleSelect(this)">
             <h4>Số sao</h4>
             <div class="star-filters">
                 <div class="star-filter">
@@ -1133,26 +1128,15 @@
             </label>
         </div>
 
-        <div class="filter-group">
+        <div class="filter-group"  onclick="handleSingleSelect(this)">
             <h4>Màu sắc</h4>
             <div class="color-filters">
                 <div>
-                    <input type="checkbox" id="colorBlack" value="Đen">
-                    <label for="colorBlack">Đen</label>
+                    <th:block th:each="l :${listV}">
+                    <input type="checkbox" id="colorBlack" th:value="${l.getColor()}">
+                    <label for="colorBlack" th:text="${l.getColor()}"></label>
+                    </th:block>
                 </div>
-                <div>
-                    <input type="checkbox" id="colorWhite" value="Trắng">
-                    <label for="colorWhite">Trắng</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="colorGray" value="Xám">
-                    <label for="colorGray">Xám</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="colorMint" value="Xanh">
-                    <label for="colorGray">Xanh bạc hà</label>
-                </div>
-            </div>
         </div>
 
         <div class="filter-group">
@@ -1180,7 +1164,7 @@
         <button class="apply-btn" onclick="applyFilters()">Áp dụng</button>
     </div>
 </div>
-<!--Modal zoom ảnh-->
+    </div>
 <!-- Thêm modal phóng to -->
 <div class="image-zoom-modal">
     <span class="close-zoom-modal">&times;</span>
@@ -1188,14 +1172,21 @@
         <img class="zoom-modal-image" src="" alt="">
     </div>
 </div>
-
-
+<!--Xử lý danh sách khách hàng review sản phẩm-->
 <script>
     const pathParts = window.location.pathname.split('/');
     const productId = pathParts[4];
 
     let currentPage = 0;
+    // Gọi hàm khi tải trang
+    document.addEventListener('DOMContentLoaded', function() {
+        setupImageZoom();
 
+        // Nếu có load reviews ngay khi tải trang
+        if (typeof loadReviews === 'function') {
+            loadReviews(0);
+        }
+    });
     function loadReviews(page = 0) {
         axios.get(`/opulentia/${productId}?page=${page}`, {
             headers: {
@@ -1223,7 +1214,7 @@
                         if (review.reviewImages && review.reviewImages.length > 0) {
                             images = `<div class="review-images">`;
                             review.reviewImages.forEach(img => {
-                                images += `<img src="${img.url}" alt="Review ${review.reviewID}" class="review-image">`;
+                                images += `<img src="/uploads/${img.imageUrl}" alt="Review ${review.reviewID}" class="review-image">`;
                             });
                             images += `</div>`;
                         }
@@ -1246,21 +1237,18 @@
                 }
 
                 reviewContainer.innerHTML = html;
-
+                setupImageZoom();
                 // Tạo nút phân trang
                 let pageHtml = '';
 
-                if (currentPage > 0) {
-                    pageHtml += `<button onclick="loadReviews(${currentPage - 1})">← Trước</button>`;
-                }
+                pageHtml += `<button onclick="loadReviews(${currentPage - 1})" ${currentPage === 0 ? 'disabled' : ''}>← Trước</button>`;
 
                 for (let i = 0; i < totalPages; i++) {
-                    pageHtml += `<button onclick="loadReviews(${i})" ${i === currentPage ? 'style="font-weight:bold"' : ''}>${i + 1}</button>`;
+                    pageHtml += `<button onclick="loadReviews(${i})" class="${i === currentPage ? 'active-page' : ''}">${i + 1}</button>`;
                 }
 
-                if (currentPage < totalPages - 1) {
-                    pageHtml += `<button onclick="loadReviews(${currentPage + 1})">Sau →</button>`;
-                }
+
+                pageHtml += `<button onclick="loadReviews(${currentPage + 1})" ${currentPage === totalPages - 1 ? 'disabled' : ''}>Sau →</button>`;
 
                 paginationContainer.innerHTML = pageHtml;
             })
@@ -1279,8 +1267,21 @@
         if (diffDays === 1) return "1 ngày trước";
         return `${diffDays} ngày trước`;
     }
-
+    // check box chỉ được chọn 1
+    function handleSingleSelect(container) {
+        const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                if (this.checked) {
+                    checkboxes.forEach(other => {
+                        if (other !== this) other.checked = false;
+                    });
+                }
+            });
+        });
+    }
     // Tải trang đầu tiên
+
     loadReviews(0);
 
 </script>
@@ -1292,10 +1293,8 @@
         let currentColorIndex = 0;
         const slider = document.querySelector('.image-slider');
         const allImages = slider.querySelectorAll('img'); // sửa tên biến cho khớp
-
         function showImage(colorIndex, imageIndex) {
             allImages.forEach(img => img.classList.remove('active'));
-
             const activeImage = slider.querySelector(`img[data-color-index="${colorIndex}"][data-image-index="${imageIndex}"]`);
             if (activeImage) {
                 activeImage.classList.add('active');
@@ -1389,8 +1388,6 @@
             console.log('Size selected:', selectedSize);
         });
     });
-
-
     document.querySelectorAll('.quantity-button').forEach(button => {
         button.addEventListener('click', function() {
             const input = this.parentNode.querySelector('.quantity-input');
@@ -1449,48 +1446,10 @@
         console.log('Hủy lọc');
     }
 </script>
-
-<!--Hiệu ứng cho nut favorite-->
-<script>
-    // Xử lý nút yêu thích
-    $('.ot-favorite-btn').click(function (e) {
-        e.stopPropagation();
-        const icon = $(this).find('i');
-        if (icon.hasClass('far')) {
-            icon.removeClass('far').addClass('fas');
-            $(this).css('color', '#ff4757');
-        } else {
-            icon.removeClass('fas').addClass('far');
-            $(this).css('color', '#333');
-        }
-    });
-</script>
-<!--Hiệu ứng rớt từng ô màu-->
-<script>
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Lặp qua tất cả các product-wrapper
-        document.querySelectorAll('.ot-product-wrapper').forEach(wrapper => {
-            const colorCircles = wrapper.querySelectorAll('.ot-color-circle');
-
-            // Nếu có các color-circle
-            if (colorCircles.length > 0) {
-                // Thêm style động cho mỗi circle
-                colorCircles.forEach((circle, index) => {
-                    const delay = (index + 1) * 0.1; // 0.1s, 0.2s, 0.3s,...
-                    circle.style.transitionDelay = `${delay}s`;
-                });
-
-                // Thêm style cho wrapper (tùy chọn)
-                const maxDelay = (colorCircles.length) * 0.1;
-                wrapper.style.setProperty('--max-transition-delay', `${maxDelay}s`);
-            }
-        });
-    });
-</script>
 <!--script zoom ảnh-->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    // Hàm thiết lập zoom ảnh
+    function setupImageZoom() {
         const reviewImages = document.querySelectorAll('.review-image');
         const zoomModal = document.querySelector('.image-zoom-modal');
         const zoomModalImg = document.querySelector('.zoom-modal-image');
@@ -1501,46 +1460,54 @@
         let startPos = { x: 0, y: 0 };
         let translatePos = { x: 0, y: 0 };
 
-        // Mở modal khi click vào ảnh
+        // Reset trạng thái ảnh
+        function resetImageState() {
+            currentScale = 1;
+            translatePos = { x: 0, y: 0 };
+            zoomModalImg.style.transform = `scale(${currentScale}) translate(${translatePos.x}px, ${translatePos.y}px)`;
+            zoomModalImg.classList.remove('grabbing');
+        }
+
+        // Mở modal zoom
+        function openZoomModal(imgSrc, imgAlt) {
+            zoomModal.style.display = 'flex';
+            zoomModalImg.src = imgSrc;
+            zoomModalImg.alt = imgAlt;
+            resetImageState();
+        }
+
+        // Đóng modal zoom
+        function closeZoomModal() {
+            zoomModal.style.display = 'none';
+        }
+
+        // Thêm sự kiện click cho từng ảnh review
         reviewImages.forEach(img => {
-            img.addEventListener('click', function() {
-                zoomModal.style.display = 'flex';
-                zoomModalImg.src = this.src;
-                zoomModalImg.alt = this.alt;
-                resetImageState();
+            img.addEventListener('click', function(e) {
+                e.stopPropagation();
+                openZoomModal(this.src, this.alt);
             });
         });
 
-        // Đóng modal
-        closeModal.addEventListener('click', closeModalHandler);
+        // Đóng modal khi click vào nút đóng
+        closeModal.addEventListener('click', closeZoomModal);
+
+        // Đóng modal khi click ra ngoài
         zoomModal.addEventListener('click', function(e) {
             if (e.target === zoomModal) {
-                closeModalHandler();
+                closeZoomModal();
             }
         });
 
-        // Zoom ảnh bằng chuột
+        // Zoom bằng chuột
         zoomModalImg.addEventListener('wheel', function(e) {
             e.preventDefault();
-
             const delta = e.deltaY > 0 ? -0.1 : 0.1;
-            const newScale = Math.max(0.5, Math.min(3, currentScale + delta));
-
-            // Tính toán zoom dựa trên vị trí con trỏ
-            const rect = zoomModalImg.getBoundingClientRect();
-            const offsetX = e.clientX - rect.left - translatePos.x;
-            const offsetY = e.clientY - rect.top - translatePos.y;
-
-            // Cập nhật vị trí để zoom tại điểm con trỏ
-            translatePos.x -= (offsetX * (newScale / currentScale - 1));
-            translatePos.y -= (offsetY * (newScale / currentScale - 1));
-
-            currentScale = newScale;
-            updateImageTransform();
-            updateCursorStyle();
+            currentScale = Math.max(0.5, Math.min(3, currentScale + delta));
+            zoomModalImg.style.transform = `scale(${currentScale}) translate(${translatePos.x}px, ${translatePos.y}px)`;
         });
 
-        // Xử lý kéo ảnh
+        // Kéo ảnh khi zoom lớn hơn 1
         zoomModalImg.addEventListener('mousedown', function(e) {
             if (currentScale > 1) {
                 isDragging = true;
@@ -1549,57 +1516,29 @@
                     y: e.clientY - translatePos.y
                 };
                 zoomModalImg.classList.add('grabbing');
-                e.preventDefault(); // Ngăn chặn selection text
+                e.preventDefault();
             }
         });
 
         document.addEventListener('mousemove', function(e) {
             if (!isDragging) return;
-
             translatePos.x = e.clientX - startPos.x;
             translatePos.y = e.clientY - startPos.y;
-            updateImageTransform();
+            zoomModalImg.style.transform = `scale(${currentScale}) translate(${translatePos.x}px, ${translatePos.y}px)`;
         });
 
         document.addEventListener('mouseup', function() {
-            if (isDragging) {
-                isDragging = false;
-                zoomModalImg.classList.remove('grabbing');
-                updateCursorStyle();
-            }
+            isDragging = false;
+            zoomModalImg.classList.remove('grabbing');
         });
 
         // Đóng bằng phím ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                closeModalHandler();
+                closeZoomModal();
             }
         });
-
-        // Cập nhật transform cho ảnh
-        function updateImageTransform() {
-            zoomModalImg.style.transform = `scale(${currentScale}) translate(${translatePos.x}px, ${translatePos.y}px)`;
-        }
-
-        // Cập nhật cursor style
-        function updateCursorStyle() {
-            zoomModalImg.classList.toggle('can-drag', currentScale > 1);
-        }
-
-        // Reset trạng thái ảnh
-        function resetImageState() {
-            currentScale = 1;
-            translatePos = { x: 0, y: 0 };
-            updateImageTransform();
-            zoomModalImg.classList.remove('grabbing', 'can-drag');
-        }
-
-        // Xử lý đóng modal
-        function closeModalHandler() {
-            zoomModal.style.display = 'none';
-            resetImageState();
-        }
-    });
+    }
 </script>
 </body>
 </html>

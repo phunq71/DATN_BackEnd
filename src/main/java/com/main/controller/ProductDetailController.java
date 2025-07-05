@@ -2,6 +2,7 @@ package com.main.controller;
 import com.main.dto.Image_DetailDTO;
 import com.main.dto.Variant_DetailDTO;
 import com.main.entity.*;
+import com.main.repository.ItemRepository;
 import com.main.repository.OrderDetailRepository;
 import com.main.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,9 @@ public class ProductDetailController {
     CategoryService categoryService;
     @Autowired
     OrderDetailRepository orderDetailRepository;
-    @GetMapping("/opulentia")
-    public String ProductDetailPAGE(Model model) {
-        return "View/productDetail";
-    }
+    @Autowired
+    private ItemRepository itemRepository;
+
     //Yêu cầu /opulentia/{categoryParent}/{categoryID}/{productId} <--id sản phẩm>>.
     @GetMapping("/opulentia/{categoryParent}/{categoryID}/{productId}")
     public String ProductDetail(Model model,
@@ -56,10 +56,10 @@ public class ProductDetailController {
         Optional<Variant> variant = variantService.findById(variantID);
         List<Image_DetailDTO> listImage = imageService.findByVariant(variant.get());
         List<Item> listI = itemService.findByVariant(variant.get());
+        String formattedPrice = formatToVND(variant.get().getPrice());
         model.addAttribute("listI", listI);
         model.addAttribute("descriptionVariant", variant.get().getDescription());
         model.addAttribute("colorVariant", variant.get().getColor());
-        String formattedPrice = formatToVND(variant.get().getPrice());
         model.addAttribute("priceVariant", formattedPrice);
         model.addAttribute("listImage", listImage);
         model.addAttribute("product", product.get());

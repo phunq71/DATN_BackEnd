@@ -3,7 +3,6 @@ package com.main.dto;
 import com.main.entity.Image;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.util.List;
 @Setter

@@ -12,4 +12,5 @@ public class Item_DetailDTO {
     String variantID;
     Integer sizeID;
     List<Size> sizes;
+
 }

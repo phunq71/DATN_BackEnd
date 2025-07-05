@@ -1,8 +1,6 @@
 package com.main.dto;
 
-import com.main.entity.ReviewImage;
 import lombok.*;
-
 import java.time.LocalDate;
 import java.util.List;
 

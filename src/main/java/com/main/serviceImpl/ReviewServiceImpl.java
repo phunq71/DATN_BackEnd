@@ -1,7 +1,6 @@
 package com.main.serviceImpl;
 
 import com.main.dto.Review_ReviewDTO;
-import com.main.entity.Review;
 import com.main.mapper.ReviewMapper;
 import com.main.repository.ReviewRepository;
 import com.main.service.ReviewService;

@@ -8,7 +8,6 @@ import com.main.entity.Variant;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,6 @@ public class ProductMapper {
         dto.setProductId(product.getProductID());
         dto.setProductName(product.getProductName());
         dto.setVariants(VariantMapper.toDTOList(product.getVariants()));
-
         return dto;
     }
     //chuyển đối tượng Product->ProductByCategoryDTO
