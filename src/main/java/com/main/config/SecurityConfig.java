@@ -1,11 +1,8 @@
 package com.main.config;
 
 
-import com.main.security.CustomAuthenticationSuccessHandler;
-import com.main.security.CustomLoginFailureHandler;
-import com.main.security.CustomOAuth2UserService;
-import com.main.security.OAuth2RefererSavingFilter;
-import com.main.security.CustomUserDetailsService;
+import com.main.security.*;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +11,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -26,11 +25,15 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
-    @Autowired
-    private CustomAuthenticationSuccessHandler successHandler;
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
+        return new JwtAuthenticationFilter(jwtService, userDetailsService);
+    }
+
 
     @Autowired
-    private CustomLoginFailureHandler customLoginFailureHandler;
+    private OAuth2SuccessHandler oAuth2SuccessHandler;
+
 
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
@@ -39,49 +42,52 @@ public class SecurityConfig {
     private OAuth2RefererSavingFilter oAuth2RefererSavingFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+        System.out.println("✅ SecurityFilterChain from SecurityConfigTest is active");
         http
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/opulentia/rest/cart/**") // ✅ cấu hình CSRF riêng
-                )
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/opulentia/user/**").authenticated()
-                        .requestMatchers("/auth", "/auth/login","/auth/**", "/index", "/logo/**", "/js/**",
-                                "/data/**", "/test/**","/.well-known/**", "/opulentia/**", "/uploads/**" )
-                        .permitAll()
+                        .requestMatchers("/opulentia/rest/**").permitAll()
+                        .requestMatchers("/opulentia/**").permitAll()
+                        .requestMatchers("/auth/**", "/index", "/logo/**", "/js/**", "/data/**",
+                                "/test/**", "/.well-known/**", "/uploads/**","/oauth2/**",
+                                "/api/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/user/**", "/edit-profile").hasRole("USER")
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/auth")
-                        .loginProcessingUrl("/auth/login")
-                        .failureHandler(customLoginFailureHandler)
-                        .successHandler(successHandler)
-                        .permitAll()
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            String requestURI = request.getRequestURI();
+
+                            // Nếu request đến từ trình duyệt (text/html) => chuyển hướng
+                            String acceptHeader = request.getHeader("Accept");
+                            if (acceptHeader != null && acceptHeader.contains("text/html")) {
+                                response.sendRedirect("/auth");
+                            } else {
+                                // Request kiểu API (json, axios,...) thì trả về 401
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.getWriter().write("Unauthorized");
+                            }
+                        })
                 )
-                .addFilterBefore(new OAuth2RefererSavingFilter(), OAuth2LoginAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(oAuth2RefererSavingFilter, OAuth2LoginAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/auth")
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
-                        .successHandler(successHandler)
-                )
-
-                .rememberMe(remember -> remember
-                        .key("v3qJHiO/ffKD+oLXkCMnyImZ/TOm8Rds6IZ6Xd6Cp456J8Ogh+qUYoUchFN2FliZwdTJa1lbJ5tUUpnJQOx/Ew==")
-                        .tokenValiditySeconds(7 * 24 * 60 * 60)
-                        .userDetailsService(userDetailsService)
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/index2")
-                        .deleteCookies("JSESSIONID", "remember-me") // 👈 thêm dòng này
-                        .permitAll()
+                                .successHandler(oAuth2SuccessHandler)
                 );
-
         return http.build();
     }
+
+
+
+
 
 
     @Bean

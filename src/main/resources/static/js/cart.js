@@ -45,14 +45,15 @@ function getCartsFromLocalStorage(){
 function getItem(carts) {
     return axios.post("/opulentia/rest/cart", carts)
         .then(response => {
-            console.log(response.data);
-            return response.data; // ✅ TRẢ DỮ LIỆU RA NGOÀI
+            console.log("✅ Phản hồi từ server:", response.data);
+            return response.data;
         })
         .catch(error => {
-            console.log(error);
-            return []; // 👈 nếu lỗi thì trả mảng rỗng hoặc giá trị mặc định
+            console.error("❌ Lỗi khi gửi request:", error);
+            return [];
         });
 }
+
 // Function to format price with VND currency
 function formatPrice(price) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);

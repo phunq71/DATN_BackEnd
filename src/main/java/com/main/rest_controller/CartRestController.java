@@ -22,6 +22,7 @@ public class CartRestController {
 
     @PostMapping
     public ResponseEntity<List<List<ItemCartDTO>>> cart(@RequestBody List<CartDTO> cartDTOs) {
+        System.out.println("✅ VÀO ĐƯỢC CONTROLLER /opulentia/rest/cart");
         List<List<ItemCartDTO>> itemCartDTOs = new ArrayList<>();
         itemCartDTOs= cartService.getItemCarts(cartDTOs);
         System.out.println(itemCartDTOs);
@@ -30,6 +31,7 @@ public class CartRestController {
 
     @PostMapping("/miniCart")
     public ResponseEntity<List<MiniCartDTO>> miniCart(@RequestBody List<CartDTO> carts) {
+        System.out.println("✅ VÀO ĐƯỢC CONTROLLER /opulentia/rest/cart");
         List<MiniCartDTO> miniCartDTOs = new ArrayList<>();
         miniCartDTOs= cartService.getMiniCarts(carts);
         return ResponseEntity.ok(miniCartDTOs);

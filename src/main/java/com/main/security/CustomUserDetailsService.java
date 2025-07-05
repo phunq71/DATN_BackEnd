@@ -13,14 +13,23 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private AccountRepository accRepository;
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Account account = accRepository.findByEmail(email)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return accountRepository.findByEmailAndProviderIsNull(username)
+                .map(CustomUserDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        return new CustomUserDetails(account); // ✅ Trả về đối tượng tùy biến
     }
+
+    public UserDetails loadUserByProvider(String provider, String providerId) throws UsernameNotFoundException {
+        return accountRepository.findByProviderAndProviderId(provider, providerId)
+                .map(CustomUserDetails::new)
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy tài khoản OAuth2"));
+    }
+
+
 }
 
 

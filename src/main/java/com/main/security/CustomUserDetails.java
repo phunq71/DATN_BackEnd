@@ -34,6 +34,17 @@ public class CustomUserDetails implements UserDetails {
     public String getAccountId() {
         return account.getAccountId();
     }
+    public String getProvider() {
+        return account.getProvider();
+    }
+
+    public String getProviderId() {
+        return account.getProviderId();
+    }
+
+
+
+
 
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }

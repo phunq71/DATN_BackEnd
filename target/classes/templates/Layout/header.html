@@ -358,11 +358,11 @@
 
 
                     <!-- Form ẩn để POST logout -->
-                    <th:block th:if="${#authorization.expression('isAuthenticated()')}">
-                        <form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                        </form>
-                    </th:block>
+<!--                    <th:block th:if="${#authorization.expression('isAuthenticated()')}">-->
+<!--                        <form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;">-->
+<!--                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
+<!--                        </form>-->
+<!--                    </th:block>-->
 
 
                     <a href="/allOrders" class="text-white ms-3"><i class="fa-solid fa-receipt"></i></a>
@@ -420,9 +420,9 @@
             });
         });
 
-        //logout
         function confirmLogout(event) {
             event.preventDefault();
+
             Swal.fire({
                 title: 'Bạn có chắc muốn đăng xuất?',
                 icon: 'warning',
@@ -439,10 +439,33 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('logoutForm').submit();
+                    axios.post("/api/auth/logout", {}, {
+                        withCredentials: true // gửi cookie (accessToken, refreshToken)
+                    })
+                        .then(() => {
+                            // Xóa token lưu ở localStorage/sessionStorage nếu có
+                            localStorage.removeItem("accessToken");
+                            localStorage.removeItem("refreshToken");
+                            sessionStorage.removeItem("accessToken");
+                            sessionStorage.removeItem("refreshToken");
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Đăng xuất thành công!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.href = "/index";
+                            });
+                        })
+                        .catch(err => {
+                            console.error("❌ Lỗi khi đăng xuất:", err);
+                            Swal.fire("Lỗi", "Đăng xuất thất bại!", "error");
+                        });
                 }
             });
         }
+
     </script>
 
     <script>

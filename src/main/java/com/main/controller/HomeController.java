@@ -4,6 +4,7 @@ import com.main.entity.Product;
 import com.main.repository.ProductRepository;
 import com.main.security.CustomOAuth2User;
 import com.main.security.CustomUserDetails;
+import com.main.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.net.http.HttpRequest;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -32,7 +35,9 @@ public class HomeController {
 //		return "Layout/footer";
 //	}
     @Autowired
-ProductRepository productRepository;
+    ProductRepository productRepository;
+    @Autowired
+    private JwtService jwtService;
 
     @GetMapping({"/viewAll"})
     public String viewAll() {
@@ -106,9 +111,12 @@ ProductRepository productRepository;
 //		return "View/allOrders";
 //	}
 //
-	@GetMapping("/edit-profile")
-	public String editProfile() {
-		return "View/edit-profile";
+    @GetMapping("/edit-profile")
+    public String editProfile(HttpServletRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("🔐 AUTH tại /edit-profile: " + auth);
+        System.out.println("🔐 AUTHORITIES: " + auth.getAuthorities());
+        return "View/edit-profile";
 	}
 //	@GetMapping("/orderDetail")
 //	public String orderDetail() {
