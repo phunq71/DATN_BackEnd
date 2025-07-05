@@ -111,11 +111,11 @@ public class HomeController {
 //		return "View/allOrders";
 //	}
 //
-    @GetMapping("/edit-profile")
+    @GetMapping("/opulentia_user/edit-profile")
     public String editProfile(HttpServletRequest request) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("🔐 AUTH tại /edit-profile: " + auth);
-        System.out.println("🔐 AUTHORITIES: " + auth.getAuthorities());
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        System.out.println("🔐 AUTH tại /edit-profile: " + auth);
+//        System.out.println("🔐 AUTHORITIES: " + auth.getAuthorities());
         return "View/edit-profile";
 	}
 //	@GetMapping("/orderDetail")
