@@ -2,8 +2,9 @@ package com.main.rest_controller;
 
 import com.main.dto.ReviewImage_ReviewDTO;
 import com.main.dto.Review_ReviewDTO;
-import com.main.repository.ReviewImageRepository;
 import com.main.repository.ReviewRepository;
+import com.main.service.ReviewImageService;
+import com.main.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,19 +21,37 @@ import java.util.Map;
 @RestController
 public class ReviewRestController {
     @Autowired
-    ReviewRepository reviewRepository;
+    ReviewService reviewService;
     @Autowired
-    private ReviewImageRepository reviewImageRepository;
+    private ReviewImageService reviewImageService;
 
     @GetMapping("/opulentia/{productID}")
-    public ResponseEntity<Map<String, Object>> findAllReviews(@PathVariable String productID,
-                                                              @RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<Map<String, Object>> findFilteredReviews(
+            @PathVariable String productID,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) Integer rating,
+            @RequestParam(required = false) String color,
+            @RequestParam(required = false) String size,
+            @RequestParam(required = false) Boolean hasImage
+    ) {
+        System.out.println(productID);
+        System.out.println(rating);
+        System.out.println(color);
+        System.out.println(size);
+        System.out.println(hasImage);
         Pageable pageable = PageRequest.of(page, 5);
-        Page<Review_ReviewDTO> reviewPage = reviewRepository.getReviewsByProductID(productID, pageable);
+
+        // Gọi repository có truyền các filter
+        Page<Review_ReviewDTO> reviewPage = reviewService.findFilteredReviews(
+                productID, rating, color, size, hasImage, pageable
+        );
+
+        // Lấy ảnh nếu có
         reviewPage.getContent().forEach(dto -> {
-            List<ReviewImage_ReviewDTO> images = reviewImageRepository.findByReviewID(dto.getReviewID());
+            List<ReviewImage_ReviewDTO> images = reviewImageService.findByReviewID(dto.getReviewID());
             dto.setReviewImages(images);
         });
+
         Map<String, Object> response = new HashMap<>();
         response.put("reviews", reviewPage.getContent());
         response.put("totalPages", reviewPage.getTotalPages());
