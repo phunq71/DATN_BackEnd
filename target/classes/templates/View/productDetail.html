@@ -1189,7 +1189,6 @@
     });
     function loadReviews(page = 0) {
         axios.get(`/opulentia/${productId}?page=${page}`, {
-           
         })
             .then(res => {
                 const data = res.data;

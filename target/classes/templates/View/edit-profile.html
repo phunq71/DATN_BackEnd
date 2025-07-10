@@ -33,6 +33,7 @@
         padding-left: 40px;
         font-size: 14px;
         margin-top: 4px;
+        cursor: pointer;
     }
 
     .e-toggle {
@@ -261,6 +262,224 @@
         border-radius: 0 !important;
     }
 </style>
+<style>
+    /* CSS Reset và Base Styles */
+    .cp-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+        animation: cp-fadeIn 0.3s ease-out;
+        color: black;
+    }
+
+    @keyframes cp-fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .cp-modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 30px;
+        border: none;
+        width: 600px;
+        max-width: 90%;
+        max-height: 90vh;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        overflow-y: auto;
+        animation: cp-slideDown 0.3s ease-out;
+    }
+
+    @keyframes cp-slideDown {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .cp-close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .cp-close:hover {
+        color: #333;
+    }
+
+    .cp-form-group {
+        margin-bottom: 20px;
+        position: relative; /* Cho phép absolute positioning của error messages */
+    }
+
+    .cp-form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .cp-form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 16px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .cp-form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        outline: none;
+    }
+
+    .cp-btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s;
+        min-width: 120px;
+        text-align: center;
+    }
+
+    .cp-btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .cp-btn-primary:hover {
+        background-color: #0069d9;
+    }
+
+    .cp-btn-primary:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+
+    .cp-btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .cp-btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    /* Error/Success Messages - Đã chừa chỗ sẵn */
+    .cp-invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 8px;
+        height: 20px; /* Chừa chỗ cố định */
+        display: block; /* Luôn hiển thị để tránh giật layout */
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .cp-invalid-feedback.show {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .cp-is-invalid {
+        border-color: #dc3545 !important;
+    }
+
+    .cp-is-valid {
+        border-color: #28a745 !important;
+    }
+
+    /* Password Check Container */
+    .cp-password-check {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .cp-password-check-input {
+        flex: 1;
+        min-width: 0; /* Ngăn flex item overflow */
+    }
+
+    /* Password Strength Meter */
+    .cp-password-strength {
+        margin-top: 8px;
+        font-size: 0.875em;
+        height: 20px; /* Chừa chỗ cố định */
+    }
+
+    .cp-password-weak {
+        color: #dc3545;
+    }
+
+    .cp-password-medium {
+        color: #ffc107;
+    }
+
+    .cp-password-strong {
+        color: #28a745;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 600px) {
+        .cp-modal-content {
+            width: 95%;
+            padding: 20px 15px;
+        }
+
+        .cp-password-check {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .cp-btn {
+            width: 100%;
+        }
+    }
+
+    .cp-loading-text {
+           display: inline-block;
+           position: relative;
+           padding-right: 20px;
+       }
+
+    .cp-loading-text::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: cp-spin 1s linear infinite;
+    }
+
+    @keyframes cp-spin {
+        to { transform: translateY(-50%) rotate(360deg); }
+    }
+
+       .cp-password-very-strong {
+           color: #218838;
+           font-weight: bold;
+       }
+</style>
 
 
 <div class="container-fluid all">
@@ -268,7 +487,7 @@
         <!-- Sidebar -->
         <div class="col-md-3 e-sidebar p-4">
             <div class="text-center mb-4">
-                <div class="mt-2 fw-bold" style="font-size: 40px;">Thuong142</div>
+                <div class="mt-2 fw-bold" id="displayName" style="font-size: 40px;">Thuong142</div>
             </div>
 
             <nav class="e-sidebar-nav">
@@ -278,8 +497,8 @@
                     <i class="fas fa-chevron-down"></i>
                 </a>
                 <div class="collapse ps-3" id="securityMenu">
-                    <a href="#" class="e-sub-link">Đổi mật khẩu</a>
-                    <a href="#" class="e-sub-link">Đổi email/SĐT</a>
+                    <a class="e-sub-link" id="changePassword">Đổi mật khẩu</a>
+                    <a class="e-sub-link" id="changePhone">Đổi số điện thoại</a>
                 </div>
 
                 <a href="#" class="active"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a>
@@ -291,37 +510,30 @@
                     <i class="fas fa-chevron-down"></i>
                 </a>
 <!--                <form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;"></form>-->
-
-                <a href="#" onclick="confirmLogout(event)"
-                   class="e-toggle d-flex justify-content-between align-items-center" role="button">
-                    <span><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</span>
-                    <i class="fas fa-chevron-down"></i>
-                </a>
-
                 <div class="collapse ps-3" id="rankingMenu">
                     <a href="#" class="e-sub-link">Thứ hạng</a>
                     <a href="#" class="e-sub-link">Ưu đãi</a>
                     <a href="#" class="e-sub-link">Chính sách</a>
                     <a href="#" class="e-sub-link">Kho voucher</a>
                 </div>
+                <a href="#" onclick="confirmLogout(event)"
+                   class="e-toggle d-flex justify-content-between align-items-center" role="button">
+                    <span><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+
+
             </nav>
         </div>
 
         <!-- Main Content -->
         <div class="col-md-9 p-4 main-content">
             <h4>Thông tin cá nhân</h4>
-
-            <form>
                 <div class="e-form-section row">
                     <div class="col-md-8">
                         <div class="e-input-group">
-                            <label class="e-form-label">Tên đăng nhập</label>
-                            <input type="text" class="e-form-control" value="Thuong142">
-                        </div>
-
-                        <div class="e-input-group">
-                            <label class="e-form-label">Tên</label>
-                            <input type="text" class="e-form-control" value="Nguyen Thi Hoai Thuong">
+                            <label class="e-form-label">Họ và tên</label>
+                            <input type="text" id="fullName" class="e-form-control" value="Nguyen Thi Hoai Thuong">
                         </div>
 
                         <div class="e-input-group">
@@ -334,15 +546,12 @@
                                 <input class="form-check-input" type="radio" name="gender" id="female" checked>
                                 <label class="form-check-label" for="female">Nữ</label>
                             </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="gender" id="other">
-                                <label class="form-check-label" for="other">Khác</label>
-                            </div>
+
                         </div>
 
                         <div class="e-input-group">
                             <label class="e-form-label">Ngày sinh</label>
-                            <input type="date" class="e-form-control">
+                            <input type="date" id="dob" class="e-form-control">
                         </div>
 
                         <!-- Địa chỉ -->
@@ -351,51 +560,94 @@
                             <div class="row mb-3">
                                 <div class="col-md-4">
                                     <label class="form-label">Tỉnh/Thành phố</label>
-                                    <select class="e-form-select">
-                                        <option value="" disabled selected>Chọn</option>
-                                        <option value="">Vũng Tàu</option>
-                                        <option value="hanoi">Hà Nội</option>
-                                        <option value="hcm">TP Hồ Chí Minh</option>
-                                        <option value="danang">Đà Nẵng</option>
+                                    <select class="e-form-select" id="province">
+                                        <option selected></option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Quận/Huyện</label>
-                                    <select class="e-form-select"><option>Chọn</option></select>
+                                    <select class="e-form-select" id="district">
+                                        <option selected></option>
+                                    </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Phường/Xã</label>
-                                    <select class="e-form-select"><option>Chọn</option></select>
+                                    <select class="e-form-select" id="ward">
+                                        <option selected></option>
+                                    </select>
                                 </div>
                             </div>
                             <label class="form-label">Địa chỉ (số nhà, tên đường)</label>
-                            <input type="text" class="e-form-control" placeholder="Nhập địa chỉ cụ thể">
+                            <input type="text" class="e-form-control" placeholder="Nhập địa chỉ cụ thể" id="address">
                         </div>
 
-                        <button type="submit" class="btn e-btn-black mt-3">Lưu</button>
+                        <button class="btn e-btn-black mt-3" id="saveBtn">Lưu</button>
                     </div>
 
                     <!-- Avatar -->
                     <div class="col-md-4 text-center">
-                        <img src="https://jbagy.me/wp-content/uploads/2025/03/anh-avatar-vo-tri-meo-1-768x1024.jpg" class="e-profile-pic mb-3" alt="avatar">
+                        <img src="" id="imageAvt" class="e-profile-pic mb-3" alt="avatar">
 <!--                        <button id="chooseImageBtn" class="">Chọn ảnh mới</button>-->
-                        <input type="file" id="fileInput" accept="image/*" class="form-control">
+                        <input type="file" id="imageInput" accept="image/*" class="form-control">
                     </div>
                 </div>
-            </form>
         </div>
+    </div>
+</div>
+
+
+<!-- Modal thay đổi mật khẩu -->
+<div id="cp-changePasswordModal" class="cp-modal">
+    <div class="cp-modal-content">
+        <span class="cp-close">&times;</span>
+        <h2>Thay đổi mật khẩu</h2>
+
+        <form id="cp-passwordForm">
+            <!-- Nhập mật khẩu cũ -->
+            <div class="cp-form-group">
+                <label for="cp-oldPassword">Mật khẩu hiện tại</label>
+                <div class="cp-password-check">
+                    <input type="password" class="cp-form-control cp-password-check-input" id="cp-oldPassword" required>
+                    <button type="button" id="cp-checkPasswordBtn" class="cp-btn cp-btn-secondary">Kiểm tra</button>
+                </div>
+                <div id="cp-oldPasswordFeedback" class="cp-invalid-feedback"></div>
+            </div>
+
+            <!-- Nhập mật khẩu mới (ban đầu ẩn) -->
+            <div id="cp-newPasswordSection" style="display: none;">
+                <!-- Nhập mật khẩu mới -->
+                <div class="cp-form-group">
+                    <label for="cp-newPassword">Mật khẩu mới</label>
+                    <input type="password" class="cp-form-control" id="cp-newPassword" required>
+                    <div id="cp-newPasswordFeedback" class="cp-invalid-feedback"></div>
+                    <div id="cp-passwordStrength" class="cp-password-strength"></div>
+                    <small>Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (!@#$%^&*).</small>
+                </div>
+
+                <!-- Xác nhận mật khẩu mới -->
+                <div class="cp-form-group">
+                    <label for="cp-confirmPassword">Xác nhận mật khẩu mới</label>
+                    <input type="password" class="cp-form-control" id="cp-confirmPassword" required>
+                    <div id="cp-confirmPasswordFeedback" class="cp-invalid-feedback"></div>
+                </div>
+
+                <!-- Nút đổi mật khẩu -->
+                <div class="cp-form-group">
+                    <button type="submit" id="cp-changePasswordBtn" class="cp-btn cp-btn-primary" disabled>Đổi mật khẩu</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const chooseImageBtn = document.getElementById('chooseImageBtn');
-        const fileInput = document.getElementById('fileInput');
+        const fileInput = document.getElementById('imageInput');
 
         // Khi nhấn nút "Chọn ảnh mới", kích hoạt input file
-        chooseImageBtn.addEventListener('click', function() {
-            fileInput.click();
-        });
+        // chooseImageBtn.addEventListener('click', function() {
+        //     fileInput.click();
+        // });
 
         // Xử lý khi chọn file
         fileInput.addEventListener('change', function(e) {
@@ -435,7 +687,97 @@
     //             document.getElementById('logoutForm').submit();
     //         }
     //     });
+    //}
+</script>
+<script>
+    let dataAddress = [];
+    let provincesSelect = document.getElementById('province');
+    let districtsSelect = document.getElementById('district');
+    let wardsSelect = document.getElementById('ward');
+
+    // Load JSON dữ liệu
+    fetch('/data/Address.json')
+        .then(res => res.json())
+        .then(json => {
+            dataAddress = json;
+            populateProvinces();
+        });
+
+    function populateProvinces() {
+        dataAddress.forEach(province => {
+            let option = document.createElement('option');
+            option.value = province.ProvinceID;
+            option.textContent = province.ProvinceName;
+            provincesSelect.appendChild(option);
+        });
+    }
+
+    provincesSelect.addEventListener('change', () => {
+        clearSelect(districtsSelect);
+        clearSelect(wardsSelect);
+
+        let selectedProvinceId = provincesSelect.value;
+
+
+        let province = dataAddress.find(p => p.ProvinceID == selectedProvinceId);
+        if (province) {
+            //districtContainer.style.display = 'block';
+            province.Districts.forEach(district => {
+                let option = document.createElement('option');
+                option.value = district.DistrictID;
+                option.textContent = district.DistrictName;
+                districtsSelect.appendChild(option);
+            });
+        }
+    });
+
+    districtsSelect.addEventListener('change', () => {
+        clearSelect(wardsSelect);
+        // resultDiv.style.display = 'none';
+
+        let selectedProvinceId = provincesSelect.value;
+        let selectedDistrictId = districtsSelect.value;
+
+        // if (!selectedDistrictId) {
+        //     wardContainer.style.display = 'none';
+        //     return;
+        // }
+
+        let province = dataAddress.find(p => p.ProvinceID == selectedProvinceId);
+        if (!province) return;
+
+        let district = province.Districts.find(d => d.DistrictID == selectedDistrictId);
+        if (district) {
+           // wardContainer.style.display = 'block';
+            district.Wards.forEach(ward => {
+                let option = document.createElement('option');
+                option.value = ward.WardCode;
+                option.textContent = ward.WardName;
+                wardsSelect.appendChild(option);
+            });
+        }
+    });
+
+    wardsSelect.addEventListener('change', () => {
+        let selectedWardCode = wardsSelect.value;
+        // if (!selectedWardCode) {
+        //     resultDiv.style.display = 'none';
+        //     return;
+        // }
+
+        // resProvince.textContent = provincesSelect.value;
+        // resDistrict.textContent = districtsSelect.value;
+        // resWard.textContent = selectedWardCode;
+        // resultDiv.style.display = 'block';
+    });
+
+    function clearSelect(selectElement) {
+        while (selectElement.options.length > 1) {
+            selectElement.remove(1);
+        }
     }
 </script>
+<script src="/js/edit-profile.js"></script>
+<script src="/js/edit-profile-security.js"></script>
 </body>
 </html>

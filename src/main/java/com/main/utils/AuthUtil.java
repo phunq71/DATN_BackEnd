@@ -2,6 +2,7 @@ package com.main.utils;
 
 import com.main.security.CustomOAuth2User;
 import com.main.security.CustomUserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public final class AuthUtil {
