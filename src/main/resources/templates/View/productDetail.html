@@ -217,30 +217,7 @@
         margin-bottom: 10px;
     }
 
-    .size-option {
-        width: 40px;
-        height: 40px;
-        border: 2px solid black;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-weight: bold;
-        transition: all 0.2s ease;
-    }
 
-    .size-option.selected {
-        background-color: black;
-        color: white;
-        border: 2px solid white;
-        box-shadow: 0 0 0 2px black;
-    }
-
-    .size-option.out-of-stock {
-        background-color: #e0e0e0;
-        color: #a0a0a0;
-        cursor: not-allowed;
-    }
 
     .rating-progress {
         width: 100%;
@@ -801,6 +778,83 @@
         transform: scale(1.05);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
+    /* --- Khối chứa selector --- */
+    .size-selector {
+        margin-top: 20px;
+    }
+
+    /* --- Khối chứa danh sách size --- */
+    .size-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    /* --- Thẻ <a> bọc từng size --- */
+    .size-wrapper a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        width: 100%;
+    }
+
+    /* --- Style mặc định của mỗi size --- */
+    .size-option {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 52px;
+        min-height: 44px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        background-color: transparent;
+        border: 2px solid #000;
+        font-size: 16px;
+        font-weight: 600;
+        color: #000;
+        transition: all 0.25s ease;
+        text-align: center;
+    }
+
+    /* --- Hover hiệu ứng --- */
+    .size-option:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
+
+    /* --- Khi được chọn --- */
+    .size-option.selected {
+        background-color: #000;
+        color: #fff;
+        border-color: #000;
+        font-weight: 700;
+    }
+
+    /* --- Khi hết hàng --- */
+    .size-option.out-of-stock {
+        border: 2px dashed #aaa;
+        color: #999;
+        cursor: not-allowed;
+        pointer-events: none;
+        opacity: 0.5;
+        background-color: transparent;
+    }
+
+    /* --- Span bên trong để giữ chữ căn giữa --- */
+    .size-option span {
+        width: 100%;
+        text-align: center;
+        color: inherit;
+        font-weight: inherit;
+    }
+
+    /* --- Trạng thái hiển thị tồn kho --- */
+    #stock-status {
+        margin-top: 16px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
 </style>
 <!--style cho zoom ảnh-->
 <style>
@@ -904,18 +958,38 @@
         </div>
         <div class="size-selector">
             <div class="size-container">
-                <div th:each="size, iter : ${listI}"
-                     th:class="'size-option' + (${size.getSize().getCode() == null} ? ' out-of-stock' : '')"
-                     th:attr="data-size=${size.getSize().getCode() != null ? size.getSize().getCode() : 'N/A'}"
-                     th:text="${size.getSize().getCode() != null ? size.getSize().getCode() : 'Hết hàng'}">
+                <div th:each="size : ${listI}" class="size-wrapper">
+                    <a class="size-link" th:if="${size.getSize().getCode() != null}"
+
+                       th:data-variant-id="${variantID}"
+                       th:data-size-code="${size.getSize().getCode()}">
+                        <div th:class="'size-option'"
+                             th:attr="data-size=${size.getSize().getCode()}">
+                            <span th:text="${size.getSize().getCode()}"></span>
+                        </div>
+                    </a>
+                    <div th:if="${size.getSize().getCode() == null}"
+                         class="size-option out-of-stock">
+                        <span>Hết hàng</span>
+                    </div>
                 </div>
+
             </div>
         </div>
+
+        <div class="product-stock" id="stock-status">
+            <!-- Sẽ cập nhật bằng JS -->
+            Vui lòng chọn size
+        </div>
+
         <div class="rating">
             <div class="rating-box">
-                <div style="color:#666">★ 4.5</div>
+                <!-- Hiển thị rating trung bình -->
+                <div style="color:#666" th:text="'★ ' + ${#numbers.formatDecimal(averageRating, 1, 1)}"></div>
+                <!-- Thanh progress tổng thể -->
                 <div class="rating-progress">
-                    <div class="rating-progress-bar"></div>
+                    <div class="rating-progress-bar"
+                         th:style="'width:' + ${overallPercentage} + '%'"></div>
                 </div>
             </div>
         </div>
@@ -945,16 +1019,26 @@
 <div class="review-otherProducts">
     <div class="review">
         <div class="rating-overview">
-            <div class="average-rating">4.5</div>
+            <div class="average-rating" th:text="${#numbers.formatDecimal(averageRating, 1, 1)}"></div>
             <div class="stars">
-                <span class="star full">★</span>
-                <span class="star full">★</span>
-                <span class="star full">★</span>
-                <span class="star full">★</span>
-                <span class="star partial" style="--percentage: 50%">★</span>
+                <!-- Tính toán số sao đầy và phần trăm -->
+                <th:block th:with="fullStars=${T(java.lang.Math).floor(averageRating)},
+                      partialStar=${averageRating - fullStars},
+                      partialPercent=${partialStar * 100}">
+
+                    <!-- Hiển thị 5 sao -->
+                    <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                        <!-- Xác định trạng thái từng sao -->
+                        <th:block th:with="isFull=${i <= fullStars},
+                             isPartial=${i == fullStars + 1 and partialStar > 0}">
+                <span th:class="${'star'} +
+                              (${isFull} ? ' full' : '') +
+                              (${isPartial} ? ' partial' : '')"
+                      th:attr="style=${isPartial} ? '--percentage: ' + ${partialPercent} + '%' : ''">★</span>
+                        </th:block>
+                    </th:block>
+                </th:block>
             </div>
-
-
             <div class="filter-section">
                 <button class="filter-btn" onclick="openFilterModal()">
                     <i class="fas fa-filter"></i> Lọc
@@ -964,44 +1048,14 @@
         </div>
         <div class="rating-section">
 
-
-            <div class="rating-bar">
-                <div>5 sao</div>
+            <!-- Hiển thị từ 5 sao xuống 1 sao -->
+            <div th:each="star : ${#numbers.sequence(5, 1, -1)}" class="rating-bar">
+                <div th:text="${star} + ' sao'"></div>
                 <div class="progress-container">
-                    <div class="progress-bar" style="width: 70%"></div>
+                    <div class="progress-bar"
+                         th:style="'width:' + ${ratingPercentages.containsKey(star) ? ratingPercentages.get(star) : 0} + '%'"></div>
                 </div>
-                <div>42</div>
-            </div>
-
-            <div class="rating-bar">
-                <div>4 sao</div>
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: 20%"></div>
-                </div>
-                <div>12</div>
-            </div>
-
-            <div class="rating-bar">
-                <div>3 sao</div>
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: 5%"></div>
-                </div>
-                <div>3</div>
-            </div>
-
-            <div class="rating-bar">
-                <div>2 sao</div>
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: 3%"></div>
-                </div>
-                <div>2</div>
-            </div>
-            <div class="rating-bar">
-                <div>1 sao</div>
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: 2%"></div>
-                </div>
-                <div>1</div>
+                <div th:text="${ratingCounts.containsKey(star) ? ratingCounts.get(star) : 0}"></div>
             </div>
             <!-- Phần đánh giá chi tiết của khách hàng -->
             <div class="pagination"></div>
@@ -1094,77 +1148,72 @@
 <div id="filterModal" class="filter-modal">
     <div class="modal-content">
         <h3>Lọc đánh giá</h3>
-        <div class="filter-group" onclick="handleSingleSelect(this)">
+
+        <!-- ★ Số sao - được chọn 1 -->
+        <div class="filter-group" onclick="handleSingleSelect(this, 'rating')">
             <h4>Số sao</h4>
             <div class="star-filters">
-                <div class="star-filter">
-                    <input type="checkbox" id="star5" value="5">
+                <div class= "star-filter">
+                    <input type="checkbox" name="rating" id="star5" value="5">
                     <label for="star5">5</label>
                 </div>
                 <div class="star-filter">
-                    <input type="checkbox" id="star4" value="4">
+                    <input type="checkbox" name="rating" id="star4" value="4">
                     <label for="star4">4</label>
                 </div>
                 <div class="star-filter">
-                    <input type="checkbox" id="star3" value="3">
+                    <input type="checkbox" name="rating" id="star3" value="3">
                     <label for="star3">3</label>
                 </div>
                 <div class="star-filter">
-                    <input type="checkbox" id="star2" value="2">
+                    <input type="checkbox" name="rating" id="star2" value="2">
                     <label for="star2">2</label>
                 </div>
                 <div class="star-filter">
-                    <input type="checkbox" id="star1" value="1">
+                    <input type="checkbox" name="rating" id="star1" value="1">
                     <label for="star1">1</label>
                 </div>
             </div>
         </div>
 
+        <!-- Đánh giá có ảnh -->
         <div class="filter-group">
             <h4>Đánh giá có ảnh</h4>
             <label class="toggle-switch">
-                <input type="checkbox" id="hasImage">
+                <input type="checkbox" name="hasImage" id="hasImage">
                 <span class="slider"></span>
             </label>
         </div>
 
-        <div class="filter-group"  onclick="handleSingleSelect(this)">
+        <!-- Màu sắc - chọn 1 -->
+        <div class="filter-group" onclick="handleSingleSelect(this, 'color')">
             <h4>Màu sắc</h4>
             <div class="color-filters">
                 <div>
-                    <th:block th:each="l :${listV}">
-                    <input type="checkbox" id="colorBlack" th:value="${l.getColor()}">
-                    <label for="colorBlack" th:text="${l.getColor()}"></label>
+                    <th:block th:each="l, iter : ${listV}">
+                        <input type="checkbox" name="color" th:id="'color_' + ${iter.index}" th:value="${l.getColor()}">
+                        <label th:for="'color_' + ${iter.index}" th:text="${l.getColor()}"></label>
                     </th:block>
                 </div>
+            </div>
         </div>
 
-        <div class="filter-group">
+        <!-- Size - chọn 1 -->
+        <div class="filter-group" onclick="handleSingleSelect(this, 'size')">
             <h4>Size</h4>
             <div class="size-filters">
-                <div>
-                    <input type="checkbox" id="sizeS" value="S">
-                    <label for="sizeS">S</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="sizeM" value="M">
-                    <label for="sizeM">M</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="sizeL" value="L">
-                    <label for="sizeL">L</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="sizeXL" value="XL">
-                    <label for="sizeXL">XL</label>
-                </div>
+                <th:block th:each="sizee, iter : ${listI}">
+                    <div>
+                        <input type="checkbox" name="size" th:id="'size_' + ${iter.index}" th:value="${sizee.getSize().getCode()}">
+                        <label th:for="'size_' + ${iter.index}" th:text="${sizee.getSize().getCode()}"></label>
+                    </div>
+                </th:block>
             </div>
         </div>
 
         <button class="apply-btn" onclick="applyFilters()">Áp dụng</button>
     </div>
 </div>
-    </div>
 <!-- Thêm modal phóng to -->
 <div class="image-zoom-modal">
     <span class="close-zoom-modal">&times;</span>
@@ -1172,30 +1221,75 @@
         <img class="zoom-modal-image" src="" alt="">
     </div>
 </div>
+<!--Chặn thẻ a của thymleaf và dùng rest api cho sự kiện chọn size-->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const links = document.querySelectorAll(".size-link");
+
+        links.forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                const variantID = link.getAttribute("data-variant-id");
+                const sizeCode = link.getAttribute("data-size-code");
+
+                // ✅ Bỏ class 'selected' khỏi tất cả các size-option
+                document.querySelectorAll('.size-option.selected')
+                    .forEach(el => el.classList.remove('selected'));
+
+                // ✅ Thêm class 'selected' vào size-option hiện tại
+                const optionDiv = link.querySelector(".size-option");
+                if (optionDiv) {
+                    optionDiv.classList.add("selected");
+                }
+
+                // ✅ Gọi API REST Controller
+                axios.get(`/opulentia/variant/${variantID}/size/${sizeCode}`)
+                    .then(response => {
+                        const stock = response.data;
+                        const stockElement = document.getElementById("stock-status");
+                        console.log(stock)
+                        if (stock > 0) {
+                            stockElement.innerText = `Còn ${stock} sản phẩm`;
+                            stockElement.style.color = "green";
+                        } else {
+                            stockElement.innerText = "Hết hàng";
+                            stockElement.style.color = "red";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Lỗi gọi API:", error);
+                    });
+            });
+        });
+    });
+</script>
 <!--Xử lý danh sách khách hàng review sản phẩm-->
 <script>
     const pathParts = window.location.pathname.split('/');
     const productId = pathParts[4];
-
     let currentPage = 0;
-    // Gọi hàm khi tải trang
-    document.addEventListener('DOMContentLoaded', function() {
-        setupImageZoom();
 
-        // Nếu có load reviews ngay khi tải trang
-        if (typeof loadReviews === 'function') {
-            loadReviews(0);
-        }
+    document.addEventListener('DOMContentLoaded', function () {
+        setupImageZoom();
+        loadReviews(0);
     });
-    function loadReviews(page = 0) {
-        axios.get(`/opulentia/${productId}?page=${page}`, {
-        })
+
+    function loadReviews(page = 0, filters = {}) {
+        const params = new URLSearchParams();
+        params.append("page", page);
+
+        if (filters.rating) params.append("rating", filters.rating);
+        if (filters.color) params.append("color", filters.color);
+        if (filters.size) params.append("size", filters.size);
+        if (filters.hasImage) params.append("hasImage", filters.hasImage);
+
+        axios.get(`/opulentia/${productId}?${params.toString()}`)
             .then(res => {
                 const data = res.data;
                 const reviews = data.reviews;
                 const totalPages = data.totalPages;
                 currentPage = data.currentPage;
-                console.log("Tổng số trang:", data.totalPages, "Trang hiện tại:", data.currentPage);
+
                 const reviewContainer = document.querySelector(".customer-reviews");
                 const paginationContainer = document.querySelector(".pagination");
 
@@ -1207,7 +1301,7 @@
                     reviews.forEach(review => {
                         const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
                         let images = '';
-                        if (review.reviewImages && review.reviewImages.length > 0) {
+                        if (review.reviewImages?.length > 0) {
                             images = `<div class="review-images">`;
                             review.reviewImages.forEach(img => {
                                 images += `<img src="/uploads/${img.imageUrl}" alt="Review ${review.reviewID}" class="review-image">`;
@@ -1216,34 +1310,31 @@
                         }
 
                         html += `
-                    <div class="review-item">
-                        <div class="review-header">
-                            <div class="reviewer-name">${review.customerName}</div>
-                            <div class="review-stars">${stars}</div>
-                        </div>
-                        <div class="review-meta">
-                            <span>Màu: ${review.color} | Size: ${review.size}</span>
-                            <span class="review-time">${formatDateToAgo(review.createAt)}</span>
-                        </div>
-                        <div class="review-content">${review.content}</div>
-                        ${images}
-                    </div>
-                `;
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer-name">${review.customerName}</div>
+                                    <div class="review-stars">${stars}</div>
+                                </div>
+                                <div class="review-meta">
+                                    <span>Màu: ${review.color} | Size: ${review.size}</span>
+                                    <span class="review-time">${formatDateToAgo(review.createAt)}</span>
+                                </div>
+                                <div class="review-content">${review.content}</div>
+                                ${images}
+                            </div>
+                        `;
                     });
                 }
 
                 reviewContainer.innerHTML = html;
                 setupImageZoom();
-                // Tạo nút phân trang
+
+                // Phân trang
                 let pageHtml = '';
-
                 pageHtml += `<button onclick="loadReviews(${currentPage - 1})" ${currentPage === 0 ? 'disabled' : ''}>← Trước</button>`;
-
                 for (let i = 0; i < totalPages; i++) {
                     pageHtml += `<button onclick="loadReviews(${i})" class="${i === currentPage ? 'active-page' : ''}">${i + 1}</button>`;
                 }
-
-
                 pageHtml += `<button onclick="loadReviews(${currentPage + 1})" ${currentPage === totalPages - 1 ? 'disabled' : ''}>Sau →</button>`;
 
                 paginationContainer.innerHTML = pageHtml;
@@ -1256,14 +1347,14 @@
     function formatDateToAgo(dateStr) {
         const now = new Date();
         const date = new Date(dateStr);
-        const diffTime = now - date;
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
 
         if (diffDays === 0) return "Hôm nay";
         if (diffDays === 1) return "1 ngày trước";
         return `${diffDays} ngày trước`;
     }
-    // check box chỉ được chọn 1
+
+    // Chỉ chọn 1 checkbox trong nhóm
     function handleSingleSelect(container) {
         const checkboxes = container.querySelectorAll('input[type="checkbox"]');
         checkboxes.forEach(cb => {
@@ -1276,12 +1367,45 @@
             });
         });
     }
-    // Tải trang đầu tiên
 
-    loadReviews(0);
+    function applyFilters() {
+        const selectedRating = document.querySelector('input[name="rating"]:checked')?.value || null;
+        const selectedColor = document.querySelector('input[name="color"]:checked')?.value || null;
+        const selectedSize = document.querySelector('input[name="size"]:checked')?.value || null;
+        const hasImage = document.querySelector('#hasImage')?.checked || false;
 
+        const filters = {
+            rating: selectedRating,
+            color: selectedColor,
+            size: selectedSize,
+            hasImage: hasImage
+        };
+
+        loadReviews(0, filters);
+
+        document.querySelector('.clear-filter').style.display = 'block';
+        document.getElementById('filterModal').style.display = 'none';
+    }
+
+    function clearFilters() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = false);
+
+        loadReviews(0);
+        document.querySelector('.clear-filter').style.display = 'none';
+    }
+
+    // Mở/đóng modal
+    function openFilterModal() {
+        document.getElementById('filterModal').style.display = 'block';
+    }
+
+    window.onclick = function (event) {
+        if (event.target == document.getElementById('filterModal')) {
+            document.getElementById('filterModal').style.display = 'none';
+        }
+    };
 </script>
-
 <!--thuận vừa sửa logic image silde trong js-->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -1367,82 +1491,6 @@
     });
 
 </script>
-<!--Xử lý chọn size-->
-<script>
-    document.querySelectorAll('.size-option:not(.out-of-stock)').forEach(option => {
-        option.addEventListener('click', function() {
-            // Bỏ chọn tất cả các option trước
-            document.querySelectorAll('.size-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-
-            // Chọn option hiện tại
-            this.classList.add('selected');
-
-            // Có thể thêm code để lưu size được chọn nếu cần
-            const selectedSize = this.getAttribute('data-size');
-            console.log('Size selected:', selectedSize);
-        });
-    });
-    document.querySelectorAll('.quantity-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const input = this.parentNode.querySelector('.quantity-input');
-            let value = parseInt(input.value);
-
-            if (this.classList.contains('minus') && value > 1) {
-                value--;
-            } else if (this.classList.contains('plus')) {
-                value++;
-            }
-
-            input.value = value;
-            // Có thể thêm code cập nhật giỏ hàng ở đây
-        });
-    });
-</script>
-
-<!--Xử lý filter-->
-<script>
-    // Mở modal filter
-    function openFilterModal() {
-        document.getElementById('filterModal').style.display = 'block';
-    }
-
-    // Đóng modal filter
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('filterModal')) {
-            document.getElementById('filterModal').style.display = 'none';
-        }
-    }
-
-    // Áp dụng filter
-    function applyFilters() {
-        // Logic lọc đánh giá ở đây
-        console.log('Áp dụng filter');
-
-        // Hiển thị nút hủy lọc
-        document.querySelector('.clear-filter').style.display = 'block';
-
-        // Đóng modal
-        document.getElementById('filterModal').style.display = 'none';
-    }
-
-    // Hủy lọc
-    function clearFilters() {
-        // Reset tất cả filter
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-
-        // Ẩn nút hủy lọc
-        document.querySelector('.clear-filter').style.display = 'none';
-
-        // Hiển thị lại tất cả đánh giá
-        console.log('Hủy lọc');
-    }
-</script>
-<!--script zoom ảnh-->
 <script>
     // Hàm thiết lập zoom ảnh
     function setupImageZoom() {
