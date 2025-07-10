@@ -778,23 +778,27 @@
         transform: scale(1.05);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
+    /* --- Khối chứa selector --- */
     .size-selector {
         margin-top: 20px;
     }
 
+    /* --- Khối chứa danh sách size --- */
     .size-container {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
     }
 
+    /* --- Thẻ <a> bọc từng size --- */
     .size-wrapper a {
-        text-decoration: none;   /* ❌ Bỏ gạch chân */
-        color: inherit;          /* ✅ Kế thừa màu từ .size-option */
-        display: block;          /* ✅ Click được toàn bộ khối */
+        text-decoration: none;
+        color: inherit;
+        display: block;
         width: 100%;
     }
 
+    /* --- Style mặc định của mỗi size --- */
     .size-option {
         display: flex;
         align-items: center;
@@ -803,8 +807,8 @@
         min-height: 44px;
         padding: 12px 20px;
         border-radius: 8px;
-        background-color: transparent;   /* ❌ nền trong */
-        border: 2px solid #000;          /* ✅ viền đen */
+        background-color: transparent;
+        border: 2px solid #000;
         font-size: 16px;
         font-weight: 600;
         color: #000;
@@ -812,18 +816,21 @@
         text-align: center;
     }
 
+    /* --- Hover hiệu ứng --- */
     .size-option:hover {
         background-color: #f0f0f0;
         cursor: pointer;
     }
 
+    /* --- Khi được chọn --- */
     .size-option.selected {
-        background-color: #000;   /* ✅ nền đen */
-        color: #fff;              /* ✅ chữ trắng */
+        background-color: #000;
+        color: #fff;
         border-color: #000;
-        font-weight: 700;         /* ✅ in đậm */
+        font-weight: 700;
     }
 
+    /* --- Khi hết hàng --- */
     .size-option.out-of-stock {
         border: 2px dashed #aaa;
         color: #999;
@@ -833,12 +840,21 @@
         background-color: transparent;
     }
 
+    /* --- Span bên trong để giữ chữ căn giữa --- */
     .size-option span {
         width: 100%;
         text-align: center;
         color: inherit;
         font-weight: inherit;
     }
+
+    /* --- Trạng thái hiển thị tồn kho --- */
+    #stock-status {
+        margin-top: 16px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
 </style>
 <!--style cho zoom ảnh-->
 <style>
@@ -930,7 +946,7 @@
             <span th:text="${colorVariant}" style="padding: 4px 10px; background-color: #eee; border-radius: 6px; font-weight: 500; color: #333;"></span>
             <div class="color-options">
                 <th:block th:each="variant, iterStat : ${listV}">
-                   <a th:href="@{/opulentia/${product.category.parent}/${product.category.categoryId}/{productId}/{variantId}/{code}(productId=${product.getProductID()}, variantId=${variant.variantId})}">
+                   <a th:href="@{/opulentia/${product.category.parent}/${product.category.categoryId}/{productId}/{variantId}(productId=${product.getProductID()}, variantId=${variant.variantId})}">
                         <div class="color-option"
                              th:classappend="${iterStat.index == 0}"
                              th:attr="data-color-index=${iterStat.index}"
@@ -943,15 +959,11 @@
         <div class="size-selector">
             <div class="size-container">
                 <div th:each="size : ${listI}" class="size-wrapper">
-                    <a th:if="${size.getSize().getCode() != null}"
-                       th:href="@{/opulentia/{categoryParent}/{categoryID}/{productId}/{variantID}/{size}(
-                           productId=${product.productID},
-                           variantID=${variantID},
-                           size=${size.getSize().getCode()}
-               )}">
-                        <div th:class="'size-option' +
-                       (${size.getSize().getCode() == null} ? ' out-of-stock' : '') +
-                       (${size.getSize().getCode()} == ${code} ? ' selected' : '')"
+                    <a class="size-link" th:if="${size.getSize().getCode() != null}"
+
+                       th:data-variant-id="${variantID}"
+                       th:data-size-code="${size.getSize().getCode()}">
+                        <div th:class="'size-option'"
                              th:attr="data-size=${size.getSize().getCode()}">
                             <span th:text="${size.getSize().getCode()}"></span>
                         </div>
@@ -965,10 +977,9 @@
             </div>
         </div>
 
-        <div>
-    <span th:if="${variantInv != null and variantInv > 0}"
-          th:text="'Số lượng còn: ' + ${variantInv}"></span>
-            <span th:unless="${variantInv != null and variantInv > 0}">Hết hàng</span>
+        <div class="product-stock" id="stock-status">
+            <!-- Sẽ cập nhật bằng JS -->
+            Vui lòng chọn size
         </div>
 
         <div class="rating">
@@ -1064,7 +1075,7 @@
                 <!-- Product -->
                 <th:block th:each="products, iterStat : ${listProduct}">
                     <th:block th:if="${products.productID != product.productID and iterStat.index < 5}">
-                        <a th:href="@{/opulentia/${products.category.parent}/${products.category.categoryId}/{productId}/{variantId}/{code}(productId=${products.getProductID()}, variantId=${products.variants[0].variantID})}" class="product-link">
+                        <a th:href="@{/opulentia/${products.category.parent}/${products.category.categoryId}/{productId}/{variantId}(productId=${products.getProductID()}, variantId=${products.variants[0].variantID})}" class="product-link">
                             <div class="ot-product-container">
                                 <div class="ot-product-wrapper">
                                     <div class="ot-product-info">
@@ -1210,6 +1221,48 @@
         <img class="zoom-modal-image" src="" alt="">
     </div>
 </div>
+<!--Chặn thẻ a của thymleaf và dùng rest api cho sự kiện chọn size-->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const links = document.querySelectorAll(".size-link");
+
+        links.forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                const variantID = link.getAttribute("data-variant-id");
+                const sizeCode = link.getAttribute("data-size-code");
+
+                // ✅ Bỏ class 'selected' khỏi tất cả các size-option
+                document.querySelectorAll('.size-option.selected')
+                    .forEach(el => el.classList.remove('selected'));
+
+                // ✅ Thêm class 'selected' vào size-option hiện tại
+                const optionDiv = link.querySelector(".size-option");
+                if (optionDiv) {
+                    optionDiv.classList.add("selected");
+                }
+
+                // ✅ Gọi API REST Controller
+                axios.get(`/opulentia/variant/${variantID}/size/${sizeCode}`)
+                    .then(response => {
+                        const stock = response.data;
+                        const stockElement = document.getElementById("stock-status");
+                        console.log(stock)
+                        if (stock > 0) {
+                            stockElement.innerText = `Còn ${stock} sản phẩm`;
+                            stockElement.style.color = "green";
+                        } else {
+                            stockElement.innerText = "Hết hàng";
+                            stockElement.style.color = "red";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Lỗi gọi API:", error);
+                    });
+            });
+        });
+    });
+</script>
 <!--Xử lý danh sách khách hàng review sản phẩm-->
 <script>
     const pathParts = window.location.pathname.split('/');
