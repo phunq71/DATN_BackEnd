@@ -13,6 +13,7 @@ const cartContainer = document.getElementById('cart-container');
 let checkedItems=[];
 
 function getItemCartsFromServer(){
+
     return axios.get('/opulentia/user/rest/cart')
         .then(response =>{
         return response.data;

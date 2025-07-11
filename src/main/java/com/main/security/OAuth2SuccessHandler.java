@@ -81,7 +81,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .path("/")
                 .build();
         response.addHeader("Set-Cookie", clearCookie.toString());
-
+        Cookie flagCookie = new Cookie("flag", "true");
+        flagCookie.setPath("/"); // Áp dụng toàn site
+        flagCookie.setMaxAge(60); // Tồn tại 60s, hoặc bạn có thể để -1 (session)
+        response.addCookie(flagCookie);
         response.sendRedirect(redirectUrl);
 
     }

@@ -33,9 +33,8 @@ public class ProductDetailController {
     }
 
     // Sửa lại URL: thêm `/product` vào đầu
-    @GetMapping("/opulentia/{categoryParent}/{categoryID}/{productId}/{variantID}/{code}")
+    @GetMapping("/opulentia/{categoryParent}/{categoryID}/{productId}/{variantID}")
     public String VariantDetail(Model model,
-                                @PathVariable String code,
                                 @PathVariable String productId,
                                 @PathVariable String variantID) {
         Optional<Product> product = productService.findByProductID(productId);
@@ -47,7 +46,7 @@ public class ProductDetailController {
         List<Image_DetailDTO> listImage = imageService.findByVariant(variant.get());
         List<Item> listI = itemService.findByVariant(variant.get());
         String formattedPrice = formatToVND(variant.get().getPrice());
-        Integer variantInv = inventoryService.getQuantityByVariantAndSizeCode(variantID, code);
+//        Integer variantInv = inventoryService.getQuantityByVariantAndSizeCode(variantID, code);
         // Lấy số lượng đánh giá theo từng mức sao
         Map<Integer, Integer> ratingCounts = reviewService.getReviewRatingCounts(productId);
         // Đếm tổng số lượt đánh giá cho sản phẩm
@@ -76,8 +75,8 @@ public class ProductDetailController {
         model.addAttribute("ratingPercentages", ratingPercentages);
         model.addAttribute("averageRating", averageRating);
         model.addAttribute("overallPercentage", overallPercentage);
-        model.addAttribute("code", code);
-        model.addAttribute("variantInv", variantInv);
+//        model.addAttribute("code", code);
+//        model.addAttribute("variantInv", variantInv);
         model.addAttribute("variantID", variantID);
         model.addAttribute("variants", variant.get());
         model.addAttribute("listI", listI);

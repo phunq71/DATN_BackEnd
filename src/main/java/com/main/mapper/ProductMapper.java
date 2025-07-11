@@ -2,7 +2,7 @@ package com.main.mapper;
 
 import com.main.dto.Product_DetailDTO;
 import com.main.entity.Product;
-import com.main.dto.ProductByCategory;
+import com.main.dto.ProductByCategoryDTO;
 import com.main.entity.Image;
 import com.main.entity.Variant;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ public class ProductMapper {
         return dto;
     }
     //chuyển đối tượng Product->ProductByCategoryDTO
-    public static ProductByCategory toDTO(Product product) {
+    public static ProductByCategoryDTO toDTO(Product product) {
         //lọc ds các biến thể đang hoạt động
         List<Variant> variants = product.getVariants().stream()
                 .filter(Variant::getIsUse)
@@ -63,7 +63,7 @@ public class ProductMapper {
                 );
 
         //trả về dto
-        return new ProductByCategory(
+        return new ProductByCategoryDTO(
                 product.getProductID(),
                 product.getProductName(),
                 mainImageUrl,
@@ -72,4 +72,5 @@ public class ProductMapper {
                 variantMainId
         );
     }
+
 }
