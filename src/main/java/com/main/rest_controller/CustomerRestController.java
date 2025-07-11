@@ -1,6 +1,7 @@
 package com.main.rest_controller;
 
 import com.main.dto.CustomerDTO;
+import com.main.entity.Customer;
 import com.main.service.AccountService;
 import com.main.service.CustomerService;
 import com.main.utils.AuthUtil;
@@ -158,4 +159,36 @@ public class CustomerRestController {
             );
         }
     }
+    @GetMapping("/opulentia_user/phoneNumber")
+    public ResponseEntity<String> getPhoneNumber() {
+        String accountId= AuthUtil.getAccountID();
+        if (accountId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Customer customer = customerService.findByAccountID(accountId);
+        return ResponseEntity.ok(customer.getPhone());
+    }
+    @PutMapping("/opulentia_user/changePhone")
+    public ResponseEntity<String> updatePhoneNumber(@RequestBody Map<String, String> request) {
+        String accountId = AuthUtil.getAccountID();
+        if (accountId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Chưa đăng nhập");
+        }
+
+        String newPhone = request.get("newPhoneNumber");
+        if (newPhone == null || !newPhone.matches("^0\\d{9}$")) {
+            return ResponseEntity.badRequest().body("Số điện thoại không hợp lệ");
+        }
+
+        Customer customer = customerService.findByAccountID(accountId);
+        if (customer == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy khách hàng");
+        }
+
+        customer.setPhone(newPhone);
+        customerService.save(customer); // hoặc update nếu bạn dùng custom
+
+        return ResponseEntity.ok("Cập nhật thành công");
+    }
+
 }

@@ -98,5 +98,11 @@ public class CustomerServiceImpl implements CustomerService {
                 newCustomer.getImageAvt() != null ? newCustomer.getImageAvt() : oldCustomer.getImageAvt()
         );
     }
+    public Customer findByAccountID(String accountId) {
+        return customerRepository.findByAccount_AccountId(accountId);
+    }
+    public Customer save(Customer customer) {
+        return customerRepository.save(customer);
+    }
 }
 

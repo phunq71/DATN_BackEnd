@@ -16,7 +16,6 @@ public class CustomerDTO {
     private String address;
     private LocalDate dob;
     private String imageAvt;
-
     private String addressDetail;
     private String ward;
     private String district;
