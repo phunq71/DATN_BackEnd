@@ -38,15 +38,19 @@ public class ProductDetailController {
                                 @PathVariable String productId,
                                 @PathVariable String variantID) {
         Optional<Product> product = productService.findByProductID(productId);
+        //DS CUNG LOAI
         Category category = categoryService.findByCategoryId(product.get().getCategory().getCategoryId());
         List<Product> listProduct = productService.findByCategory(category);
         model.addAttribute("listProduct", listProduct);
+        //Image slider, màu sắc
         List<Variant_DetailDTO> listV = variantService.findByProduct(product.get());
         Optional<Variant> variant = variantService.findById(variantID);
+        //Tìm ds ảnh bằng bằng biến thể
         List<Image_DetailDTO> listImage = imageService.findByVariant(variant.get());
+        //Tìm ds tìm item bằng biến thể để lấy size của biến thể
         List<Item> listI = itemService.findByVariant(variant.get());
         String formattedPrice = formatToVND(variant.get().getPrice());
-//        Integer variantInv = inventoryService.getQuantityByVariantAndSizeCode(variantID, code);
+
         // Lấy số lượng đánh giá theo từng mức sao
         Map<Integer, Integer> ratingCounts = reviewService.getReviewRatingCounts(productId);
         // Đếm tổng số lượt đánh giá cho sản phẩm
@@ -75,8 +79,6 @@ public class ProductDetailController {
         model.addAttribute("ratingPercentages", ratingPercentages);
         model.addAttribute("averageRating", averageRating);
         model.addAttribute("overallPercentage", overallPercentage);
-//        model.addAttribute("code", code);
-//        model.addAttribute("variantInv", variantInv);
         model.addAttribute("variantID", variantID);
         model.addAttribute("variants", variant.get());
         model.addAttribute("listI", listI);
