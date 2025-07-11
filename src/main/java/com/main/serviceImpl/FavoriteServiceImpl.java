@@ -58,8 +58,20 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         if (favorite != null) {
             favoriteRepo.delete(favorite);
-            System.out.println("Đã xoá favorite");
         }
+    }
+
+    @Override
+    public void addFavorite(String accountId, String productId) {
+        Favorite favorite = new Favorite();
+        favorite.setCustomer(customerRepo.findByAccount_AccountId(accountId));
+        favorite.setProduct(productRepo.getReferenceById(productId));
+        FavoriteId id = new FavoriteId();
+        id.setProductId(productId);
+        id.setCustomerId(accountId);
+        favorite.setId(id);
+        favoriteRepo.save(favorite);
+        return;
     }
 
 

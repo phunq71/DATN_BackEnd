@@ -1,15 +1,27 @@
 package com.main.serviceImpl;
 
-import com.main.entity.Category;
-import com.main.entity.Product;
-import com.main.repository.ProductRepository;
+import com.main.dto.ColorOption;
+import com.main.dto.ProductViewDTO;
+import com.main.dto.SupportDetailDTO;
+import com.main.entity.*;
+import com.main.repository.*;
 import com.main.service.ProductService;
+import com.main.utils.AuthUtil;
+import com.main.utils.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import com.main.dto.ProductByCategory;
+import java.util.stream.Collectors;
+
+import com.main.dto.ProductByCategoryDTO;
 import com.main.mapper.ProductMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +32,20 @@ import org.springframework.data.domain.Pageable;
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private VariantRepository variantRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
+    private ProductMapper productMapper;
+
+
     //Tim sp cho trang chi tiet sp
     @Override
     public Optional<Product> findByProductID(String productID){
@@ -31,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
     }
     //hiển thị sp theo dm có phân trang
     @Override
-    public Page<ProductByCategory> getProductsByCategory(String parentId, String childId, int page) {
+    public Page<ProductViewDTO> getProductsByCategory(String parentId, String childId, int page) {
         Pageable pageable = PageRequest.of(page, 12); // 12 sản phẩm/trang
         Page<Product> productPage;
         if (childId == null || childId.equals("null")) {
@@ -40,6 +66,171 @@ public class ProductServiceImpl implements ProductService {
             productPage = productRepository.findByParentAndChildCategory(parentId, childId, pageable);
         }
         //chuyển đổi Page<p> thành page<PbyC>
-        return productPage.map(ProductMapper::toDTO);
+        List<ProductViewDTO> productViewDTOList = new ArrayList<>();
+        List<ProductByCategoryDTO> list = productPage.map(ProductMapper::toDTO).getContent();
+        Pageable pageable1 = PageRequest.of(0, 10);
+        List<Product> products = productRepository.findTopSellingProducts(pageable1);
+        List<String> hotProductIDs = products.stream().map(Product::getProductID).toList();
+        list.forEach(pro ->{
+            ProductViewDTO productViewDTO = new ProductViewDTO();
+            Product product = productRepository.findById(pro.getProductID()).orElse(null);
+            productViewDTO.setProductID(pro.getProductID());
+            enrichProductViewDTO(productViewDTO, product, hotProductIDs,productRepository.isNewProduct(product.getProductID()) > 0);
+            productViewDTOList.add(productViewDTO);
+        });
+        return new PageImpl<>(productViewDTOList, pageable, productPage.getTotalElements());
+
+    }
+
+    @Override
+    public List<ProductViewDTO> findProductsSale() {
+        List<ProductViewDTO> list = new ArrayList<>();
+        list = productRepository.findDiscountedProducts();
+        if (!list.isEmpty()) {
+            //set isFavorite
+            markFavorites(list);
+            // set isNew và hot
+            Pageable pageable = PageRequest.of(0, 10);
+            List <Product> products = productRepository.findTopSellingProducts(pageable);
+            List<String> productIDs = products.stream().map(Product::getProductID).toList();
+            list.forEach(product -> {
+                product.setIsNew(productRepository.isNewProduct(product.getProductID()) > 0);
+                Product pro = productRepository.getReferenceById(product.getProductID());
+                enrichProductViewDTO(product, pro, productIDs, product.getIsNew());
+            });
+
+        }
+        return list;
+    }
+
+    @Override
+    public List<ProductViewDTO> findProductNews() {
+        List<ProductViewDTO> result = new ArrayList<>();
+        List<Product> listPro = productRepository.findRecentProducts();
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Product> products = productRepository.findTopSellingProducts(pageable);
+        List<String> hotProductIDs = products.stream().map(Product::getProductID).toList();
+
+        for (Product product : listPro) {
+            ProductViewDTO dto = new ProductViewDTO();
+            dto.setProductID(product.getProductID());
+            enrichProductViewDTO(dto, product, hotProductIDs, true);
+            result.add(dto);
+        }
+
+        List<Variant> variantList = variantRepository.findNewVariantsOfOldProducts();
+        variantList.forEach(variant -> {
+            ProductViewDTO dto = new ProductViewDTO();
+            Product product = variant.getProduct();
+            enrichProductViewDTO(dto, product, hotProductIDs, true);
+            variant.getImages().forEach(img -> {
+                if(img.getIsMainImage()){
+                    dto.setProductID(product.getProductID());
+                    dto.setImageUrl(img.getImageUrl());
+                }
+            });
+            dto.setVariantID(variant.getVariantID());
+            result.add(dto);
+        });
+        return result;
+    }
+    @Override
+    public List<ProductViewDTO> findBestSellingProducts() {
+        Pageable pageable = PageRequest.of(0, 10);
+        List <Product> products = productRepository.findTopSellingProducts(pageable);
+        List<String> hotProductIDs = products.stream().map(Product::getProductID).toList();
+        List<ProductViewDTO> listDTO = new ArrayList<>();
+        products.forEach(product -> {
+            ProductViewDTO dto = new ProductViewDTO();
+            dto.setProductID(product.getProductID());
+            enrichProductViewDTO(dto, product, hotProductIDs, productRepository.isNewProduct(product.getProductID()) > 0);
+            listDTO.add(dto);
+        });
+        return listDTO;
+    }
+
+
+    private Double calculateAvgRating(String productID) {
+        Double avg = reviewRepository.findAverageRatingByProductId(productID);
+        if (avg != null) {
+            BigDecimal rounded = new BigDecimal(avg).setScale(1, RoundingMode.HALF_UP);
+            return rounded.doubleValue();
+        }
+        return null;
+    }
+
+    private List<ColorOption> extractColorOptions(List<Variant> variants) {
+        List<ColorOption> colorList = DataUtils.getListColors();
+        return variants.stream()
+                .map(variant -> {
+                    String colorName = variant.getColor();
+                    return colorList.stream()
+                            .filter(color -> color.getTen().equalsIgnoreCase(colorName))
+                            .findFirst()
+                            .orElse(null);
+                })
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+
+    private void enrichProductViewDTO(ProductViewDTO dto, Product product, List<String> hotProductIDs, boolean isNew) {
+        ProductByCategoryDTO mapped = ProductMapper.toDTO(product);
+        dto.setProductName(mapped.getProductName());
+        dto.setPrice(mapped.getPrice());
+        dto.setParentCategoryId(product.getCategory().getParent().getCategoryId());
+        dto.setChildCategoryId(product.getCategory().getCategoryId());
+        dto.setImageUrl(mapped.getMainImageUrl());
+        dto.setVariantID(mapped.getVariantMainID());
+        dto.setDiscountPercent(productRepository.findDiscountPercentByProductID(product.getProductID()));
+        dto.setIsHot(hotProductIDs.contains(product.getProductID()));
+        dto.setIsNew(isNew);
+        dto.setAvg_rating(calculateAvgRating(product.getProductID()));
+        dto.setOptions(extractColorOptions(product.getVariants()));
+    }
+
+    @Override
+    public void markFavorites(List<ProductViewDTO> products) {
+        String accountID = AuthUtil.getAccountID();
+        if (accountID == null) return;
+
+        Optional<Account> optionalAccount = accountRepository.findByAccountId(accountID);
+        if (optionalAccount.isEmpty()) return;
+
+        List<Favorite> favorites = optionalAccount.get().getCustomer().getFavorites();
+        List<String> favoriteProductIDs = favorites.stream()
+                .map(fav -> fav.getProduct().getProductID())
+                .toList();
+
+        products.forEach(product ->
+                product.setIsFavorite(favoriteProductIDs.contains(product.getProductID()))
+        );
+    }
+
+    @Override
+    public SupportDetailDTO getSupportDetail(String variantId) {
+        Variant variant = variantRepository.findById(variantId).get();
+        SupportDetailDTO dto = new SupportDetailDTO();
+
+        String accountID = AuthUtil.getAccountID();
+        if (accountID == null) dto.setIsFavorite(false);
+
+        Optional<Account> optionalAccount = accountRepository.findByAccountId(accountID);
+        if (optionalAccount.isEmpty()) dto.setIsFavorite(false);
+
+        List<Favorite> favorites = optionalAccount.get().getCustomer().getFavorites();
+        List<String> favoriteProductIDs = favorites.stream()
+                .map(fav -> fav.getProduct().getProductID())
+                .toList();
+        dto.setIsFavorite(favoriteProductIDs.contains(variant.getProduct().getProductID()));
+        dto.setDiscountPercent(productRepository.findDiscountPercentByProductID(variant.getProduct().getProductID()));
+        dto.setIsNew(productRepository.isNewProduct(variant.getProduct().getProductID()) > 0);
+        Pageable pageable = PageRequest.of(0, 10);
+        List <Product> products = productRepository.findTopSellingProducts(pageable);
+        List<String> hotProductIDs = products.stream().map(Product::getProductID).toList();
+        dto.setIsHot(hotProductIDs.contains(variant.getProduct().getProductID()));
+        dto.setSoldQuantity(productRepository.countSoldQuantityByProductId(variant.getProduct().getProductID()));
+        return dto;
     }
 }

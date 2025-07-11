@@ -18,4 +18,11 @@ public interface InventoryRepository  extends JpaRepository<Inventory, Inventory
             "WHERE v.variantID = :variantId AND s.code = :code")
     Integer getQuantityByVariantAndSizeCode(@Param("variantId") String variantId,
                                             @Param("code") String code);
+
+
+    @Query("""
+        SELECT SUM(inv.quantity) FROM Inventory inv
+        WHERE inv.item.itemId=:itemId
+        """)
+    public Integer getStockQuantityByItemId(@Param("itemId") int itemId);
 }

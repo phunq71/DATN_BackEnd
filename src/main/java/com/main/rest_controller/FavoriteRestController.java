@@ -29,6 +29,19 @@ public class FavoriteRestController {
         return ResponseEntity.ok(favorites);
     }
 
+    @PostMapping
+    public ResponseEntity<?> addFavorite(@RequestParam String idPro) {
+        if (!AuthUtil.isLogin()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Bạn chưa đăng nhập");
+        }
+
+        String accountId = AuthUtil.getAccountID();
+        favoriteService.addFavorite(accountId, idPro);
+
+        return ResponseEntity.ok("Đã thêm yêu thích");
+    }
+
+
     // Xóa sản phẩm yêu thích theo productId
     @DeleteMapping("/{productId}")
     public ResponseEntity<?> removeFavorite(@PathVariable("productId") String productId) {

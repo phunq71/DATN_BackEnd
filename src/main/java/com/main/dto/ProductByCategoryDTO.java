@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Data @AllArgsConstructor @NoArgsConstructor
-public class ProductByCategory {
+public class ProductByCategoryDTO {
     private String productID;
     private String productName;
     private String mainImageUrl;

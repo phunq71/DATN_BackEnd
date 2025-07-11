@@ -9,4 +9,6 @@ public interface FavoriteService {
 
     void removeFavorite(String accountId, String productId);
 
+    void addFavorite(String accountId, String productId);
+
 }

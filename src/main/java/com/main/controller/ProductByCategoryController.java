@@ -1,17 +1,16 @@
 package com.main.controller;
 
-import com.main.dto.ProductByCategory;
+import com.main.dto.ProductByCategoryDTO;
+import com.main.dto.ProductViewDTO;
 import com.main.security.JwtService;
 import com.main.service.CategoryService;
 import com.main.service.ProductService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class ProductByCategoryController {
@@ -35,11 +34,12 @@ public class ProductByCategoryController {
         String childCategory = "null".equalsIgnoreCase(child) ? null : child;
 
         //gọi service
-        Page<ProductByCategory> productPage = productService.getProductsByCategory(parent, childCategory, page);
+        Page<ProductViewDTO> productPage = productService.getProductsByCategory(parent, childCategory, page);
 
         //lấy tên danh mục
         String parentCategoryName = categoryService.findNameById(parent);
         String childCategoryName = (childCategory != null) ? categoryService.findNameById(childCategory) : null;
+        System.out.println(page);
 
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("currentPage", page);
@@ -50,6 +50,6 @@ public class ProductByCategoryController {
         model.addAttribute("childCategoryName", childCategoryName);
 
 
-        return "View/ProductByCategory";
+        return "View/ProductByCategory2";
     }
 }
