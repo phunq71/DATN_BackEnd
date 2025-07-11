@@ -26,6 +26,8 @@
 // // axios.post("/api/auth/login", { email, password }, { withCredentials: true });
 // // axios.defaults.withCredentials = true; // nếu dùng toàn cục
 
+let carts=[];
+
 async function isLoggedIn() {
     try {
         const response = await fetch("/api/auth/check-login", {

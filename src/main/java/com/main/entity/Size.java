@@ -22,6 +22,7 @@ public class Size implements Serializable {
 
     @Column(length = 5)
     private String code;
+
     @JsonIgnore //Thêm vào tránh vòng lặp
     @OneToMany(mappedBy = "size")
     private List<Item> items;

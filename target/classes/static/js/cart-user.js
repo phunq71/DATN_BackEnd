@@ -8,12 +8,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 let cartIds=[];
 let itemCarts=[];
-let carts=[];
+
 const cartContainer = document.getElementById('cart-container');
 let checkedItems=[];
 
 function getItemCartsFromServer(){
-    return axios.get('/opulentia/user/rest/cart')
+    return axios.get('/opulentia_user/rest/cart')
         .then(response =>{
         return response.data;
         }
@@ -24,14 +24,15 @@ function getItemCartsFromServer(){
 }
 
 function updateCartsFromServer(carts){
-    return axios.put('/opulentia/user/rest/cart/update',carts)
+    carts.sort((a, b) => new Date(a.latestDate) - new Date(b.latestDate));
+    return axios.put('/opulentia_user/rest/cart/update',carts)
         .then(response =>{
-        console.log(response.data)
-        return response.data;
-    }).catch(error =>{
-        console.log(error);
-        return [];
-    });
+            console.log(response.data)
+            return response.data;
+        }).catch(error =>{
+            console.log(error);
+            return [];
+        });
 }
 
 function getCartsFromItemCarts(itemCarts) {
@@ -134,7 +135,11 @@ function createCartItemRow(chosenProduct, productGroup) {
                 </div>
             </div>
         </td>
-        <td class="c-price">${formatPrice(chosenProduct.price)}</td>
+        <td class="c-price">
+        
+                    ${renderPrice(chosenProduct.price, chosenProduct.discountPercent)}
+                   
+        </td>
         <td class="c-actions">
             <div class="c-quantity-container">
                 <button class="c-quantity-btn minus" ${currentOutOfStock ? 'disabled' : ''}>-</button>
@@ -142,7 +147,7 @@ function createCartItemRow(chosenProduct, productGroup) {
                 <button class="c-quantity-btn plus" ${currentOutOfStock ? 'disabled' : ''}>+</button>
             </div>
         </td>
-        <td class="c-item-total">${formatPrice(currentOutOfStock ? 0 : (chosenProduct.price * (chosenProduct.quantity || 1)))}</td>
+        <td class="c-item-total">${formatPrice(currentOutOfStock ? 0 : ((chosenProduct.price - chosenProduct.discountPercent) * (chosenProduct.quantity || 1)))}</td>
         <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
     `;
 
@@ -436,7 +441,7 @@ function updateTotalAmount() {
         if (cartItem) {
             const item = findItemByID(cartItem.itemID);
             if (item) {
-                total += item.price * cartItem.quantity;
+                total += (item.price- item.discountPercent) * cartItem.quantity;
             }
         }
     });
@@ -524,4 +529,14 @@ function updateTotalQuantity() {
     }
 
     document.getElementById('total-quantity').innerText=totalQuantity;
+}
+
+function renderPrice(basisPrice, discountPercent){
+    if(discountPercent>0){
+        return `
+                    <span class="basis-price">${formatPrice(basisPrice)}</span><br>
+                    <span class="price-after-discount">${formatPrice(basisPrice-discountPercent)}</span>
+        `;
+    }
+    return formatPrice(basisPrice);
 }

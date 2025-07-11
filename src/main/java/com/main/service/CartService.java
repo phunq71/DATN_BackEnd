@@ -15,11 +15,18 @@ public interface CartService {
 
     public List<CartDTO> getCartsByCustomerId(String customerId);
 
-    public List<List<ItemCartDTO>> updateCarts(List<CartDTO> carts);
+    List<List<ItemCartDTO>> updateCarts(List<CartDTO> carts, String customerId);
 
     public List<CartDTO> addCustomerID(List<CartDTO> cart, String customerID);
 
     public void deleteCartsByCartIds(List<CartId> cartIds);
 
     public void clearCartsByCustomerId(String customerId);
+
+    public List<CartDTO> mergeCarts(List<CartDTO> carts);
+
+    List<CartDTO> mergeCartLists(List<CartDTO> list1, List<CartDTO> list2);
+
+    public List<CartDTO> newCarts(List<CartDTO> carts, String accountId);
+
 }

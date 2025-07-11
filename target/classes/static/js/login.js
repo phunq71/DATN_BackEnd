@@ -28,10 +28,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 showConfirmButton: false,
                 timer: 1500,
                 timerProgressBar: true
-            }).then(() => {
-                const redirectUrl = localStorage.getItem("redirectAfterLogin") || "/index";
-                localStorage.removeItem("redirectAfterLogin");
-                window.location.href = redirectUrl;
+            }).then(async () => {
+                let redirectUrl = localStorage.getItem("redirectAfterLogin") || "/index";
+                if(redirectUrl ==="/opulentia_user/checkout"){
+                    redirectUrl="/opulentia/cart";
+                    await mergeCartLocalStorageAndServer();
+                    clearCartLocalStorage();
+                    document.dispatchEvent(new Event('cartUpdated'));
+                }
+
+                    localStorage.removeItem("redirectAfterLogin");
+                    window.location.href = redirectUrl;
+
+
             });
 
         } catch (error) {
@@ -66,6 +75,28 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
+
+    async function mergeCartLocalStorageAndServer(){
+      const carts= JSON.parse(localStorage.getItem('carts'));
+      await checkMergeCart(carts);
+
+    }
+
+    function checkMergeCart(carts){
+        return axios.post("/opulentia_user/mergeCartLocalStorageAndServer", carts)
+            .then(response => {
+                return response.data;
+            }).catch(error => {
+                console.log(error);
+                return false;
+            })
+    }
+
+    function clearCartLocalStorage(){
+        localStorage.removeItem('carts');
+    }
+
+
 });
 
 

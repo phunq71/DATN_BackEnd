@@ -7,7 +7,7 @@ import com.main.entity.Cart;
 import com.main.entity.CartId;
 import com.main.entity.Customer;
 import com.main.entity.Item;
-import com.main.repository.CartRepository;
+import com.main.repository.*;
 import com.main.service.CartService;
 import com.nimbusds.jose.util.Pair;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,17 @@ import java.util.stream.Collectors;
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
+    private final InventoryRepository inventoryRepository;
+    private final ItemRepository itemRepository;
+    private final CustomerRepository customerRepository;
+    private final ProductRepository productRepository;
 
-    public CartServiceImpl(CartRepository cartRepository) {
+    public CartServiceImpl(CartRepository cartRepository, InventoryRepository inventoryRepository, ItemRepository itemRepository, CustomerRepository customerRepository, ProductRepository productRepository) {
         this.cartRepository = cartRepository;
+        this.inventoryRepository = inventoryRepository;
+        this.itemRepository = itemRepository;
+        this.customerRepository = customerRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -32,10 +40,13 @@ public class CartServiceImpl implements CartService {
             List<ItemCartDTO> itemCarts = new ArrayList<>();
             itemCarts=cartRepository.getItemsBySameProduct(cart.getItemID());
             itemCarts.forEach(itemCartDTO -> {
-                if(itemCartDTO.getItemID().equals(cart.getItemID())){
+                if(itemCartDTO.getItemID().equals(cart.getItemID())){ //cart chính
                     itemCartDTO.setQuantity(cart.getQuantity());
                     itemCartDTO.setChosen(true);
                     itemCartDTO.setLatestDate(cart.getLatestDate());
+                    Item item= itemRepository.findById(itemCartDTO.getItemID()).get();
+                    String productID = item.getVariant().getProduct().getProductID();
+                    itemCartDTO.setDiscountPercent(productRepository.findDiscountPercentByProductID(productID));
                 }
             });
             listItemCarts.add(itemCarts);
@@ -59,8 +70,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<List<ItemCartDTO>> updateCarts(List<CartDTO> carts) {
-        List<CartDTO> oldCarts = cartRepository.getCartsByCustomerId(carts.get(0).getCustomerID());
+    public List<List<ItemCartDTO>> updateCarts(List<CartDTO> carts, String customerId) {
+        List<CartDTO> oldCarts = cartRepository.getCartsByCustomerId(customerId);
         List<CartDTO> saveCarts = getChanges(oldCarts, carts).getLeft();
         List<CartDTO> removeCarts = getChanges(oldCarts, carts).getRight();
         System.out.println("saveCarts: "+saveCarts);
@@ -102,6 +113,49 @@ public class CartServiceImpl implements CartService {
     public void clearCartsByCustomerId(String customerId) {
         cartRepository.clearCartsByCustomerId(customerId);
     }
+
+    @Override
+    public List<CartDTO> mergeCarts(List<CartDTO> carts) {
+        // Nhóm các cart item theo key (customerID + itemID) VÀ giữ thứ tự xuất hiện đầu tiên
+        Map<String, List<CartDTO>> groupedCarts = carts.stream()
+                .collect(Collectors.groupingBy(
+                        cart -> cart.getCustomerID() + "-" + cart.getItemID(),
+                        LinkedHashMap::new, // Giữ thứ tự
+                        Collectors.toList()
+                ));
+
+        List<CartDTO> result = new ArrayList<>();
+
+        for (Map.Entry<String, List<CartDTO>> entry : groupedCarts.entrySet()) {
+            List<CartDTO> cartGroup = entry.getValue();
+
+            if (cartGroup.size() == 1) {
+                // Không trùng lặp
+                result.add(cartGroup.get(0));
+            } else {
+                // Merge các cart cùng key
+                CartDTO mergedCart = cartGroup.get(0);
+                for (int i = 1; i < cartGroup.size(); i++) {
+                    CartDTO current = cartGroup.get(i);
+                    mergedCart.setQuantity(mergedCart.getQuantity() + current.getQuantity());
+                    if (current.getLatestDate().isAfter(mergedCart.getLatestDate())) {
+                        mergedCart.setLatestDate(current.getLatestDate());
+                    }
+                }
+
+                // Kiểm tra tồn kho
+                int stockQuantity = inventoryRepository.getStockQuantityByItemId(mergedCart.getItemID());
+                if (mergedCart.getQuantity() > stockQuantity) {
+                    mergedCart.setQuantity(stockQuantity);
+                }
+
+                result.add(mergedCart);
+            }
+        }
+
+        return result;
+    }
+
 
 
     /**
@@ -158,4 +212,70 @@ public class CartServiceImpl implements CartService {
 
         return Pair.of(toSave, toDelete);
     }
+
+    @Override
+    public List<CartDTO> mergeCartLists(List<CartDTO> list1, List<CartDTO> list2) {
+        // Map key là ItemID (Integer)
+        Map<Integer, CartDTO> mergedMap = new HashMap<>();
+
+        processCartList(mergedMap, list1, false);
+        processCartList(mergedMap, list2, true);
+
+        return new ArrayList<>(mergedMap.values());
+    }
+
+    @Override
+    public List<CartDTO> newCarts(List<CartDTO> cartDTOs, String accountId) {
+        Customer customer = customerRepository.findById(accountId).get();
+        cartRepository.clearCartsByCustomerId(accountId);
+        cartDTOs.forEach(cartDTO -> {
+            Cart cart = new Cart();
+            Item item= itemRepository.findById(cartDTO.getItemID()).get();
+            CartId cartId = new CartId(cartDTO.getCustomerID(), cartDTO.getItemID());
+            cart.setId(cartId);
+            cart.setCustomer(customer);
+            cart.setItem(item);
+            cart.setQuantity(cartDTO.getQuantity());
+            cart.setLatestDate(cartDTO.getLatestDate());
+            cartRepository.save(cart);
+        });
+
+        return cartDTOs;
+    }
+    private void processCartList(Map<Integer, CartDTO> mergedMap, List<CartDTO> cartList, boolean isList2) {
+        if (cartList == null) return;
+
+        for (CartDTO cartItem : cartList) {
+            // Key chỉ là ItemID
+            Integer key = cartItem.getItemID();
+
+            if (mergedMap.containsKey(key)) {
+                // Đã tồn tại thì cộng quantity
+                CartDTO existingItem = mergedMap.get(key);
+                existingItem.setQuantity(existingItem.getQuantity() + cartItem.getQuantity());
+
+                // Nếu là list2 thì update CustomerID
+                if (isList2) {
+                    existingItem.setCustomerID(cartItem.getCustomerID());
+                }
+
+                // Cập nhật latestDate mới hơn
+                if (cartItem.getLatestDate() != null &&
+                        (existingItem.getLatestDate() == null ||
+                                cartItem.getLatestDate().isAfter(existingItem.getLatestDate()))) {
+                    existingItem.setLatestDate(cartItem.getLatestDate());
+                }
+            } else {
+                // Thêm mới
+                mergedMap.put(key, new CartDTO(
+                        cartItem.getCustomerID(),
+                        cartItem.getItemID(),
+                        cartItem.getQuantity(),
+                        cartItem.getLatestDate()
+                ));
+            }
+        }
+    }
+
+
 }
