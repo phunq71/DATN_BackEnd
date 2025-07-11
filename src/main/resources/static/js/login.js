@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", async (e) => {
         e.preventDefault(); // Ngăn reload nhưng vẫn giữ kiểm tra hợp lệ
 
-        // Nếu form không hợp lệ, return (trình duyệt đã hiển thị thông báo)
         if (!form.reportValidity()) return;
 
         const email = document.getElementById("email").value.trim();

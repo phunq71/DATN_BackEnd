@@ -20,7 +20,6 @@ public class ProductDetailController {
     private final CategoryService categoryService;
     private final ImageService imageService;
     private final ItemService itemService;
-    private final InventoryService inventoryService;
     private final ReviewService reviewService;
     public ProductDetailController(ProductService productService, VariantService variantService, CategoryService categoryService, ImageService imageService, ItemService itemService, InventoryService inventoryService, ReviewService reviewService) {
         this.productService = productService;
@@ -28,7 +27,6 @@ public class ProductDetailController {
         this.categoryService = categoryService;
         this.imageService = imageService;
         this.itemService = itemService;
-        this.inventoryService = inventoryService;
         this.reviewService = reviewService;
     }
 
@@ -50,6 +48,7 @@ public class ProductDetailController {
         //Tìm ds tìm item bằng biến thể để lấy size của biến thể
         List<Item> listI = itemService.findByVariant(variant.get());
         String formattedPrice = formatToVND(variant.get().getPrice());
+
         // Lấy số lượng đánh giá theo từng mức sao
         Map<Integer, Integer> ratingCounts = reviewService.getReviewRatingCounts(productId);
         // Đếm tổng số lượt đánh giá cho sản phẩm

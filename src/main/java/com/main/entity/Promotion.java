@@ -42,7 +42,7 @@ public class Promotion {
     private String type;
 
     @ManyToOne
-    @JoinColumn(name = "membershipID",  nullable = false)
+    @JoinColumn(name = "membershipID")
     private Membership membership;
 
     @OneToMany(mappedBy = "promotion")
