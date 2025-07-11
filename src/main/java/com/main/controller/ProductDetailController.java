@@ -50,6 +50,7 @@ public class ProductDetailController {
         //Tìm ds tìm item bằng biến thể để lấy size của biến thể
         List<Item> listI = itemService.findByVariant(variant.get());
         String formattedPrice = formatToVND(variant.get().getPrice());
+
         // Lấy số lượng đánh giá theo từng mức sao
         Map<Integer, Integer> ratingCounts = reviewService.getReviewRatingCounts(productId);
         // Đếm tổng số lượt đánh giá cho sản phẩm

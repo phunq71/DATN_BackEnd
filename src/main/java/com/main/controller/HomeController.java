@@ -1,21 +1,18 @@
 package com.main.controller;
 
+import com.main.dto.ProductViewDTO;
 import com.main.entity.Product;
 import com.main.repository.ProductRepository;
-import com.main.security.CustomOAuth2User;
-import com.main.security.CustomUserDetails;
 import com.main.security.JwtService;
+import com.main.service.ProductService;
+import com.main.serviceImpl.ProductServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.net.http.HttpRequest;
-import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -38,41 +35,71 @@ public class HomeController {
     ProductRepository productRepository;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private ProductService productService;
 
-    @GetMapping({"/viewAll"})
-    public String viewAll() {
-        List<Product> products = productRepository.findByParentCategoryOnly2("A0001");
-        System.out.println(products.size());
-        return "View/highlightProducts";
-    }
+//    @GetMapping({"/viewAll"})
+//    public String viewAll() {
+//        List<Product> products = productRepository.findByParentCategoryOnly2("A0001");
+//        System.out.println(products.size());
+//        return "View/highlightProducts";
+//    }
 
     @GetMapping("/index")
-    public String index(@RequestParam(value="login", required = false) String login,  Model model) {
-        if (login != null) {
-            model.addAttribute("status", "success");
-            model.addAttribute("messageLayout", "Đăng nhập thành công");
-        }
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public String index(Model model) {
 
-        if (authentication == null || !authentication.isAuthenticated()) {
-            System.out.println("⚠️ Không có thông tin đăng nhập");
-        }
+        List<ProductViewDTO> list = new ArrayList<>();
+        list = productService.findProductsSale();
 
-        Object principal = authentication.getPrincipal();
+        List<ProductViewDTO> list2 = new ArrayList<>();
+        list2 = productService.findProductNews();
 
-        if (principal instanceof CustomOAuth2User oAuthUser) {
-            System.out.println("✅ OAuth2 - ID: " + oAuthUser.getAccountId());
-        } else if (principal instanceof CustomUserDetails userDetails) {
-            System.out.println("✅ Login thường - ID: " + userDetails.getAccountId());
-        } else if (principal instanceof String s && s.equals("anonymousUser")) {
-            System.out.println("⚠️ Chưa đăng nhập");
-        } else {
-            System.out.println("❓ Không rõ loại người dùng: " + principal.getClass());
-        }
-       return "View/index";
+        List<ProductViewDTO> list3 = new ArrayList<>();
+        list3 = productService.findBestSellingProducts();
+
+        productService.markFavorites(list);
+        productService.markFavorites(list2);
+        productService.markFavorites(list3);
 
 
+        model.addAttribute("discountedProducts", list);
+        model.addAttribute("newProducts", list2);
+        model.addAttribute("bestSellingProducts", list3);
+
+        return "View/index";
     }
+
+    @GetMapping("/opulentia/deals")
+    public String getDeals(Model model) {
+        List<ProductViewDTO> list = new ArrayList<>();
+        list = productService.findProductsSale();
+        productService.markFavorites(list);
+        model.addAttribute("products", list);
+        model.addAttribute("title", "deals");
+        return "View/Collection";
+    }
+
+    @GetMapping("/opulentia/news")
+    public String getNews(Model model) {
+        List<ProductViewDTO> list = new ArrayList<>();
+        list = productService.findProductNews();
+        productService.markFavorites(list);
+        model.addAttribute("products", list);
+        model.addAttribute("title", "news");
+        return "View/Collection";
+    }
+
+    @GetMapping("/opulentia/bestselling")
+    public String getBestSelling(Model model) {
+        List<ProductViewDTO> list = new ArrayList<>();
+        list = productService.findBestSellingProducts();
+        productService.markFavorites(list);
+        model.addAttribute("products", list);
+        model.addAttribute("title", "bestSelling");
+        return "View/Collection";
+    }
+
+
 
     @GetMapping("/index2")
     public String index( Model model, HttpServletRequest request) {
