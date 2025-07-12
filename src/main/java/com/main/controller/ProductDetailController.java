@@ -1,10 +1,12 @@
 package com.main.controller;
 import com.main.dto.Image_DetailDTO;
+import com.main.dto.ProductViewDTO;
 import com.main.dto.Variant_DetailDTO;
 import com.main.entity.*;
 import com.main.service.*;
 import com.main.serviceImpl.InventoryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,12 +38,18 @@ public class ProductDetailController {
     @GetMapping("/opulentia/{categoryParent}/{categoryID}/{productId}/{variantID}")
     public String VariantDetail(Model model,
                                 @PathVariable String productId,
-                                @PathVariable String variantID) {
+                                @PathVariable String variantID,
+                                @PathVariable String categoryParent,
+                                @PathVariable String categoryID) {
         Optional<Product> product = productService.findByProductID(productId);
         //DS CUNG LOAI
         Category category = categoryService.findByCategoryId(product.get().getCategory().getCategoryId());
-        List<Product> listProduct = productService.findByCategory(category);
-        model.addAttribute("listProduct", listProduct);
+        Page<ProductViewDTO> pageProduct = productService.getProductsByCategory(categoryParent, categoryID, 0);
+        List<ProductViewDTO> productList = new ArrayList<>(pageProduct.getContent());
+        productList.removeIf(productViewDTO ->
+                productViewDTO.getProductID().equals(productId)
+        );
+        model.addAttribute("listProduct1", productList);
         //Image slider, màu sắc
         List<Variant_DetailDTO> listV = variantService.findByProduct(product.get());
         Optional<Variant> variant = variantService.findById(variantID);

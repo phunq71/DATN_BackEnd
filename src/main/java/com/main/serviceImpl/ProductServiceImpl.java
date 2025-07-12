@@ -76,8 +76,10 @@ public class ProductServiceImpl implements ProductService {
             Product product = productRepository.findById(pro.getProductID()).orElse(null);
             productViewDTO.setProductID(pro.getProductID());
             enrichProductViewDTO(productViewDTO, product, hotProductIDs,productRepository.isNewProduct(product.getProductID()) > 0);
+
             productViewDTOList.add(productViewDTO);
         });
+        markFavorites(productViewDTOList);
         return new PageImpl<>(productViewDTOList, pageable, productPage.getTotalElements());
 
     }
@@ -225,7 +227,7 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
         dto.setIsFavorite(favoriteProductIDs.contains(variant.getProduct().getProductID()));
         dto.setDiscountPercent(productRepository.findDiscountPercentByProductID(variant.getProduct().getProductID()));
-        dto.setIsNew(productRepository.isNewProduct(variant.getProduct().getProductID()) > 0);
+        dto.setIsNew(variantRepository.isNewVariantOf(variantId)>0);
         Pageable pageable = PageRequest.of(0, 10);
         List <Product> products = productRepository.findTopSellingProducts(pageable);
         List<String> hotProductIDs = products.stream().map(Product::getProductID).toList();

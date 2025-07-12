@@ -270,6 +270,7 @@
     .otherProduct-title{
         display: flex;
         margin-right:15px ;
+        margin-bottom: 50px;
     }
 
     .otherProduct-title h4{
@@ -296,6 +297,7 @@
         border: 1px solid #e0e0e0;
         border-radius: 4px;
         overflow: hidden;
+        margin-top: -50px;
     }
 
     .ot-product-wrapper {
@@ -334,7 +336,7 @@
 
     .ot-sale-price {
         font-weight: bold;
-        color: #e74c3c;
+        color: #090909;
         font-size: 16px;
     }
 
@@ -355,7 +357,7 @@
         width: 18px;
         height: 18px;
         border-radius: 50%;
-        border: 1px solid #eee;
+        border: 1px solid #050505;
     }
 
     .ot-labels-container {
@@ -381,14 +383,33 @@
         background-color: #e74c3c;
     }
 
-    .ot-favorite-btn {
-        background: none;
-        border: none;
-        color: #333;
+    .favorite-btn {
+        font-size: larger;
+        margin-left: 90%;
+        position: relative;
+        top: -210px;
+        background: transparent;   /* nền trong suốt */
+        border: none;              /* bỏ viền */
+        border-radius: 0;          /* không bo tròn */
         cursor: pointer;
-        font-size: 16px;
-        margin-left: auto;
-        align-self: flex-start;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+        width: auto;               /* tự co theo nội dung */
+        height: auto;
+        padding: 0;                /* bỏ khoảng thừa */
+    }
+
+
+
+    .product-container:hover .favorite-btn {
+        transform: translateY(-0);
+    }
+
+    .favorite-btn:hover {
+        color: #ff4757;
+        transform: scale(1.2) !important;
     }
 
 
@@ -684,6 +705,7 @@
 
     .viewAll h5{
         margin-left: auto;
+        margin-top: -50px;
         margin-right: 10px;
     }
 
@@ -1073,70 +1095,68 @@
         <section class="ot-products-section">
             <div class="ot-products-list">
                 <!-- Product -->
-                <th:block th:each="products, iterStat : ${listProduct}">
+                <th:block th:each="products, iterStat : ${listProduct1}">
                     <th:block th:if="${products.productID != product.productID and iterStat.index < 5}">
-                        <a th:href="@{/opulentia/${products.category.parent}/${products.category.categoryId}/{productId}/{variantId}(productId=${products.getProductID()}, variantId=${products.variants[0].variantID})}" class="product-link">
+                        <a th:href="@{'/opulentia/' + ${products.parentCategoryId} + '/' + ${products.childCategoryId} + '/' + ${products.productID}
+                                + '/' + ${products.variantID}}" style="text-decoration: none; color: black">
                             <div class="ot-product-container">
                                 <div class="ot-product-wrapper">
                                     <div class="ot-product-info">
                                         <div class="ot-labels-container">
-                                            <div class="ot-new-label">NEW</div>
-                                            <div class="ot-discount-label">-10%</div>
+                                            <div th:if="${products.isHot}" class="ot-new-label"> ●&nbsp; Bán chạy</div>
+                                            <div th:if="${products.getDiscountPercent()}" class="ot-discount-label" th:text="'- ' + ${products.getDiscountPercent() +' %'}">-15%</div>
+
                                         </div>
                                         <div class="ot-product-title" th:text="${products.productName}"></div>
 
                                         <!-- Color options -->
                                         <div class="ot-color-options">
-                                            <th:block th:each="variant : ${products.variants}">
-                                                <th:block th:switch="${variant.getColor()}">
-                                                    <div class="ot-color-circle" th:case="'Đen'" style="background-color: #000000;"></div>
-                                                    <div class="ot-color-circle" th:case="'Nâu'" style="background-color: #8B4513;"></div>
-                                                    <div class="ot-color-circle" th:case="'Xám'" style="background-color: #808080;"></div>
-                                                    <div class="ot-color-circle" th:case="'Trắng'" style="background-color: #FFFFFF; border: 1px solid #ccc;"></div>
-                                                    <div class="ot-color-circle" th:case="'Xanh biển'" style="background-color: #1E90FF;"></div>
-                                                    <div class="ot-color-circle" th:case="'Xanh Navy'" style="background-color: #000080;"></div>
-                                                    <div class="ot-color-circle" th:case="'Xanh dương'" style="background-color: #4682B4;"></div>
-                                                    <div class="ot-color-circle" th:case="'Xanh đậm'" style="background-color: #005f73;"></div>
-                                                    <div class="ot-color-circle" th:case="'Da lạnh'" style="background-color: #fbe8eb;"></div>
-                                                    <div class="ot-color-circle" th:case="'Nâu đất'" style="background-color: #A0522D;"></div>
-                                                    <div class="ot-color-circle" th:case="'Ngũ sắc'" style="background: linear-gradient(45deg, red, yellow, green, blue, purple);"></div>
-                                                    <div class="ot-color-circle" th:case="'Nâu sáng'" style="background-color: #D2B48C;"></div>
-                                                    <div class="ot-color-circle" th:case="'Hồng kem'" style="background-color: #f8c8dc;"></div>
-                                                    <div class="ot-color-circle" th:case="'Đen xám'" style="background: linear-gradient(to right, #000000, #808080);"></div>
-                                                    <div class="ot-color-circle" th:case="'Kem'" style="background-color: #fffdd0;"></div>
-                                                    <div class="ot-color-circle" th:case="'Đỏ'" style="background-color: #ff4d4d;"></div>
-                                                    <div class="ot-color-circle" th:case="'Hồng'" style="background-color: #ff69b4;"></div>
-                                                    <div class="ot-color-circle" th:case="'Xanh sẫm'" style="background-color: #003366;"></div>
-                                                    <div class="ot-color-circle" th:case="'Xanh dương (sọc)'" style="background: repeating-linear-gradient(45deg, #4682B4, #4682B4 5px, white 5px, white 10px);"></div>
-                                                    <div class="ot-color-circle" th:case="'Đen & Trắng (sọc)'" style="background: repeating-linear-gradient(45deg, black, black 5px, white 5px, white 10px);"></div>
-                                                    <div class="ot-color-circle" th:case="*" style="background-color: #ccc;"></div>
-                                                </th:block>
-                                            </th:block>
+                                            <div class="ot-color-circle"
+                                                 th:each="color : ${products.getOptions()}"
+                                                 th:style="'background-color:' + ${color.ma} + ';'">
+                                            </div>
                                         </div>
 
-                                        <div class="ot-price-container"
-                                             th:if="${products.variants != null and #lists.size(products.variants) > 0}">
-                                            <span class="ot-sale-price">900.000đ</span>
-                                            <span class="ot-original-price"
-                                                  th:text="${products.variants[0].price}"></span>
+                                        <div class="ot-price-container">
+
+                                            <span class="ot-sale-price"
+                                                  th:if="${products.discountPercent != null}"
+                                                  th:text="${#numbers.formatDecimal(products.price.multiply(100 - products.discountPercent).divide(100), 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                                            </span>
+                                            <span class="ot-original-price text-decoration-line-through text-secondary"
+                                                  th:if="${products.discountPercent != null}"
+                                                  th:text="${#numbers.formatDecimal(products.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                                            </span>
+
+                                            <!-- Nếu không giảm -->
+                                            <span class="ot-sale-price"
+                                                  th:unless="${products.discountPercent != null}"
+                                                  th:text="${#numbers.formatDecimal(products.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                                            </span>
+                                            <span
+                                                    th:text="${products.avg_rating != null ?  products.avg_rating + ' ★' : ' Chưa có đánh giá'}">
+                                        </span>
                                         </div>
+
                                     </div>
 
                                     <div class="ot-product-image-container">
-                                        <img th:each="img : ${products.variants[0].images}"
-                                             th:if="${img.isMainImage}"
-                                             th:src="@{'/uploads/' + ${img.imageUrl}}"
+                                        <img th:src="@{'/uploads/' + ${products.getImageUrl()}}"
                                              class="ot-product-image"
                                              alt="Ảnh sản phẩm">
                                     </div>
+
                                 </div>
                             </div>
                         </a>
+                        <button class="favorite-btn" th:attr="data-idpro=${products.productID}">
+                            <i th:class="${products.isFavorite} ? 'fas fa-heart text-dark' : 'far fa-heart'"></i>
+                        </button>
                     </th:block>
                 </th:block>
 
                 <div class="viewAll">
-                    <h5>Xem tất cả</h5>
+                    <h5><a th:href="@{'/opulentia/' + ${categoryParent} + ' /' + ${categoryID} + '/0'} "}>Xem tất cả</a></h5>
                 </div>
             </div>
         </section>

@@ -1361,21 +1361,7 @@
         updateFilterBadge();
     });
 </script>
-<!--Hiệu ứng cho nut favorite-->
-<script>
-    // Xử lý nút yêu thích
-    $('.favorite-btn').click(function (e) {
-        e.stopPropagation();
-        const icon = $(this).find('i');
-        if (icon.hasClass('far')) {
-            icon.removeClass('far').addClass('fas');
-            $(this).css('color', '#ff4757');
-        } else {
-            icon.removeClass('fas').addClass('far');
-            $(this).css('color', '#333');
-        }
-    });
-</script>
+
 <!--Hiệu ứng rớt từng ô màu-->
 <script>
 
