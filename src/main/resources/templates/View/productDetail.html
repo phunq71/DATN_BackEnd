@@ -101,6 +101,22 @@
     .color-selector, .size-selector {
         margin: 1rem 0;
     }
+    .new-badge {
+        height: 50px;  /* tùy kích thước ảnh gốc */
+        width: auto;
+        object-fit: contain;
+        animation: pop 0.4s ease-out;
+    }
+    @keyframes pop {
+        0% {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
 
     .color-options {
         display: flex;
@@ -643,10 +659,12 @@
     }
 
     .quantity-field {
-        display: inline-flex;  /* Hiển thị các phần tử con trên cùng 1 hàng */
+        display: inline-flex;
 
-        border-radius: 4px;     /* Bo góc nhẹ (tuỳ chọn) */
-        overflow: hidden;       /* Ẩn phần tràn ra ngoài */
+        border-radius: 4px;
+        /*overflow: hidden;*/
+
+        margin: 10px 0; /* 16px trên và dưới, 0 trái phải */
     }
 
     .qty-btn {
@@ -854,6 +872,45 @@
         font-size: 15px;
         font-weight: 600;
     }
+    .favorite-btn {
+        position: relative; /* hoặc absolute nếu bạn muốn đặt ở vị trí cố định */
+        z-index: 10; /* hoặc lớn hơn, ví dụ 1000 nếu cần */
+
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #333;
+        font-size: larger;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-top: -10px;
+        margin-left: 10px;
+    }
+
+    .favorite-btn:hover {
+        color: #ff4757;
+    }
+    .original-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 1rem;            /* Nhỏ hơn giá mới */
+        margin-right: 12px;
+        vertical-align: middle;
+    }
+
+    .sale-price {
+        color: #e53935;             /* Màu đỏ nổi bật */
+        font-weight: bold;
+        font-size: 1.8rem;          /* To hơn rõ rệt */
+        line-height: 1.2;
+    }
+
 
 </style>
 <!--style cho zoom ảnh-->
@@ -942,8 +999,16 @@
     <div class="product-info">
         <h1 th:text="${product.getProductName()}"></h1>
         <div class="color-selector">
-            <span style="font-weight: 500; margin-right: 6px;">Color:</span>
+            <span style="font-weight: 500; margin-right: 6px;">Màu sắc:</span>
             <span th:text="${colorVariant}" style="padding: 4px 10px; background-color: #eee; border-radius: 6px; font-weight: 500; color: #333;"></span>
+
+            <!-- Hiển thị ảnh "NEW" nếu variantNew == true -->
+            <img class="new-badge"
+                 th:if="${variantNew}"
+                 src="/uploads/NewImage.png"
+                 alt="New"/>
+
+
             <div class="color-options">
                 <th:block th:each="variant, iterStat : ${listV}">
                    <a th:href="@{/opulentia/${product.category.parent}/${product.category.categoryId}/{productId}/{variantId}(productId=${product.getProductID()}, variantId=${variant.variantId})}">
@@ -981,6 +1046,14 @@
             <!-- Sẽ cập nhật bằng JS -->
             Vui lòng chọn size
         </div>
+        <div>
+            <span th:text="'Số sản phẩm đã bán: ' + ${variantSoldQuantity}"></span>
+
+            <img th:if="${variantIsHot}"
+                 src="/uploads/hoticon.png"
+                 style="height: 50px; width: 50px; margin-top: -10px;"
+                 alt="Hot product" />
+        </div>
 
         <div class="rating">
             <div class="rating-box">
@@ -997,8 +1070,18 @@
             <button class="qty-btn minus">-</button>
             <input type="number" class="qty-input" value="1" min="1">
             <button class="qty-btn plus">+</button>
+            <button class="favorite-btn" th:attr="data-idpro=${product.getProductID()}">
+                <i th:class="${pro.isFavorite} ? 'fas fa-heart text-dark' : 'far fa-heart'"></i>
+            </button>
         </div>
-        <div class="price" th:text="${priceVariant}"></div>
+
+        <!-- Khi có giảm giá -->
+        <span class="price original-price" th:if="${pricePromotion != null}" th:text="${priceVariant}"></span>
+        <span class="price sale-price" th:if="${pricePromotion != null}" th:text="${pricePromotion}"></span>
+
+        <!-- Khi không có giảm giá -->
+        <span class="price" th:if="${pricePromotion == null}" th:text="${priceVariant}"></span>
+
         <button class="add-to-cart">ADD TO CART</button>
     </div>
 </div>

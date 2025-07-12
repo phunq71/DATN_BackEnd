@@ -215,17 +215,19 @@ public class ProductServiceImpl implements ProductService {
 
         String accountID = AuthUtil.getAccountID();
         if (accountID == null) dto.setIsFavorite(false);
-
-        Optional<Account> optionalAccount = accountRepository.findByAccountId(accountID);
-        if (optionalAccount.isEmpty()) dto.setIsFavorite(false);
-
-        List<Favorite> favorites = optionalAccount.get().getCustomer().getFavorites();
-        List<String> favoriteProductIDs = favorites.stream()
-                .map(fav -> fav.getProduct().getProductID())
-                .toList();
-        dto.setIsFavorite(favoriteProductIDs.contains(variant.getProduct().getProductID()));
+        else{
+            Optional<Account> optionalAccount = accountRepository.findByAccountId(accountID);
+            if (optionalAccount.isEmpty()) dto.setIsFavorite(false);
+            else{
+                List<Favorite> favorites = optionalAccount.get().getCustomer().getFavorites();
+                List<String> favoriteProductIDs = favorites.stream()
+                        .map(fav -> fav.getProduct().getProductID())
+                        .toList();
+                dto.setIsFavorite(favoriteProductIDs.contains(variant.getProduct().getProductID()));
+            }
+        }
         dto.setDiscountPercent(productRepository.findDiscountPercentByProductID(variant.getProduct().getProductID()));
-        dto.setIsNew(productRepository.isNewProduct(variant.getProduct().getProductID()) > 0);
+        dto.setIsNew(variantRepository.isNewVariantOf(variantId)>0);
         Pageable pageable = PageRequest.of(0, 10);
         List <Product> products = productRepository.findTopSellingProducts(pageable);
         List<String> hotProductIDs = products.stream().map(Product::getProductID).toList();
