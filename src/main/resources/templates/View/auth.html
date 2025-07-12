@@ -813,9 +813,8 @@
                                     <div class="lg-rs-form-group">
                                         <select class="lg-rs-form-control" id="gender" required>
                                             <option value="" disabled selected></option>
-                                            <option value="male">Nam</option>
-                                            <option value="female">Nữ</option>
-                                            <option value="other">Khác</option>
+                                            <option value="true">Nam</option>
+                                            <option value="false">Nữ</option>
                                         </select>
                                         <label for="gender" class="lg-rs-form-label">Giới tính</label>
                                     </div>
@@ -853,22 +852,16 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="lg-rs-form-group">
-                                        <select class="lg-rs-form-control" id="city" name="city" required>
+                                        <select class="lg-rs-form-control" id="province" name="province" required>
                                             <option value="" disabled selected></option>
-                                            <option value="hanoi">Hà Nội</option>
-                                            <option value="hcm">TP Hồ Chí Minh</option>
-                                            <option value="danang">Đà Nẵng</option>
                                         </select>
-                                        <label for="city" class="lg-rs-form-label">Tỉnh/Thành phố</label>
+                                        <label for="province" class="lg-rs-form-label">Tỉnh/Thành phố</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="lg-rs-form-group">
                                         <select class="lg-rs-form-control" id="district" name="district" required>
                                             <option value="" disabled selected></option>
-                                            <option value="quan1">Quận 1</option>
-                                            <option value="quan2">Quận 2</option>
-                                            <option value="quan3">Quận 3</option>
                                         </select>
                                         <label for="district" class="lg-rs-form-label">Quận/Huyện</label>
                                     </div>
@@ -877,9 +870,6 @@
                                     <div class="lg-rs-form-group">
                                         <select class="lg-rs-form-control" id="ward" name="ward" required>
                                             <option value="" disabled selected></option>
-                                            <option value="phuong1">Phường 1</option>
-                                            <option value="phuong2">Phường 2</option>
-                                            <option value="phuong3">Phường 3</option>
                                         </select>
                                         <label for="ward" class="lg-rs-form-label">Phường/Xã</label>
                                     </div>
@@ -897,7 +887,13 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="lg-rs-btn-submit btn w-100 mb-3">ĐĂNG KÝ</button>
+                            <button id="registerBtn" type="button" class="lg-rs-btn-submit btn w-100 mb-3">ĐĂNG KÝ</button>
+                            <div id="otpSection" style="display: none;">
+                                <label for="otp">Nhập mã OTP đã gửi về email:</label>
+                                <input type="text" id="otp" class="form-control" required>
+                                <button id="confirmOtpBtn" class="btn btn-success mt-2">Xác nhận OTP</button>
+                            </div>
+
                         </form>
                     </div>
                 </div>
@@ -965,6 +961,146 @@
 
 
     </script>
+<!-- Xử lý đăng ký-->
+
+ <script>
+     let dataAddress = [];
+     let provincesSelect = document.getElementById('province');
+     let districtsSelect = document.getElementById('district');
+     let wardsSelect = document.getElementById('ward');
+
+     axios.get('/data/Address.json')
+         .then(response => {
+             dataAddress = response.data;
+             populateProvinces();
+         })
+         .catch(error => {
+             console.error("Lỗi khi tải dữ liệu địa chỉ:", error);
+         });
+
+     function populateProvinces() {
+         provincesSelect.innerHTML = '<option value="">Chọn tỉnh/thành phố</option>';
+         dataAddress.forEach(province => {
+             let option = document.createElement('option');
+             option.value = province.ProvinceName;
+             option.textContent = province.ProvinceName;
+             provincesSelect.appendChild(option);
+         });
+     }
+
+     provincesSelect.addEventListener('change', () => {
+         clearSelect(districtsSelect);
+         clearSelect(wardsSelect);
+         let selectedProvinceName = provincesSelect.value;
+         if (!selectedProvinceName) return;
+         let province = dataAddress.find(p => p.ProvinceName === selectedProvinceName);
+         if (province) {
+             districtsSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+             province.Districts.forEach(district => {
+                 let option = document.createElement('option');
+                 option.value = district.DistrictName;
+                 option.textContent = district.DistrictName;
+                 districtsSelect.appendChild(option);
+             });
+         }
+     });
+
+     districtsSelect.addEventListener('change', () => {
+         clearSelect(wardsSelect);
+         let selectedProvinceName = provincesSelect.value;
+         let selectedDistrictName = districtsSelect.value;
+         if (!selectedProvinceName || !selectedDistrictName) return;
+         let province = dataAddress.find(p => p.ProvinceName === selectedProvinceName);
+         if (!province) return;
+         let district = province.Districts.find(d => d.DistrictName === selectedDistrictName);
+         if (district) {
+             wardsSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+             district.Wards.forEach(ward => {
+                 let option = document.createElement('option');
+                 option.value = ward.WardName;
+                 option.textContent = ward.WardName;
+                 wardsSelect.appendChild(option);
+             });
+         }
+     });
+
+     function clearSelect(selectElement) {
+         while (selectElement.options.length > 1) {
+             selectElement.remove(1);
+         }
+     }
+
+     document.addEventListener("DOMContentLoaded", function () {
+         const otpSection = document.getElementById("otpSection");
+
+         function register() {
+             const email = document.getElementById("reg-email").value;
+             const fullname = document.getElementById("fullname").value;
+             const birthday = document.getElementById("birthday").value;
+             const gender = document.getElementById("gender").value;
+             const password = document.getElementById("reg-password").value;
+             const confirmPassword = document.getElementById("confirm-password").value;
+
+             const provinceName = provincesSelect.value;
+             const districtName = districtsSelect.value;
+             const wardName = wardsSelect.value;
+             const addressDetail = document.getElementById("address").value;
+
+             if (!email || !fullname || !birthday || !gender || !password || !confirmPassword) {
+                 alert("Vui lòng điền đầy đủ thông tin bắt buộc!");
+                 return;
+             }
+
+             if (password !== confirmPassword) {
+                 alert("Mật khẩu không khớp!");
+                 return;
+             }
+
+             if (!addressDetail || !provinceName || !districtName || !wardName) {
+                 alert("Vui lòng nhập đầy đủ địa chỉ!");
+                 return;
+             }
+
+             const fullAddress = `${addressDetail}, ${wardName}, ${districtName}, ${provinceName}`;
+
+             const customerData = {
+                 email,
+                 password,
+                 confirmPassword,
+                 fullname,
+                 gender,
+                 address: fullAddress,
+                 dob: birthday
+             };
+
+             axios.post("/opulentia/send-otp-register", customerData)
+                 .then(res => {
+                     alert(res.data); // ✅ Thông báo gửi thành công
+                     otpSection.style.display = "block"; // ✅ Hiện ô nhập OTP
+                 })
+                 .catch(err => {
+                     console.error("Lỗi gửi OTP:", err);
+                     alert(err.response?.data || "Gửi OTP thất bại.");
+                 });
+         }
+
+         function confirmOtp() {
+             const otp = document.getElementById("otp").value;
+             axios.post(`/opulentia/confirm-otp-register?otp=${otp}`)
+                 .then(res => {
+                     alert(res.data); // ✅ Đăng ký thành công
+                     window.location.href = "/auth";
+                 })
+                 .catch(err => {
+                     console.error("Lỗi xác nhận OTP:", err);
+                     alert(err.response?.data || "Xác nhận OTP thất bại.");
+                 });
+         }
+
+         document.getElementById("registerBtn").addEventListener("click", register);
+         document.getElementById("confirmOtpBtn").addEventListener("click", confirmOtp);
+     });
+ </script>
 
 </body>
 

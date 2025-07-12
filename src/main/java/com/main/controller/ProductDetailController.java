@@ -22,7 +22,6 @@ public class ProductDetailController {
     private final CategoryService categoryService;
     private final ImageService imageService;
     private final ItemService itemService;
-    private final InventoryService inventoryService;
     private final ReviewService reviewService;
     public ProductDetailController(ProductService productService, VariantService variantService, CategoryService categoryService, ImageService imageService, ItemService itemService, InventoryService inventoryService, ReviewService reviewService) {
         this.productService = productService;
@@ -30,7 +29,6 @@ public class ProductDetailController {
         this.categoryService = categoryService;
         this.imageService = imageService;
         this.itemService = itemService;
-        this.inventoryService = inventoryService;
         this.reviewService = reviewService;
     }
 
@@ -99,9 +97,9 @@ public class ProductDetailController {
         return "View/productDetail";
     }
     private String formatToVND(Number amount) {
-        if (amount == null) return "0 VNĐ";
+        if (amount == null) return "0 ₫";
         NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return nf.format(amount) + " VNĐ";
+        return nf.format(amount) + " ₫";
     }
 }
 

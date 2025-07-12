@@ -1,5 +1,7 @@
 
 
+let carts=[];
+
 async function isLoggedIn() {
     try {
         const response = await fetch("/api/auth/check-login", {

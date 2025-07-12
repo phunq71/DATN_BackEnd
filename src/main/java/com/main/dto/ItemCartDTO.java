@@ -29,6 +29,8 @@ public class ItemCartDTO {
     private Long stockQuantity=0L;
     private boolean isChosen=false; //cart được chọn
 
+    private Byte discountPercent;
+
     public ItemCartDTO(Integer itemID, String productName, String variantID, String color, Integer sizeID, String sizeCode, BigDecimal price, String mainImage, Boolean isInStock, Long stockQuantity) {
         this.itemID = itemID;
         this.productName = productName;

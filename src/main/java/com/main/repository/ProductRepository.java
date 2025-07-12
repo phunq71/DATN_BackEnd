@@ -77,7 +77,8 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
       AND pr.startDate <= CURRENT_TIMESTAMP
       AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
       AND pr.type = 'ProductDiscount'
-""")
+
+    """)
     Byte findDiscountPercentByProductID(@Param("productID") String productID);
 
 
@@ -98,6 +99,5 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
             "JOIN it.variant va " +
             "WHERE va.product.productID = :productId")
     long countSoldQuantityByProductId(@Param("productId") String productId);
-
 
 }

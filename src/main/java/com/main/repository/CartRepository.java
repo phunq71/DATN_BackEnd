@@ -32,8 +32,8 @@ public interface CartRepository extends JpaRepository<Cart, CartId> {
             "JOIN Product p on p.productID = v.product.productID " +
             "JOIN Size s on s.sizeID = i.size.sizeID " +
             "WHERE p.productID = (SELECT v2.product.productID FROM Item i2 " +
-            "JOIN Variant v2 ON v2.variantID = i2.variant.variantID " +
-            "WHERE i2.itemId = :itemId)")
+            "                   JOIN Variant v2 ON v2.variantID = i2.variant.variantID " +
+            "                   WHERE i2.itemId = :itemId)")
     public List<ItemCartDTO> getItemsBySameProduct(@Param("itemId") int itemId);
 
     @Query("SELECT p.productName, v.price, img.imageUrl " +
@@ -46,7 +46,7 @@ public interface CartRepository extends JpaRepository<Cart, CartId> {
 
     @Query("""
     SELECT c.id.customer, c.id.item, c.quantity, c.latestDate FROM Cart c
-    WHERE c.id.customer = :customerId
+    WHERE c.id.customer = :customerId ORDER BY c.latestDate DESC
     """)
     public List<CartDTO> getCartsByCustomerId(@Param("customerId") String customerId);
 
@@ -54,4 +54,6 @@ public interface CartRepository extends JpaRepository<Cart, CartId> {
     @Transactional
     @Query("DELETE FROM Cart c WHERE c.id.customer=:customerId")
     public void clearCartsByCustomerId(@Param("customerId") String customerId);
+
+
 }

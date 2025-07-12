@@ -822,52 +822,47 @@
 
     /* --- Style mặc định của mỗi size --- */
     .size-option {
+        width: 50px;
+        height: 50px;
+        border: 2px solid black;
         display: flex;
         align-items: center;
         justify-content: center;
-        min-width: 52px;
-        min-height: 44px;
-        padding: 12px 20px;
-        border-radius: 8px;
-        background-color: transparent;
-        border: 2px solid #000;
-        font-size: 16px;
-        font-weight: 600;
-        color: #000;
-        transition: all 0.25s ease;
-        text-align: center;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s ease;
     }
 
     /* --- Hover hiệu ứng --- */
-    .size-option:hover {
-        background-color: #f0f0f0;
-        cursor: pointer;
-    }
+    /*.size-option:hover {*/
+    /*    background-color: #f0f0f0;*/
+    /*    cursor: pointer;*/
+    /*}*/
 
     /* --- Khi được chọn --- */
     .size-option.selected {
-        background-color: #000;
-        color: #fff;
-        border-color: #000;
-        font-weight: 700;
+        background-color: black;
+        color: white;
+        border: 2px solid white;
+        box-shadow: 0 0 0 2px black;
     }
 
     /* --- Khi hết hàng --- */
     .size-option.out-of-stock {
-        border: 2px dashed #aaa;
-        color: #999;
-        cursor: not-allowed;
+        background-color: #e0e0e0;
+        color: #a0a0a0;
+
         pointer-events: none;
-        opacity: 0.5;
-        background-color: transparent;
+        cursor: not-allowed;
     }
 
     /* --- Span bên trong để giữ chữ căn giữa --- */
     .size-option span {
-        width: 100%;
+        font-size: 16px;
         text-align: center;
         color: inherit;
         font-weight: inherit;
+        padding: 5px;
     }
 
     /* --- Trạng thái hiển thị tồn kho --- */
@@ -964,7 +959,7 @@
     <div class="product-info">
         <h1 th:text="${product.getProductName()}"></h1>
         <div class="color-selector">
-            <span style="font-weight: 500; margin-right: 6px;">Color:</span>
+            <span style="font-weight: 500; margin-right: 6px;">Màu:</span>
             <span th:text="${colorVariant}" style="padding: 4px 10px; background-color: #eee; border-radius: 6px; font-weight: 500; color: #333;"></span>
             <div class="color-options">
                 <th:block th:each="variant, iterStat : ${listV}">
@@ -979,23 +974,22 @@
             </div>
         </div>
         <div class="size-selector">
-            <div class="size-container">
-                <div th:each="size : ${listI}" class="size-wrapper">
-                    <a class="size-link" th:if="${size.getSize().getCode() != null}"
+            <div class="size-container" id="size-container">
+<!--                <div th:each="size : ${listI}" class="size-wrapper">-->
+<!--                    <a class="size-link" th:if="${size.getSize().getCode() != null}"-->
 
-                       th:data-variant-id="${variantID}"
-                       th:data-size-code="${size.getSize().getCode()}">
-                        <div th:class="'size-option'"
-                             th:attr="data-size=${size.getSize().getCode()}">
-                            <span th:text="${size.getSize().getCode()}"></span>
-                        </div>
-                    </a>
-                    <div th:if="${size.getSize().getCode() == null}"
-                         class="size-option out-of-stock">
-                        <span>Hết hàng</span>
-                    </div>
-                </div>
-
+<!--                       th:data-variant-id="${variantID}"-->
+<!--                       th:data-size-code="${size.getSize().getCode()}">-->
+<!--                        <div th:class="'size-option'"-->
+<!--                             th:attr="data-size=${size.getSize().getCode()}">-->
+<!--                            <span th:text="${size.getSize().getCode()}"></span>-->
+<!--                        </div>-->
+<!--                    </a>-->
+<!--                    <div th:if="${size.getSize().getCode() == null}"-->
+<!--                         class="size-option out-of-stock">-->
+<!--                        <span>Hết hàng</span>-->
+<!--                    </div>-->
+<!--                </div>-->
             </div>
         </div>
 
@@ -1016,12 +1010,12 @@
             </div>
         </div>
         <div class="quantity-field">
-            <button class="qty-btn minus">-</button>
-            <input type="number" class="qty-input" value="1" min="1">
-            <button class="qty-btn plus">+</button>
+            <button class="qty-btn minus" id="minusBtn">-</button>
+            <input type="number" class="qty-input" value="1" min="1" id="qty-input">
+            <button class="qty-btn plus" id="plusBtn">+</button>
         </div>
         <div class="price" th:text="${priceVariant}"></div>
-        <button class="add-to-cart">ADD TO CART</button>
+        <button class="add-to-cart" id="add-to-cart">Thêm vào giỏ hàng</button>
     </div>
 </div>
 <!-- Phần mô tả sản phẩm -->
@@ -1030,9 +1024,9 @@
         <div class="description-title">Mô tả</div>
     </div>
     <div class="">
-        <span>Về sản phẩm: </span>
-        <span th:text="${product.description}"></span> <br><br>
-        <span>Về biến thể: </span>
+
+        <span th:text="${product.description}"></span>
+        <br/>
         <span th:text="${descriptionVariant}"></span>
     </div>
 </div>
@@ -1241,274 +1235,7 @@
         <img class="zoom-modal-image" src="" alt="">
     </div>
 </div>
-<!--Chặn thẻ a của thymleaf và dùng rest api cho sự kiện chọn size-->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const links = document.querySelectorAll(".size-link");
-
-        links.forEach(link => {
-            link.addEventListener("click", function (e) {
-                e.preventDefault();
-                const variantID = link.getAttribute("data-variant-id");
-                const sizeCode = link.getAttribute("data-size-code");
-
-                // ✅ Bỏ class 'selected' khỏi tất cả các size-option
-                document.querySelectorAll('.size-option.selected')
-                    .forEach(el => el.classList.remove('selected'));
-
-                // ✅ Thêm class 'selected' vào size-option hiện tại
-                const optionDiv = link.querySelector(".size-option");
-                if (optionDiv) {
-                    optionDiv.classList.add("selected");
-                }
-
-                // ✅ Gọi API REST Controller
-                axios.get(`/opulentia/variant/${variantID}/size/${sizeCode}`)
-                    .then(response => {
-                        const stock = response.data;
-                        const stockElement = document.getElementById("stock-status");
-                        console.log(stock)
-                        if (stock > 0) {
-                            stockElement.innerText = `Còn ${stock} sản phẩm`;
-                            stockElement.style.color = "green";
-                        } else {
-                            stockElement.innerText = "Hết hàng";
-                            stockElement.style.color = "red";
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Lỗi gọi API:", error);
-                    });
-            });
-        });
-    });
-</script>
-<!--Xử lý danh sách khách hàng review sản phẩm-->
-<script>
-    const pathParts = window.location.pathname.split('/');
-    const productId = pathParts[4];
-    let currentPage = 0;
-
-    document.addEventListener('DOMContentLoaded', function () {
-        setupImageZoom();
-        loadReviews(0);
-    });
-
-    function loadReviews(page = 0, filters = {}) {
-        const params = new URLSearchParams();
-        params.append("page", page);
-
-        if (filters.rating) params.append("rating", filters.rating);
-        if (filters.color) params.append("color", filters.color);
-        if (filters.size) params.append("size", filters.size);
-        if (filters.hasImage) params.append("hasImage", filters.hasImage);
-
-        axios.get(`/opulentia/${productId}?${params.toString()}`)
-            .then(res => {
-                const data = res.data;
-                const reviews = data.reviews;
-                const totalPages = data.totalPages;
-                currentPage = data.currentPage;
-
-                const reviewContainer = document.querySelector(".customer-reviews");
-                const paginationContainer = document.querySelector(".pagination");
-
-                let html = `<h3>Đánh giá của khách hàng</h3>`;
-
-                if (!reviews || reviews.length === 0) {
-                    html += `<p>Chưa có đánh giá nào.</p>`;
-                } else {
-                    reviews.forEach(review => {
-                        const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-                        let images = '';
-                        if (review.reviewImages?.length > 0) {
-                            images = `<div class="review-images">`;
-                            review.reviewImages.forEach(img => {
-                                images += `<img src="/uploads/${img.imageUrl}" alt="Review ${review.reviewID}" class="review-image">`;
-                            });
-                            images += `</div>`;
-                        }
-
-                        html += `
-                            <div class="review-item">
-                                <div class="review-header">
-                                    <div class="reviewer-name">${review.customerName}</div>
-                                    <div class="review-stars">${stars}</div>
-                                </div>
-                                <div class="review-meta">
-                                    <span>Màu: ${review.color} | Size: ${review.size}</span>
-                                    <span class="review-time">${formatDateToAgo(review.createAt)}</span>
-                                </div>
-                                <div class="review-content">${review.content}</div>
-                                ${images}
-                            </div>
-                        `;
-                    });
-                }
-
-                reviewContainer.innerHTML = html;
-                setupImageZoom();
-
-                // Phân trang
-                let pageHtml = '';
-                pageHtml += `<button onclick="loadReviews(${currentPage - 1})" ${currentPage === 0 ? 'disabled' : ''}>← Trước</button>`;
-                for (let i = 0; i < totalPages; i++) {
-                    pageHtml += `<button onclick="loadReviews(${i})" class="${i === currentPage ? 'active-page' : ''}">${i + 1}</button>`;
-                }
-                pageHtml += `<button onclick="loadReviews(${currentPage + 1})" ${currentPage === totalPages - 1 ? 'disabled' : ''}>Sau →</button>`;
-
-                paginationContainer.innerHTML = pageHtml;
-            })
-            .catch(err => {
-                console.error("Lỗi khi lấy đánh giá:", err);
-            });
-    }
-
-    function formatDateToAgo(dateStr) {
-        const now = new Date();
-        const date = new Date(dateStr);
-        const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 0) return "Hôm nay";
-        if (diffDays === 1) return "1 ngày trước";
-        return `${diffDays} ngày trước`;
-    }
-
-    // Chỉ chọn 1 checkbox trong nhóm
-    function handleSingleSelect(container) {
-        const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', function () {
-                if (this.checked) {
-                    checkboxes.forEach(other => {
-                        if (other !== this) other.checked = false;
-                    });
-                }
-            });
-        });
-    }
-
-    function applyFilters() {
-        const selectedRating = document.querySelector('input[name="rating"]:checked')?.value || null;
-        const selectedColor = document.querySelector('input[name="color"]:checked')?.value || null;
-        const selectedSize = document.querySelector('input[name="size"]:checked')?.value || null;
-        const hasImage = document.querySelector('#hasImage')?.checked || false;
-
-        const filters = {
-            rating: selectedRating,
-            color: selectedColor,
-            size: selectedSize,
-            hasImage: hasImage
-        };
-
-        loadReviews(0, filters);
-
-        document.querySelector('.clear-filter').style.display = 'block';
-        document.getElementById('filterModal').style.display = 'none';
-    }
-
-    function clearFilters() {
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(cb => cb.checked = false);
-
-        loadReviews(0);
-        document.querySelector('.clear-filter').style.display = 'none';
-    }
-
-    // Mở/đóng modal
-    function openFilterModal() {
-        document.getElementById('filterModal').style.display = 'block';
-    }
-
-    window.onclick = function (event) {
-        if (event.target == document.getElementById('filterModal')) {
-            document.getElementById('filterModal').style.display = 'none';
-        }
-    };
-</script>
-<!--thuận vừa sửa logic image silde trong js-->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        let currentImageIndex = 0;
-        let currentColorIndex = 0;
-        const slider = document.querySelector('.image-slider');
-        const allImages = slider.querySelectorAll('img'); // sửa tên biến cho khớp
-        function showImage(colorIndex, imageIndex) {
-            allImages.forEach(img => img.classList.remove('active'));
-            const activeImage = slider.querySelector(`img[data-color-index="${colorIndex}"][data-image-index="${imageIndex}"]`);
-            if (activeImage) {
-                activeImage.classList.add('active');
-            }
-        }
-
-        function selectColor(colorIndex) {
-            currentColorIndex = colorIndex;
-            currentImageIndex = 0;
-            showImage(currentColorIndex, currentImageIndex);
-        }
-
-        function navigateImage(direction) {
-            const colorImages = slider.querySelectorAll(`img[data-color-index="${currentColorIndex}"]`);
-            const total = colorImages.length;
-
-            currentImageIndex = (currentImageIndex + direction + total) % total;
-            showImage(currentColorIndex, currentImageIndex);
-        }
-
-        // Mouse & touch drag
-        let isDragging = false;
-        let startX = 0;
-
-        slider.addEventListener('mousedown', function (e) {
-            isDragging = true;
-            startX = e.clientX;
-        });
-
-        slider.addEventListener('mousemove', function (e) {
-            if (!isDragging) return;
-            const diff = e.clientX - startX;
-            if (Math.abs(diff) > 50) {
-                navigateImage(diff > 0 ? -1 : 1);
-                isDragging = false;
-            }
-        });
-
-        slider.addEventListener('mouseup', () => isDragging = false);
-        slider.addEventListener('mouseleave', () => isDragging = false);
-
-        slider.addEventListener('touchstart', function (e) {
-            isDragging = true;
-            startX = e.touches[0].clientX;
-        });
-
-        slider.addEventListener('touchmove', function (e) {
-            if (!isDragging) return;
-            const diff = e.touches[0].clientX - startX;
-            if (Math.abs(diff) > 50) {
-                navigateImage(diff > 0 ? -1 : 1);
-                isDragging = false;
-            }
-        });
-
-        slider.addEventListener('touchend', () => isDragging = false);
-
-        // Wheel navigation
-        slider.addEventListener('wheel', function (e) {
-            e.preventDefault();
-            navigateImage(e.deltaY > 0 ? 1 : -1);
-        }, { passive: false });
-
-        // Color option click
-        document.querySelectorAll('.color-option').forEach(option => {
-            option.addEventListener('click', function () {
-                const index = parseInt(option.dataset.colorIndex);
-                selectColor(index);
-            });
-        });
-
-        // Show first image
-        showImage(0, 0);
-    });
+<script src="/js/product-detail.js">
 
 </script>
 <script>
