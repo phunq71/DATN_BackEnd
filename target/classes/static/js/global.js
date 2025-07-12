@@ -1,30 +1,6 @@
-// <<<<<<< HEAD
-// const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-// const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-// =======
-// <<<<<<< HEAD
-// // const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-// // const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-//
-// //
-// // axios.interceptors.request.use(config => {
-// //     const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
-// //
-// //     if (token) {
-// //         config.headers.Authorization = `Bearer ${token}`;
-// //         console.log("📤 Gửi request với token:", token); // 👈 In ra token ở đây
-// //     } else {
-// //         console.warn("⚠️ Không tìm thấy token trong localStorage hoặc sessionStorage");
-// //     }
-// //
-// //     return config;
-// // }, error => {
-// //     return Promise.reject(error);
-// // });
-//
-//
-// // axios.post("/api/auth/login", { email, password }, { withCredentials: true });
-// // axios.defaults.withCredentials = true; // nếu dùng toàn cục
+
+
+let carts=[];
 
 async function isLoggedIn() {
     try {
@@ -145,3 +121,4 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     });
 });
+

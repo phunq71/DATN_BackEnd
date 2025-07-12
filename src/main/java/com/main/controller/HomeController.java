@@ -123,10 +123,10 @@ public class HomeController {
 //		return "View/Cart";
 //	}
 //
-//	@GetMapping("/checkout")
-//	public String checkout() {
-//		return "View/checkout";
-//	}
+	@GetMapping("/checkout")
+	public String checkout() {
+		return "View/checkout";
+	}
 //
 //	@GetMapping("/qrPay")
 //	public String qrPay() {

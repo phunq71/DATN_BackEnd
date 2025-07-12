@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface VariantRepository extends JpaRepository<Variant, String> {
     //Lấy list sp bang product
-    List<Variant> findByProduct(Product product);
+        List<Variant> findByProduct(Product product);
 
         @Query(value = """
         SELECT v.*

@@ -1,25 +1,41 @@
 package com.main.serviceImpl;
 
 import com.main.dto.CustomerDTO;
+import com.main.dto.CustomerRegisterDTO;
+import com.main.entity.Account;
 import com.main.entity.Customer;
+import com.main.entity.Membership;
+import com.main.repository.AccountRepository;
 import com.main.repository.CustomerRepository;
+import com.main.repository.MembershipRepository;
 import com.main.service.CustomerService;
 import com.main.utils.AddressUtil;
 import com.main.utils.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
+    @Lazy
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
    private final CustomerRepository customerRepository;
+    private final AccountRepository accountRepository;
+    private final MembershipRepository membershipRepository;
 
-    public CustomerServiceImpl(CustomerRepository customerRepository) {
+    public CustomerServiceImpl(CustomerRepository customerRepository, AccountRepository accountRepository, MembershipRepository membershipRepository) {
         this.customerRepository = customerRepository;
+        this.accountRepository = accountRepository;
+        this.membershipRepository = membershipRepository;
     }
+
 
     @Override
     public String generateCustomerId() {
@@ -98,11 +114,44 @@ public class CustomerServiceImpl implements CustomerService {
                 newCustomer.getImageAvt() != null ? newCustomer.getImageAvt() : oldCustomer.getImageAvt()
         );
     }
+    @Override
     public Customer findByAccountID(String accountId) {
         return customerRepository.findByAccount_AccountId(accountId);
     }
+    @Override
     public Customer save(Customer customer) {
         return customerRepository.save(customer);
     }
+    @Override
+    public boolean saveCustomerRegister(CustomerRegisterDTO customerRegisterDTO) {
+        try {
+            Account acc = new Account();
+            acc.setAccountId(generateCustomerId());
+            acc.setEmail(customerRegisterDTO.getEmail());
+            //mã hóa mk
+            String hashedPassword = passwordEncoder.encode(customerRegisterDTO.getPassword());
+            acc.setPassword(hashedPassword);
+            acc.setRole("USER");
+            acc.setStatus(true);
+            acc.setCreateAt(LocalDate.now());
+            accountRepository.save(acc);
+            Membership mber = membershipRepository.findById("MB01").get();
+            Customer cus = new Customer();
+            cus.setCustomerId(acc.getAccountId());
+            cus.setFullName(customerRegisterDTO.getFullname());
+            cus.setGender(customerRegisterDTO.getGender());
+            cus.setAddress(customerRegisterDTO.getAddress());
+            cus.setDob(customerRegisterDTO.getDob());
+            cus.setMembership(mber);
+            cus.setImageAvt("/avatar.png");
+            cus.setPhone("0000000000");
+            customerRepository.save(cus);
+            return true;
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
+
 

@@ -13,7 +13,7 @@ public class Variant_DetailDTO {
     String description;
     BigDecimal price;
     List<Image> images;
-    List<Item_DetailDTO> items;
+    List<  Item_DetailDTO> items;
     String imagesDTO;
     String mainImage;
 }

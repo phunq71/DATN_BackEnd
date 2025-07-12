@@ -698,10 +698,152 @@
         .lg-register-form-white .lg-rs-form-control option {
             color: #000 !important;
         }
-
     </style>
+<!--Xử lý model OTP-->
+ <style>
+     /* Thêm vào CSS hiện có của bạn */
+     .otp-modal {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         z-index: 1050;
+     }
+     .otp-container {
+         position: fixed;
+         top: 0; left: 0;
+         width: 100%; height: 100%;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         z-index: 1000;
+         background: url('https://example.com/your-background-image.jpg') center/cover no-repeat;
+     }
 
-    <div class="auth">
+     .otp-container::before {
+         content: '';
+         position: absolute;
+         top: 0; left: 0;
+         width: 100%; height: 100%;
+         background-color: rgba(0, 0, 0, 0.5);
+         backdrop-filter: blur(8px);
+         -webkit-backdrop-filter: blur(8px);
+         z-index: -1;
+     }
+
+     .otp-box {
+         position: relative; /* ✅ Thêm dòng này để làm cha chứa tuyệt đối */
+         background-color: rgba(255, 255, 255, 0.95);
+         padding: 2rem;
+         border-radius: 10px;
+         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+         width: 100%;
+         max-width: 450px;
+         animation: fadeInUp 0.5s ease-out;
+         text-align: center;
+     }
+
+     .otp-title {
+         font-weight: bold;
+         font-size: 1.8rem;
+         color: #081c34;
+         margin-bottom: 1rem;
+     }
+
+     .otp-inputs {
+         display: flex;
+         justify-content: space-between;
+         gap: 10px;
+         margin: 1rem 0;
+     }
+
+     .otp-inputs input {
+         width: 3rem;
+         height: 3.2rem;
+         font-size: 1.5rem;
+         text-align: center;
+         border: 1px solid #ccc;
+         border-radius: 5px;
+     }
+
+     .otp-inputs input:focus {
+         border-color: #4a90e2;
+         outline: none;
+         box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+     }
+
+     .note {
+         color: #333;
+         font-size: 0.95rem;
+         margin-bottom: 1rem;
+     }
+
+     .msg {
+         color: red;
+         font-weight: bold;
+         margin-bottom: 1rem;
+     }
+
+     .btn-submit, .btn-resend {
+         width: 100%;
+         padding: 10px;
+         font-size: 0.95rem;
+         border-radius: 6px;
+         border: none;
+         margin-top: 10px;
+         cursor: pointer;
+         transition: background-color 0.3s ease;
+     }
+
+     /* Nút xác thực OTP - đậm */
+     .btn-submit {
+         background-color: #003366; /* xanh đậm */
+         color: #fff;
+     }
+
+     .btn-submit:hover {
+         background-color: #00509e;
+     }
+
+     /* Nút gửi lại - xám nhạt khi disabled */
+     .btn-resend {
+         background-color: #bbb;
+         color: #fff;
+     }
+
+     /* Enabled thì đổi màu xanh nhẹ */
+     .btn-resend.enabled {
+         background-color: #28a745;
+     }
+
+     .btn-resend.enabled:hover {
+         background-color: #218838;
+     }
+     .btn-cancel {
+         position: absolute;
+         top: 10px;
+         right: 10px;
+         background: transparent;
+         border: none;
+         font-size: 20px;
+         color: #333;
+         cursor: pointer;
+         z-index: 10;
+     }
+
+     .btn-cancel:hover {
+         color: red;
+     }
+
+
+     @keyframes fadeInUp {
+         from { opacity: 0; transform: translateY(20px); }
+         to { opacity: 1; transform: translateY(0); }
+     }
+ </style>
+
+ <div class="auth">
         <div class="lg-container" id="lgFormContainer">
             <!-- Left: Login -->
             <div class="lg-left">
@@ -813,9 +955,8 @@
                                     <div class="lg-rs-form-group">
                                         <select class="lg-rs-form-control" id="gender" required>
                                             <option value="" disabled selected></option>
-                                            <option value="male">Nam</option>
-                                            <option value="female">Nữ</option>
-                                            <option value="other">Khác</option>
+                                            <option value="true">Nam</option>
+                                            <option value="false">Nữ</option>
                                         </select>
                                         <label for="gender" class="lg-rs-form-label">Giới tính</label>
                                     </div>
@@ -853,22 +994,16 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="lg-rs-form-group">
-                                        <select class="lg-rs-form-control" id="city" name="city" required>
+                                        <select class="lg-rs-form-control" id="province" name="province" required>
                                             <option value="" disabled selected></option>
-                                            <option value="hanoi">Hà Nội</option>
-                                            <option value="hcm">TP Hồ Chí Minh</option>
-                                            <option value="danang">Đà Nẵng</option>
                                         </select>
-                                        <label for="city" class="lg-rs-form-label">Tỉnh/Thành phố</label>
+                                        <label for="province" class="lg-rs-form-label">Tỉnh/Thành phố</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="lg-rs-form-group">
                                         <select class="lg-rs-form-control" id="district" name="district" required>
                                             <option value="" disabled selected></option>
-                                            <option value="quan1">Quận 1</option>
-                                            <option value="quan2">Quận 2</option>
-                                            <option value="quan3">Quận 3</option>
                                         </select>
                                         <label for="district" class="lg-rs-form-label">Quận/Huyện</label>
                                     </div>
@@ -877,9 +1012,6 @@
                                     <div class="lg-rs-form-group">
                                         <select class="lg-rs-form-control" id="ward" name="ward" required>
                                             <option value="" disabled selected></option>
-                                            <option value="phuong1">Phường 1</option>
-                                            <option value="phuong2">Phường 2</option>
-                                            <option value="phuong3">Phường 3</option>
                                         </select>
                                         <label for="ward" class="lg-rs-form-label">Phường/Xã</label>
                                     </div>
@@ -897,7 +1029,35 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="lg-rs-btn-submit btn w-100 mb-3">ĐĂNG KÝ</button>
+                            <button id="registerBtn" type="button" class="lg-rs-btn-submit btn w-100 mb-3">ĐĂNG KÝ</button>
+                            <div id="otpModal" class="otp-modal" style="display: none;">
+                                <div class="otp-container">
+                                    <div class="otp-box">
+                                        <h2 class="otp-title">Nhập mã OTP</h2>
+                                        <p class="note">Mã OTP đã được gửi qua email và có hiệu lực trong 5 phút.</p>
+                                        <!-- ✅ Đổi từ <form> sang <div> -->
+                                        <div id="verifyOtpForm">
+                                            <div class="otp-inputs">
+                                                <input type="text" maxlength="1" name="digit1" required>
+                                                <input type="text" maxlength="1" name="digit2" required>
+                                                <input type="text" maxlength="1" name="digit3" required>
+                                                <input type="text" maxlength="1" name="digit4" required>
+                                                <input type="text" maxlength="1" name="digit5" required>
+                                                <input type="text" maxlength="1" name="digit6" required>
+                                            </div>
+                                            <input type="hidden" name="otp" id="otpInput">
+                                            <input type="hidden" name="email" id="otpEmailInput">
+                                            <p id="otpMessage" style="color:orangered; display:none;"></p>
+                                            <button id="confirmOtpBtn" type="button" class="btn-submit">Xác thực OTP</button>
+
+
+                                        </div>
+
+
+                                        <button id="resendBtn" class="btn-resend" disabled>Gửi lại mã (60s)</button>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -965,6 +1125,368 @@
 
 
     </script>
+<!-- Xử lý đăng ký-->
+
+ <script>
+     let otpTimer = null;
+
+     let dataAddress = [];
+     let provincesSelect = document.getElementById('province');
+     let districtsSelect = document.getElementById('district');
+     let wardsSelect = document.getElementById('ward');
+
+     axios.get('/data/Address.json')
+         .then(response => {
+             dataAddress = response.data;
+             populateProvinces();
+         })
+         .catch(error => {
+             console.error("Lỗi khi tải dữ liệu địa chỉ:", error);
+         });
+
+     function populateProvinces() {
+         provincesSelect.innerHTML = '<option value="">Chọn tỉnh/thành phố</option>';
+         dataAddress.forEach(province => {
+             let option = document.createElement('option');
+             option.value = province.ProvinceName;
+             option.textContent = province.ProvinceName;
+             provincesSelect.appendChild(option);
+         });
+     }
+
+     provincesSelect.addEventListener('change', () => {
+         clearSelect(districtsSelect);
+         clearSelect(wardsSelect);
+         let selectedProvinceName = provincesSelect.value;
+         if (!selectedProvinceName) return;
+         let province = dataAddress.find(p => p.ProvinceName === selectedProvinceName);
+         if (province) {
+             districtsSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+             province.Districts.forEach(district => {
+                 let option = document.createElement('option');
+                 option.value = district.DistrictName;
+                 option.textContent = district.DistrictName;
+                 districtsSelect.appendChild(option);
+             });
+         }
+     });
+
+     districtsSelect.addEventListener('change', () => {
+         clearSelect(wardsSelect);
+         let selectedProvinceName = provincesSelect.value;
+         let selectedDistrictName = districtsSelect.value;
+         if (!selectedProvinceName || !selectedDistrictName) return;
+         let province = dataAddress.find(p => p.ProvinceName === selectedProvinceName);
+         if (!province) return;
+         let district = province.Districts.find(d => d.DistrictName === selectedDistrictName);
+         if (district) {
+             wardsSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+             district.Wards.forEach(ward => {
+                 let option = document.createElement('option');
+                 option.value = ward.WardName;
+                 option.textContent = ward.WardName;
+                 wardsSelect.appendChild(option);
+             });
+         }
+     });
+     function clearSelect(selectElement) {
+         while (selectElement.options.length > 1) {
+             selectElement.remove(1);
+         }
+     }
+
+     document.addEventListener("DOMContentLoaded", function () {
+
+         document.querySelector(".otp-container").addEventListener("click", function (e) {
+             if (e.target === this) {
+                 hideOtpModal();
+             }
+         });
+         // Biến toàn cục để lưu dữ liệu đăng ký
+         let pendingRegistrationData = null;
+         function validateRegistrationForm() {
+             const email = document.getElementById("reg-email").value;
+             const fullname = document.getElementById("fullname").value;
+             const birthday = document.getElementById("birthday").value;
+             const gender = document.getElementById("gender").value;
+             const password = document.getElementById("reg-password").value;
+             const confirmPassword = document.getElementById("confirm-password").value;
+             const provinceName = provincesSelect.value;
+             const districtName = districtsSelect.value;
+             const wardName = wardsSelect.value;
+             const addressDetail = document.getElementById("address").value;
+
+             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+             if (!email) {
+                 Swal.fire({
+                     icon: 'warning',
+                     title: 'Thiếu Email',
+                     text: 'Vui lòng nhập địa chỉ email.',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             if (!emailRegex.test(email)) {
+                 Swal.fire({
+                     icon: 'error',
+                     title: 'Email không hợp lệ',
+                     text: 'Vui lòng nhập đúng định dạng email (ví dụ: example@gmail.com).',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             if (!fullname) {
+                 Swal.fire({
+                     icon: 'warning',
+                     title: 'Thiếu Họ tên',
+                     text: 'Vui lòng nhập họ tên đầy đủ.',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             if (!birthday) {
+                 Swal.fire({
+                     icon: 'warning',
+                     title: 'Thiếu ngày sinh',
+                     text: 'Vui lòng chọn ngày sinh.',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             if (!gender) {
+                 Swal.fire({
+                     icon: 'warning',
+                     title: 'Chưa chọn giới tính',
+                     text: 'Vui lòng chọn giới tính.',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             if (!password) {
+                 Swal.fire({
+                     icon: 'warning',
+                     title: 'Thiếu mật khẩu',
+                     text: 'Vui lòng nhập mật khẩu.',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             if (password.length < 6) {
+                 Swal.fire({
+                     icon: 'warning',
+                     title: 'Mật khẩu quá ngắn',
+                     text: 'Mật khẩu phải có ít nhất 6 ký tự.',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             if (!confirmPassword) {
+                 Swal.fire({
+                     icon: 'warning',
+                     title: 'Thiếu xác nhận mật khẩu',
+                     text: 'Vui lòng nhập lại mật khẩu để xác nhận.',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             if (password !== confirmPassword) {
+                 Swal.fire({
+                     icon: 'error',
+                     title: 'Mật khẩu không khớp',
+                     text: 'Mật khẩu và xác nhận không giống nhau.',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             if (password !== confirmPassword) {
+                 Swal.fire({
+                     icon: 'error',
+                     title: 'Mật khẩu không khớp',
+                     text: 'Vui lòng kiểm tra lại mật khẩu xác nhận.',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             if (!addressDetail || !provinceName || !districtName || !wardName) {
+                 Swal.fire({
+                     icon: 'warning',
+                     title: 'Thiếu địa chỉ',
+                     text: 'Vui lòng nhập đầy đủ địa chỉ.',
+                     confirmButtonColor: '#000000'
+                 });
+                 return false;
+             }
+
+             const fullAddress = `${addressDetail}, ${wardName}, ${districtName}, ${provinceName}`;
+
+             pendingRegistrationData = {
+                 email,
+                 password,
+                 confirmPassword,
+                 fullname,
+                 gender,
+                 address: fullAddress,
+                 dob: birthday
+             };
+
+             return true;
+         }
+
+         function register() {
+             if (!validateRegistrationForm()) {
+                 return;
+             }
+             showOtpModal(pendingRegistrationData.email);
+             // Gửi OTP
+             sendOtpForRegistration();
+         }
+
+         function sendOtpForRegistration() {
+             axios.post("/opulentia/send-otp-register", pendingRegistrationData)
+                 .then(res => {
+                     startOtpCountdown();
+                     document.getElementById("otpMessage").style.display = "none";
+                 })
+                 .catch(err => {
+                     console.error("Lỗi gửi OTP:", err);
+                     document.getElementById("otpMessage").textContent = err.response?.data || "Gửi OTP thất bại";
+                     document.getElementById("otpMessage").style.display = "block";
+                 });
+         }
+
+
+         function confirmOtp() {
+             const otpInputs = document.querySelectorAll('#otpModal .otp-inputs input');
+             const otp = Array.from(otpInputs).map(input => input.value).join('');
+             Swal.fire({
+                 icon: 'warning',
+                 title: 'Thiếu mã OTP',
+                 text: 'Vui lòng nhập đủ 6 chữ số OTP.',
+                 confirmButtonColor: '#000000'
+             });
+
+             // Gửi OTP đến endpoint xác thực
+             axios.post("/opulentia/confirm-otp-register", null, {
+                 params: {
+                     otp: otp
+                 }
+             })
+                 .then(res => {
+                     if (res.data.includes("🎉")) {
+                         Swal.fire({
+                             icon: 'success',
+                             title: 'Xác thực thành công',
+                             text: res.data,
+                             timer: 3000,
+                             showConfirmButton: false
+                         }).then(() => {
+                             hideOtpModal();
+                             window.location.href = "/auth?registerSuccess=true";
+                         });
+                     } else {
+                         // Hiển thị thông báo lỗi
+                         Swal.fire({
+                             icon: 'warning',
+                             title: 'Thiếu mã OTP',
+                             text: 'Vui lòng nhập đủ 6 chữ số OTP.',
+                             confirmButtonColor: '#000000'
+                         });
+
+                     }
+                 })
+                 .catch(err => {
+                     console.error("Lỗi xác nhận OTP:", err);
+                     Swal.fire({
+                         icon: 'error',
+                         title: 'Xác thực thất bại',
+                         text: err.response?.data || "Xác nhận OTP thất bại",
+                         confirmButtonColor: '#000000'
+                     });
+                 });
+         }
+         // Cập nhật event listeners
+         document.getElementById("registerBtn").addEventListener("click", register);
+         document.getElementById("confirmOtpBtn").addEventListener("click", confirmOtp);
+         document.getElementById("resendBtn").addEventListener("click", function(e) {
+             e.preventDefault();
+             if (!this.disabled) {
+                 sendOtpForRegistration();
+             }
+         });
+     });
+
+     // Các hàm hỗ trợ OTP modal (giữ nguyên như trước)
+     function showOtpModal(email) {
+         const modal = document.getElementById('otpModal');
+         document.getElementById('otpEmailInput').value = email;
+         modal.style.display = 'block';
+         startOtpCountdown();
+         setupOtpInputs();
+     }
+
+     function hideOtpModal() {
+         const modal = document.getElementById('otpModal');
+         modal.style.display = 'none';
+         clearInterval(otpTimer);
+     }
+
+     function startOtpCountdown() {
+         let countdown = 60;
+         const resendBtn = document.getElementById('resendBtn');
+
+         clearInterval(otpTimer);
+
+         resendBtn.disabled = true;
+         resendBtn.classList.remove('enabled');
+         resendBtn.textContent = `Gửi lại mã (${countdown}s)`;
+
+         otpTimer = setInterval(() => {
+             countdown--;
+             resendBtn.textContent = `Gửi lại mã (${countdown}s)`;
+             if (countdown <= 0) {
+                 clearInterval(otpTimer);
+                 resendBtn.disabled = false;
+                 resendBtn.classList.add('enabled');
+                 resendBtn.textContent = 'Gửi lại mã';
+             }
+         }, 1000);
+     }
+
+     function setupOtpInputs() {
+         const inputs = document.querySelectorAll('#otpModal .otp-inputs input');
+         inputs.forEach(input => input.value = ''); // Clear các input cũ
+
+         inputs.forEach((input, index) => {
+             input.addEventListener('input', () => {
+                 if (input.value.length === 1 && index < inputs.length - 1) {
+                     inputs[index + 1].focus();
+                 }
+             });
+
+             input.addEventListener('keydown', (e) => {
+                 if (e.key === 'Backspace' && !input.value && index > 0) {
+                     inputs[index - 1].focus();
+                 }
+             });
+         });
+
+         if (inputs.length > 0) {
+             inputs[0].focus();
+         }
+     }
+
+ </script>
 
 </body>
 

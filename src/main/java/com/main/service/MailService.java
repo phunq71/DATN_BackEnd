@@ -38,7 +38,7 @@ public class MailService {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom("ngoquocphu2005@gmail.com");
+            helper.setFrom("huyen.ngocharveynash@gmail.com");
             helper.setTo(to);
             helper.setSubject("🔐 Opulentia " + randomNumber); // để preview mail dễ thấy hơn
             helper.setText(content, true); // HTML

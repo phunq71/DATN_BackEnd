@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     initCart();
 });
 
-let carts =[];
+
 let itemCarts= [];
 const cartContainer = document.getElementById('cart-container');
 let checkedItems=[];
@@ -154,7 +154,7 @@ function createCartItemRow(chosenProduct, productGroup) {
                 </div>
             </div>
         </td>
-        <td class="c-price">${formatPrice(chosenProduct.price)}</td>
+        <td class="c-price">  ${renderPrice(chosenProduct.price, chosenProduct.discountPercent)}</td>
         <td class="c-actions">
             <div class="c-quantity-container">
                 <button class="c-quantity-btn minus" ${currentOutOfStock ? 'disabled' : ''}>-</button>
@@ -162,7 +162,7 @@ function createCartItemRow(chosenProduct, productGroup) {
                 <button class="c-quantity-btn plus" ${currentOutOfStock ? 'disabled' : ''}>+</button>
             </div>
         </td>
-        <td class="c-item-total">${formatPrice(currentOutOfStock ? 0 : (chosenProduct.price * (chosenProduct.quantity || 1)))}</td>
+        <td class="c-item-total">${formatPrice(currentOutOfStock ? 0 : ((chosenProduct.price - chosenProduct.discountPercent) * (chosenProduct.quantity || 1)))}</td>
         <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
     `;
 
@@ -334,6 +334,7 @@ async function handleQuantityChange(event, input) {
 // Initialize the cart
 // Initialize the cart
 function initCart() {
+    carts.sort((a, b) => new Date(a.latestDate) - new Date(b.latestDate));
     cartContainer.innerHTML = '';
 
     itemCarts.forEach(productGroup => {
@@ -457,7 +458,7 @@ function updateTotalAmount() {
         if (cartItem) {
             const item = findItemByID(cartItem.itemID);
             if (item) {
-                total += item.price * cartItem.quantity;
+                total += (item.price- item.discountPercent) * cartItem.quantity;
             }
         }
     });
@@ -546,4 +547,15 @@ function updateTotalQuantity() {
     }
 
     document.getElementById('total-quantity').innerText=totalQuantity;
+}
+
+
+function renderPrice(basisPrice, discountPercent){
+    if(discountPercent>0){
+        return `
+                    <span class="basis-price">${formatPrice(basisPrice)}</span><br>
+                    <span class="price-after-discount">${formatPrice(basisPrice-discountPercent)}</span>
+        `;
+    }
+    return formatPrice(basisPrice);
 }

@@ -76,8 +76,10 @@ public class ProductServiceImpl implements ProductService {
             Product product = productRepository.findById(pro.getProductID()).orElse(null);
             productViewDTO.setProductID(pro.getProductID());
             enrichProductViewDTO(productViewDTO, product, hotProductIDs,productRepository.isNewProduct(product.getProductID()) > 0);
+
             productViewDTOList.add(productViewDTO);
         });
+        markFavorites(productViewDTOList);
         return new PageImpl<>(productViewDTOList, pageable, productPage.getTotalElements());
 
     }

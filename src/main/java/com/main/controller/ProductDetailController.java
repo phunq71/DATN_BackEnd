@@ -1,11 +1,11 @@
 package com.main.controller;
 import com.main.dto.Image_DetailDTO;
 import com.main.dto.SupportDetailDTO;
+import com.main.dto.ProductViewDTO;
 import com.main.dto.Variant_DetailDTO;
 import com.main.entity.*;
 import com.main.service.*;
-import com.main.serviceImpl.InventoryServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,6 @@ public class ProductDetailController {
     private final CategoryService categoryService;
     private final ImageService imageService;
     private final ItemService itemService;
-    private final InventoryService inventoryService;
     private final ReviewService reviewService;
     public ProductDetailController(ProductService productService, VariantService variantService, CategoryService categoryService, ImageService imageService, ItemService itemService, InventoryService inventoryService, ReviewService reviewService) {
         this.productService = productService;
@@ -31,7 +30,6 @@ public class ProductDetailController {
         this.categoryService = categoryService;
         this.imageService = imageService;
         this.itemService = itemService;
-        this.inventoryService = inventoryService;
         this.reviewService = reviewService;
     }
 
@@ -39,12 +37,19 @@ public class ProductDetailController {
     @GetMapping("/opulentia/{categoryParent}/{categoryID}/{productId}/{variantID}")
     public String VariantDetail(Model model,
                                 @PathVariable String productId,
-                                @PathVariable String variantID) {
+                                @PathVariable String variantID,
+                                @PathVariable String categoryParent,
+                                @PathVariable String categoryID) {
         Optional<Product> product = productService.findByProductID(productId);
         //DS CUNG LOAI
         Category category = categoryService.findByCategoryId(product.get().getCategory().getCategoryId());
-        List<Product> listProduct = productService.findByCategory(category);
-        model.addAttribute("listProduct", listProduct);
+        Page<ProductViewDTO> pageProduct = productService.getProductsByCategory(categoryParent, categoryID, 0);
+        List<ProductViewDTO> productList = new ArrayList<>(pageProduct.getContent());
+        productList.removeIf(productViewDTO ->
+                productViewDTO.getProductID().equals(productId)
+        );
+        System.out.println("Có mà"+productList.size());
+        model.addAttribute("listProduct1", productList);
         //Image slider, màu sắc
         List<Variant_DetailDTO> listV = variantService.findByProduct(product.get());
         Optional<Variant> variant = variantService.findById(variantID);
@@ -112,9 +117,9 @@ public class ProductDetailController {
         return "View/productDetail";
     }
     private String formatToVND(Number amount) {
-        if (amount == null) return "0 VNĐ";
+        if (amount == null) return "0 ₫";
         NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return nf.format(amount) + " VNĐ";
+        return nf.format(amount) + " ₫";
     }
 }
 
