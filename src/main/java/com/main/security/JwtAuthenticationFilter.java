@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+
     public JwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
@@ -45,20 +47,59 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("➡️ Token: " + token);
         System.out.println("📥 Incoming URI: " + request.getRequestURI());
 
-        if (token != null && jwtService.validateToken(token)) {
-            String provider = jwtService.getProviderFromToken(token);
-            String providerId = jwtService.getProviderIdFromToken(token);
+        boolean validAccessToken = (token != null && jwtService.validateToken(token));
 
+        if (!validAccessToken) {
+            // ➕ Thử dùng refresh token nếu access token hết hạn
+            String refreshToken = getRefreshTokenFromRequest(request);
+            if (refreshToken != null && jwtService.validateToken(refreshToken)) {
+                System.out.println("🔁 Access token hết hạn, dùng refresh token để cấp mới");
+
+                String provider = jwtService.getProviderFromToken(refreshToken);
+                String providerId = jwtService.getProviderIdFromToken(refreshToken);
+                String email = jwtService.getEmailFromToken(refreshToken); // Nếu cần
+
+                UserDetails userDetails;
+                if (provider == null) {
+                    userDetails = userDetailsService.loadUserByUsername(email);
+                } else {
+                    userDetails = userDetailsService.loadUserByProvider(provider, providerId);
+                }
+
+                int accessTokenMinutes = 15;
+
+// 🔐 Xác thực người dùng
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+// 🔄 Ép kiểu về CustomUserDetails và cấp lại access token
+                CustomUserDetails customUser = (CustomUserDetails) userDetails;
+                String newAccessToken = jwtService.generateToken(customUser, accessTokenMinutes);
+
+                Cookie accessCookie = new Cookie("accessToken", newAccessToken);
+                accessCookie.setPath("/");
+                accessCookie.setHttpOnly(true);
+                accessCookie.setMaxAge(accessTokenMinutes * 60); // phút → giây
+                response.addCookie(accessCookie);
+
+
+            } else {
+                System.out.println("⚠️ Access token hết hạn và refresh token không hợp lệ");
+            }
+        } else {
+            // ✅ Token hợp lệ → xác thực
             try {
+                String provider = jwtService.getProviderFromToken(token);
+                String providerId = jwtService.getProviderIdFromToken(token);
                 UserDetails userDetails;
 
                 if (provider == null) {
-                    // Đăng nhập thường
                     String email = jwtService.getEmailFromToken(token);
-                    userDetails = userDetailsService.loadUserByUsername(email); // load bằng email
+                    userDetails = userDetailsService.loadUserByUsername(email);
                 } else {
-                    // Đăng nhập OAuth2
-                    userDetails = userDetailsService.loadUserByProvider(provider, providerId); // cần tạo hàm này
+                    userDetails = userDetailsService.loadUserByProvider(provider, providerId);
                 }
 
                 UsernamePasswordAuthenticationToken authentication =
@@ -70,9 +111,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-
         filterChain.doFilter(request, response);
     }
+
 
 
     private String getTokenFromRequest(HttpServletRequest request) {
@@ -90,6 +131,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
+
+    private String getRefreshTokenFromRequest(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        // Optional: hỗ trợ trong header nếu cần
+        String refreshHeader = request.getHeader("Refresh-Token");
+        if (refreshHeader != null && refreshHeader.startsWith("Bearer ")) {
+            return refreshHeader.substring(7);
+        }
+
+        return null;
+    }
+
 
 }
 

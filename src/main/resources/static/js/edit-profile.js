@@ -1,12 +1,17 @@
 document.addEventListener('DOMContentLoaded', async function() {
     account= await loadAccount();
     setForm(account);
+    const changePasswordBtn = document.getElementById('changePassword22');
 
+    if (account.isOAuth2 && changePasswordBtn) {
+        changePasswordBtn.style.display = 'none'; // Ẩn nút
+    }
     document.getElementById("saveBtn").addEventListener('click', save);
 });
 
 let account={};
 let fullAddress=[];
+
 
 //Input
 const displayName= document.getElementById('displayName');
@@ -138,7 +143,7 @@ function save() {
     }
 
     // Address validation - no special characters or icons
-    const addressRegex = /^[a-zA-ZÀ-ỹ0-9\s./-]+$/;
+    const addressRegex = /^[a-zA-ZÀ-ỹ0-9\s,./-]+$/;
     if (address.value.trim() && !addressRegex.test(address.value.trim())) {
         formatErrors.push('Địa chỉ không được chứa ký tự đặc biệt hoặc biểu tượng');
     }

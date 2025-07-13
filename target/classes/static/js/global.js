@@ -3,16 +3,50 @@
 let carts=[];
 
 async function isLoggedIn() {
+    let log = "🟡 [isLoggedIn] Bắt đầu kiểm tra login...\n";
+
     try {
-        const response = await fetch("/api/auth/check-login", {
-            method: "GET",
-            credentials: "include" // quan trọng: để gửi cookie kèm theo
-        });
-        return response.ok; // true nếu 200, false nếu 401
+        log += "🔍 Gọi /api/auth/check-login...\n";
+        await axios.get("/api/auth/check-login", { withCredentials: true });
+        log += "✅ Access token còn hạn → Logged in\n";
+        localStorage.setItem("isLoggedInLog", log);
+        return true;
     } catch (err) {
+        const status = err.response?.status;
+        log += `❌ Lỗi khi check-login (status: ${status})\n`;
+
+        if (status === 401) {
+            try {
+                const rememberMe = localStorage.getItem("rememberMeChecked") === "true";
+                log += `🔁 Thử refresh token với rememberMe = ${rememberMe}\n`;
+
+                await axios.post("/api/auth/refresh", { rememberMe }, {
+                    withCredentials: true
+                });
+
+                log += "✅ Refresh thành công → thử lại check-login\n";
+                await axios.get("/api/auth/check-login", {
+                    withCredentials: true
+                });
+
+                log += "✅ Check-login lại thành công sau khi refresh\n";
+                localStorage.setItem("isLoggedInLog", log);
+                return true;
+            } catch (refreshErr) {
+                const refreshStatus = refreshErr.response?.status;
+                log += `❌ Refresh token thất bại (status: ${refreshStatus})\n`;
+                localStorage.setItem("isLoggedInLog", log);
+                return false;
+            }
+        }
+
+        log += "❌ Lỗi khác ngoài 401 (mạng/khác)\n";
+        localStorage.setItem("isLoggedInLog", log);
         return false;
     }
 }
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
     const protectedPrefixes = ["/opulentia_user"]; // Link cần bảo vệ, khi chưa login thì redirect
@@ -34,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (needsAuth) {
                     event.preventDefault(); // Ngăn chuyển trang mặc định
                     window.location.href = "/auth"; // Chuyển sang trang login
+
                 }
                 // 👉 Nếu không thuộc protected thì cho đi tiếp, không redirect
             }
@@ -121,4 +156,27 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     });
 });
+
+// Gọi khi web load
+window.addEventListener('DOMContentLoaded', () => {
+    attemptAutoLogin();
+});
+
+async function attemptAutoLogin() {
+    try {
+        const res = await fetch('/api/auth/check-auth', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (res.ok) {
+            console.log('✅ Đã tự đăng nhập lại thành công');
+        } else {
+            console.log('❌ Không thể đăng nhập lại');
+        }
+    } catch (e) {
+        console.error('⚠️ Lỗi khi kiểm tra đăng nhập:', e);
+    }
+}
+
 

@@ -38,7 +38,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtService.generateAccessToken(new CustomUserDetails(account));
         String refreshToken = jwtService.generateRefreshToken(new CustomUserDetails(account));
 
-        long accessTokenMaxAge = rememberMe ? 60 * 60 : 15 * 60;         // 1 giờ hoặc 15 phút
+        long accessTokenMaxAge = 15 * 60;
         long refreshTokenMaxAge = rememberMe ? 7 * 24 * 60 * 60 : -1;     // 7 ngày hoặc không set
 
         // Cookie: Access Token

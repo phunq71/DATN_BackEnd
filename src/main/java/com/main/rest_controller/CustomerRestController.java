@@ -116,7 +116,7 @@ public class CustomerRestController {
             }
 
             // 4. Kết hợp địa chỉ đầy đủ (sử dụng dấu cách thay vì dấu phẩy)
-            String fullAddress = String.join(" ", addressDetail, ward, district, province);
+            String fullAddress = String.join(", ", addressDetail, ward, district, province);
 
             // 5. Validate file ảnh (nếu có)
             if (avatar != null && !avatar.isEmpty()) {
@@ -138,7 +138,7 @@ public class CustomerRestController {
                     "",
                     dob,
                     null,
-                    fullAddress,
+                    addressDetail,
                     ward,
                     district,
                     province,

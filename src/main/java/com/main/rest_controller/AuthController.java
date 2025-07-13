@@ -11,10 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Map;
@@ -25,6 +22,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtService jwtService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
@@ -46,15 +44,29 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody Map<String, String> body) {
-        String refreshToken = body.get("refreshToken");
+    public ResponseEntity<?> refresh(
+            @CookieValue(value = "refreshToken", required = false) String refreshToken,
+            @RequestBody Map<String, Object> body,
+            HttpServletResponse response) {
+
+        boolean rememberMe = Boolean.TRUE.equals(body.get("rememberMe"));
+
         if (!StringUtils.hasText(refreshToken) || !authService.isValidToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token không hợp lệ");
         }
 
-        JwtResponse tokens = authService.refreshToken(refreshToken);
-        return ResponseEntity.ok(tokens);
+        String email = jwtService.getEmailFromToken(refreshToken);
+        UserDetails userDetails = authService.loadUser(email);
+
+        Map<String, ResponseCookie> cookies = authService.generateTokenCookies(userDetails, rememberMe);
+
+        response.addHeader("Set-Cookie", cookies.get("accessToken").toString());
+        response.addHeader("Set-Cookie", cookies.get("refreshToken").toString());
+
+        return ResponseEntity.ok("Refresh thành công");
     }
+
+
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {

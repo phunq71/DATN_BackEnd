@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Lấy các phần tử DOM
-    const changePasswordBtn = document.getElementById('changePassword');
+
     const modal = document.getElementById('cp-changePasswordModal');
     const closeBtn = document.querySelector('.cp-close');
     const checkPasswordBtn = document.getElementById('cp-checkPasswordBtn');
@@ -10,13 +10,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const confirmPasswordInput = document.getElementById('cp-confirmPassword');
     const changePasswordBtnForm = document.getElementById('cp-changePasswordBtn');
     const passwordForm = document.getElementById('cp-passwordForm');
+    const changePasswordBtn = document.getElementById('changePassword');
+
 
     let isDraggingPassword = false;
     // Mở modal khi click vào nút Đổi mật khẩu
     changePasswordBtn.addEventListener('click', function (e) {
+        // account phải là biến toàn cục hoặc lấy từ đâu đó
+
         e.preventDefault(); // Ngăn không cho thẻ a thực hiện hành vi mặc định
         modal.style.display = 'block';
+
+
     });
+
+
 
     // Đóng modal khi click vào nút đóng
     closeBtn.addEventListener('click', function () {

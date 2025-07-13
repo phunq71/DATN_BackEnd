@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded",async function () {
 
     function updateCartsFromServer(carts){
         carts.sort((a, b) => new Date(a.latestDate) - new Date(b.latestDate));
-        return axios.put('/opulentia/user/rest/cart/update',carts)
+        return axios.put('/opulentia_user/rest/cart/update',carts)
             .then(response =>{
                 console.log(response.data)
                 return response.data;

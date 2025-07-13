@@ -41,7 +41,7 @@ public class JwtService {
     }
 
 
-    private String generateToken(CustomUserDetails user, long expirationMillis) {
+    public String generateToken(CustomUserDetails user, long expirationMillis) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMillis);
 
@@ -96,6 +96,10 @@ public class JwtService {
     public String getEmailFromToken(String token) {
         return getAllClaimsFromToken(token).getSubject(); // subject là email
     }
+
+
+
+
 }
 
 

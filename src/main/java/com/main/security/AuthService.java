@@ -31,7 +31,7 @@ public class AuthService {
         String accessToken = jwtService.generateAccessToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-        long accessTokenMaxAge = 60 * 60; // 1h
+        long accessTokenMaxAge = 15 * 60;
         long refreshTokenMaxAge = rememberMe ? 7 * 24 * 60 * 60 : -1; // 7 ngày nếu nhớ, -1 nếu không
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)

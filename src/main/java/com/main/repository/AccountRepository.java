@@ -18,6 +18,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     Optional<Account> findByProviderAndProviderId(String provider, String providerId);
 
+    // Hàm check email cho tài khoản thường
     Optional<Account> findByEmailAndProviderIsNull(String email);
     boolean existsByEmailAndProviderIsNotNull(String email);
 

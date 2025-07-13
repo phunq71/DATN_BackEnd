@@ -18,4 +18,9 @@ public class AuthStatusController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
     }
+
+    @GetMapping("/check-auth")
+    public ResponseEntity<?> checkAuth() {
+        return ResponseEntity.ok("✅ Bạn đang đăng nhập");
+    }
 }
