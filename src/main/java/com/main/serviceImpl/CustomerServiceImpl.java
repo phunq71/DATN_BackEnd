@@ -114,7 +114,14 @@ public class CustomerServiceImpl implements CustomerService {
                 newCustomer.getImageAvt() != null ? newCustomer.getImageAvt() : oldCustomer.getImageAvt()
         );
     }
-
+    @Override
+    public Customer findByAccountID(String accountId) {
+        return customerRepository.findByAccount_AccountId(accountId);
+    }
+    @Override
+    public Customer save(Customer customer) {
+        return customerRepository.save(customer);
+    }
     @Override
     public boolean saveCustomerRegister(CustomerRegisterDTO customerRegisterDTO) {
         try {
@@ -136,6 +143,8 @@ public class CustomerServiceImpl implements CustomerService {
             cus.setAddress(customerRegisterDTO.getAddress());
             cus.setDob(customerRegisterDTO.getDob());
             cus.setMembership(mber);
+            cus.setImageAvt("/avatar.png");
+            cus.setPhone("0000000000");
             customerRepository.save(cus);
             return true;
         }catch(Exception e){
@@ -144,4 +153,5 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 }
+
 

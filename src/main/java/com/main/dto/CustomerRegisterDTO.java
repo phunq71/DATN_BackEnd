@@ -18,4 +18,5 @@ public class CustomerRegisterDTO {
     private Boolean gender;
     private String address;
     private LocalDate dob;
+    private String image;
 }

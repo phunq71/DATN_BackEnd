@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 @Table(name = "Categories")
 @Data
+@ToString(exclude = {"parent", "childrens", "products"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category implements Serializable {

@@ -113,7 +113,7 @@ window.addEventListener("DOMContentLoaded", checkLoginFlag);
 
 // thêm yêu thích
 document.addEventListener("DOMContentLoaded", async function () {
-    const favoriteButtons = document.querySelectorAll(".favorite-btn");
+    const favoriteButtons = document.querySelectorAll(".favorite-btn, .favorite-btnt");
 
     favoriteButtons.forEach(button => {
         button.addEventListener("click", async function (event) {

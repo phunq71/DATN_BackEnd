@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface VariantRepository extends JpaRepository<Variant, String> {
     //Lấy list sp bang product
-    List<Variant> findByProduct(Product product);
+        List<Variant> findByProduct(Product product);
 
         @Query(value = """
         SELECT v.*
@@ -22,7 +22,6 @@ public interface VariantRepository extends JpaRepository<Variant, String> {
           AND p.CreatedDate < DATEADD(DAY, -20, GETDATE())
     """, nativeQuery = true)
         List<Variant> findNewVariantsOfOldProducts();
-
 
     @Query(value = """
     SELECT CASE 
@@ -35,7 +34,4 @@ public interface VariantRepository extends JpaRepository<Variant, String> {
       AND v.VariantID = :variantID
 """, nativeQuery = true)
     int isNewVariantOf(@Param("variantID") String variantID);
-
-
-
 }

@@ -133,10 +133,10 @@ public class HomeController {
 //		return "View/qrPay";
 //	}
 //
-//	@GetMapping("/allOrders")
-//	public String allOrders() {
-//		return "View/allOrders";
-//	}
+	@GetMapping("/allOrders")
+	public String allOrders() {
+		return "View/allOrders";
+	}
 //
     @GetMapping("/opulentia_user/edit-profile")
     public String editProfile(HttpServletRequest request) {
@@ -145,10 +145,10 @@ public class HomeController {
 //        System.out.println("🔐 AUTHORITIES: " + auth.getAuthorities());
         return "View/edit-profile";
 	}
-//	@GetMapping("/orderDetail")
-//	public String orderDetail() {
-//		return "View/orderDetail";
-//	}
+	@GetMapping("/orderDetail")
+	public String orderDetail() {
+		return "View/orderDetail";
+	}
 //
 //	@GetMapping("/return")
 //	public String RProduct() {

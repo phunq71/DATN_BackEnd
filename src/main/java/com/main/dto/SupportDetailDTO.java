@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 
 @Data @NoArgsConstructor @AllArgsConstructor
 public class SupportDetailDTO {
-    private Byte discountPercent;
-    private Boolean isFavorite;
-    private Boolean isHot;
-    private Boolean isNew;
-    private long soldQuantity;
+    private Byte discountPercent; //phần trăm giảm gias
+    private Boolean isFavorite; //Có yêu thích hay không
+    private Boolean isHot; //Bán chạy
+    private Boolean isNew; //Hàng mới
+    private long soldQuantity; //số lượng đã bán
 }

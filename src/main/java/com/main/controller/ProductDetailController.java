@@ -1,16 +1,17 @@
 package com.main.controller;
 import com.main.dto.Image_DetailDTO;
+import com.main.dto.SupportDetailDTO;
 import com.main.dto.ProductViewDTO;
 import com.main.dto.Variant_DetailDTO;
 import com.main.entity.*;
 import com.main.service.*;
-import com.main.serviceImpl.InventoryServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -47,6 +48,7 @@ public class ProductDetailController {
         productList.removeIf(productViewDTO ->
                 productViewDTO.getProductID().equals(productId)
         );
+        System.out.println("Có mà"+productList.size());
         model.addAttribute("listProduct1", productList);
         //Image slider, màu sắc
         List<Variant_DetailDTO> listV = variantService.findByProduct(product.get());
@@ -80,6 +82,24 @@ public class ProductDetailController {
         } else {
             sumRating = 0;
         }
+        SupportDetailDTO pro = productService.getSupportDetail(variantID);
+        if(pro.getDiscountPercent() != null) {
+            BigDecimal price = variant.get().getPrice(); // BigDecimal
+            byte discountPercent = pro.getDiscountPercent(); // byte
+            // Tính (1 - discountPercent / 100)
+            BigDecimal discountMultiplier = BigDecimal.ONE.subtract(
+                    BigDecimal.valueOf(discountPercent).divide(BigDecimal.valueOf(100))
+            );
+            BigDecimal pricePromotion = price.multiply(discountMultiplier);
+            String promotionPrice = formatToVND(pricePromotion);
+            model.addAttribute("pricePromotion", promotionPrice);
+        }
+
+        // Nhân để ra giá sau khuyến mãi
+        model.addAttribute("variantIsHot", pro.getIsHot());
+        model.addAttribute("variantSoldQuantity", pro.getSoldQuantity());
+        model.addAttribute("variantNew", pro.getIsNew());
+        model.addAttribute("pro", pro);
         model.addAttribute("sumRating", sumRating);
         model.addAttribute("ratingCounts", ratingCounts);
         model.addAttribute("ratingPercentages", ratingPercentages);
