@@ -141,6 +141,7 @@ public class CustomerServiceImpl implements CustomerService {
             cus.setFullName(customerRegisterDTO.getFullname());
             cus.setGender(customerRegisterDTO.getGender());
             cus.setAddress(customerRegisterDTO.getAddress());
+            cus.setAddressIdGHN(customerRegisterDTO.getFullAddressID());
             cus.setDob(customerRegisterDTO.getDob());
             cus.setMembership(mber);
             cus.setImageAvt("/avatar.png");
