@@ -1044,21 +1044,6 @@
         </div>
         <div class="size-selector">
             <div class="size-container" id="size-container">
-<!--                <div th:each="size : ${listI}" class="size-wrapper">-->
-<!--                    <a class="size-link" th:if="${size.getSize().getCode() != null}"-->
-
-<!--                       th:data-variant-id="${variantID}"-->
-<!--                       th:data-size-code="${size.getSize().getCode()}">-->
-<!--                        <div th:class="'size-option'"-->
-<!--                             th:attr="data-size=${size.getSize().getCode()}">-->
-<!--                            <span th:text="${size.getSize().getCode()}"></span>-->
-<!--                        </div>-->
-<!--                    </a>-->
-<!--                    <div th:if="${size.getSize().getCode() == null}"-->
-<!--                         class="size-option out-of-stock">-->
-<!--                        <span>Hết hàng</span>-->
-<!--                    </div>-->
-<!--                </div>-->
             </div>
         </div>
 
@@ -1098,13 +1083,10 @@
         </div>
         <div>
         <!-- Khi có giảm giá -->
-        <span class="price original-price" th:if="${pricePromotion != null}" th:text="${priceVariant}"></span>
-        <span class="price sale-price" th:if="${pricePromotion != null}" th:text="${pricePromotion}"></span>
-
+            <span class="price sale-price" style="padding-right: 5px;" th:if="${pricePromotion != null}" th:text="${pricePromotion}"></span>
+            <span class="price original-price" th:if="${pricePromotion != null}" th:text="${priceVariant}"></span>
         <!-- Khi không có giảm giá -->
-        <span class="price" th:if="${pricePromotion == null}" th:text="${priceVariant}"></span>
-
-
+            <span class="price" th:if="${pricePromotion == null}" th:text="${priceVariant}"></span>
         </div>
 <!--        <div class="price" th:text="${priceVariant}"></div>-->
         <button class="add-to-cart" id="add-to-cart">Thêm vào giỏ hàng</button>

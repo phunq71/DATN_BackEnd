@@ -5,7 +5,9 @@ import com.main.entity.Customer;
 import com.main.service.AccountService;
 import com.main.service.CustomerService;
 import com.main.utils.AuthUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -190,5 +192,11 @@ public class CustomerRestController {
 
         return ResponseEntity.ok("Cập nhật thành công");
     }
-
+    @GetMapping("/opulentia_user/qrImage")
+    public ResponseEntity<byte[]> generateQRCode(HttpServletRequest request) throws Exception {
+        String accountId = AuthUtil.getAccountID();
+        System.out.println("co acoount rrrrrrrr"+accountId);
+        byte[] qrImage = customerService.generateQRCode(accountId, 250, 250);
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(qrImage);
+    }
 }
