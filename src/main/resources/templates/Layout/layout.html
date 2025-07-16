@@ -31,6 +31,23 @@
 
 <script src="/js/global.js"></script>
 
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true"
+     data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrModalLabel">Mã QR của bạn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <img id="qrImage" alt="QR sẽ hiển thị ở đây" class="img-fluid m-3" />
+                <a id="downloadQRBtn" class="btn btn-dark" download="yourQR.png">
+                    <i class="fa-solid fa-download me-1"></i> Lưu ảnh
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 <style>
     body{
         font-family: 'Arial', sans-serif;

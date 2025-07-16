@@ -68,4 +68,10 @@ public class AccountServiceImpl implements AccountService {
         }
 
     }
+
+    @Override
+    public Optional<Account> findByEmailAndProviderIsNotNull(String email) {
+        return accountRepository.findByEmailAndProviderIsNull(email);
+    }
+
 }

@@ -2,13 +2,17 @@ package com.main.rest_controller;
 
 import com.main.dto.CustomerDTO;
 import com.main.dto.CustomerRegisterDTO;
+import com.main.entity.Account;
+import com.main.service.AccountService;
 import com.main.service.CustomerService;
 import com.main.service.MailService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.Random;
 
 @RestController
@@ -16,6 +20,7 @@ import java.util.Random;
 public class CustomerRegisterRestController {
     private final CustomerService customerService;
     private final MailService mailService;
+    private final AccountService accountService;
 
     // 🔹 Bước 1: Gửi OTP và lưu DTO vào session
     @PostMapping("/opulentia/send-otp-register")
@@ -79,5 +84,10 @@ public class CustomerRegisterRestController {
         session.removeAttribute("lastOtpSentTimeRegister");
 
         return ResponseEntity.ok("🎉 Đăng ký thành công. Vui lòng đăng nhập để sử dụng dịch vụ.");
+    }
+    @GetMapping("/opulentia/check-email")
+    public ResponseEntity<?> checkEmailExists(@RequestParam String email) {
+        boolean exists = accountService.findByEmailAndProviderIsNotNull(email).isPresent();
+        return ResponseEntity.ok(exists);
     }
 }

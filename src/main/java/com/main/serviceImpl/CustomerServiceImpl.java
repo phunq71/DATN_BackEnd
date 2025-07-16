@@ -1,5 +1,10 @@
 package com.main.serviceImpl;
 
+import com.google.zxing.WriterException;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.main.dto.CustomerDTO;
 import com.main.dto.CustomerRegisterDTO;
 import com.main.entity.Account;
@@ -17,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -142,6 +149,7 @@ public class CustomerServiceImpl implements CustomerService {
             cus.setFullName(customerRegisterDTO.getFullname());
             cus.setGender(customerRegisterDTO.getGender());
             cus.setAddress(customerRegisterDTO.getAddress());
+            cus.setAddressIdGHN(customerRegisterDTO.getFullAddressID());
             cus.setDob(customerRegisterDTO.getDob());
             cus.setMembership(mber);
             cus.setImageAvt("/avatar.png");
@@ -151,6 +159,18 @@ public class CustomerServiceImpl implements CustomerService {
         }catch(Exception e){
             e.printStackTrace();
             return false;
+        }
+    }
+    @Override
+    public byte[] generateQRCode(String content, int width, int height) {
+        try {
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+            return outputStream.toByteArray();
+        } catch (WriterException | IOException e) {
+            throw new RuntimeException("Lỗi khi tạo mã QR", e);
         }
     }
 }

@@ -255,6 +255,18 @@
             font-style: italic;
         }
 
+        .modal {
+            z-index: 1055 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1050 !important;
+        }
+
+        .modal-content {
+            position: relative;
+            z-index: 1060 !important;
+        }
 
 
     </style>
@@ -338,6 +350,13 @@
                                     <i class="fa-solid fa-user-pen me-2"></i>Thông tin cá nhân
                                 </a>
                             </li>
+                            <li>
+                                <a href="#" class="dropdown-item rounded-2 hover-bg-gray"
+                                   onclick="showQRModal(event)">
+                                    <i class="fa-solid fa-qrcode me-2"></i> Xem QR code
+                                </a>
+                            </li>
+
                             <li><hr class="dropdown-divider"></li>
 
                             <!-- Nếu chưa đăng nhập -->
@@ -356,7 +375,6 @@
                         </ul>
                     </div>
 
-
                     <!-- Form ẩn để POST logout -->
 <!--                    <th:block th:if="${#authorization.expression('isAuthenticated()')}">-->
 <!--                        <form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;">-->
@@ -372,6 +390,35 @@
             </div>
         </div>
     </div>
+
+
+    <!--    xử lý gửi yeu cau maQR-->
+    <script>
+        function loadQRCode() {
+            axios.get("/opulentia_user/qrImage", {
+                responseType: 'blob',
+            })
+                .then(res => {
+                    const imgUrl = URL.createObjectURL(res.data);
+                    document.getElementById("qrImage").src = imgUrl;
+
+                    // Gán link tải cho nút
+                    const downloadBtn = document.getElementById("downloadQRBtn");
+                    downloadBtn.href = imgUrl;
+                })
+                .catch(err => {
+                    console.error(err);
+                    window.location.href = "/auth";
+                });
+        }
+        function showQRModal(event) {
+            event.preventDefault();
+            loadQRCode();
+
+            const modal = new bootstrap.Modal(document.getElementById('qrModal'));
+            modal.show();
+        }
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -516,6 +563,4 @@
     <script src="/js/header.js"></script>
 
 </header>
-
-
 </body>

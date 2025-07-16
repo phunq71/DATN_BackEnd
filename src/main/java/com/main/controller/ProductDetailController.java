@@ -117,9 +117,9 @@ public class ProductDetailController {
         return "View/productDetail";
     }
     private String formatToVND(Number amount) {
-        if (amount == null) return "0 ₫";
+        if (amount == null) return "0₫";
         NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return nf.format(amount) + " ₫";
+        return nf.format(amount) + "₫";
     }
 }
 
