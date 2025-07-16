@@ -236,8 +236,13 @@
     }
 
     .od-details-expanded {
-        display: none;
-        animation: fadeIn 0.3s ease-in-out;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 1s ease;
+    }
+
+    .od-details-expanded.expanded {
+        max-height: 500px; /* Giá trị này đủ lớn hơn chiều cao thực tế */
     }
 
     @keyframes fadeIn {
@@ -393,91 +398,6 @@
     }
 </style>
 
-<div class="order-status">
-    <div class="progress-container">
-    <div class="progress-bar">
-        <div class="progress-line"></div>
-        <div class="progress-line-active" id="progress-line-active"></div>
-
-        <div class="progress-step">
-            <div class="step-circle completed">
-                <i class="fas fa-folder step-icon"></i>
-            </div>
-            <div class="step-label">Đơn hàng đã đặt</div>
-            <div class="step-time">21:19 24/06/2025</div>
-        </div>
-
-        <div class="progress-step">
-            <div class="step-circle completed">
-                <i class="fas fa-money-bill-wave step-icon"></i>
-            </div>
-            <div class="step-label">Đã thanh toán</div>
-            <div class="step-time">21:20 24/06/2025</div>
-        </div>
-
-        <div class="progress-step">
-            <div class="step-circle completed">
-                <i class="fas fa-truck step-icon"></i>
-            </div>
-            <div class="step-label">Đã giao cho ĐVVC</div>
-            <div class="step-time">17:49 25/06/2025</div>
-        </div>
-
-        <div class="progress-step">
-            <div class="step-circle active">
-                <i class="fas fa-box-open step-icon"></i>
-            </div>
-            <div class="step-label">Chờ giao hàng</div>
-            <div class="step-time"></div>
-        </div>
-
-        <div class="progress-step">
-            <div class="step-circle pending">
-                <i class="fas fa-star step-icon"></i>
-            </div>
-            <div class="step-label">Đã hoàn thành</div>
-            <div class="step-time"></div>
-        </div>
-    </div>
-</div>
-</div>
-<script>
-    // Tính toán và cập nhật thanh tiến trình
-    function updateProgressBar() {
-        const activeSteps = document.querySelectorAll('.step-circle.completed').length;
-        const totalSteps = document.querySelectorAll('.progress-step').length;
-        const progressPercentage = (activeSteps / (totalSteps - 1)) * 100;
-
-        document.getElementById('progress-line-active').style.width = `${progressPercentage-3}%`;
-    }
-
-    // Thêm hiệu ứng khi trang được tải
-    document.addEventListener('DOMContentLoaded', function() {
-        updateProgressBar();
-
-        // Hiệu ứng cho các bước đã hoàn thành
-        const completedSteps = document.querySelectorAll('.step-circle.completed');
-        completedSteps.forEach((step, index) => {
-            setTimeout(() => {
-                step.style.transform = 'scale(1.2)';
-                setTimeout(() => {
-                    step.style.transform = 'scale(1)';
-                }, 300);
-            }, index * 300);
-        });
-
-        // Hiệu ứng cho bước hiện tại
-        const activeStep = document.querySelector('.step-circle.active');
-        setTimeout(() => {
-            activeStep.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                activeStep.style.transform = 'scale(1)';
-            }, 300);
-        }, completedSteps.length * 300);
-    });
-</script>
-
-
 <style>
     .status-detail{
         margin: 0 100px;
@@ -514,6 +434,56 @@
         display: none;
     }
 </style>
+
+<div class="order-status">
+    <div class="progress-container">
+    <div class="progress-bar">
+        <div class="progress-line"></div>
+        <div class="progress-line-active" id="progress-line-active"></div>
+
+        <div class="progress-step">
+            <div class="step-circle completed">
+                <i class="fas fa-folder step-icon"></i>
+            </div>
+            <div class="step-label">Đơn hàng đã đặt</div>
+            <div class="step-time">21:19 24/06/2025</div>
+        </div>
+
+        <div class="progress-step">
+            <div class="step-circle completed">
+                <i class="fas fa-money-bill-wave step-icon"></i>
+            </div>
+            <div class="step-label">Đã xác nhận</div>
+            <div class="step-time">21:20 24/06/2025</div>
+        </div>
+
+        <div class="progress-step">
+            <div class="step-circle completed">
+                <i class="fas fa-truck step-icon"></i>
+            </div>
+            <div class="step-label">Đã lấy hàng</div>
+            <div class="step-time">17:49 25/06/2025</div>
+        </div>
+
+        <div class="progress-step">
+            <div class="step-circle active">
+                <i class="fas fa-box-open step-icon"></i>
+            </div>
+            <div class="step-label">Đã giao hàng</div>
+            <div class="step-time"></div>
+        </div>
+
+        <div class="progress-step">
+            <div class="step-circle pending">
+                <i class="fas fa-star step-icon"></i>
+            </div>
+            <div class="step-label">Đã hoàn thành</div>
+            <div class="step-time"></div>
+        </div>
+    </div>
+</div>
+</div>
+
 <div class="status-detail">
     <table class="order-table">
     <tr>
@@ -567,19 +537,20 @@
 
         <!-- Ngày giao hàng dự kiến 27/06/2025 -->
         <div class="od-delivery-date">Ngày nhận hàng dự kiến 30/06/2025</div>
-        <span class="od-status">Đang chờ giao hàng</span>
+        <span class="od-status" id="orderStatus"></span>
     </div>
+
+
+
 
     <div class="od-row">
         <div class="od-col">
             <div class="od-section">
                 <h2 class="od-section-title">Địa chỉ nhận hàng</h2>
                 <div class="od-address">
-                    <div class="od-recipient">Phạm Chí Tâm</div>
-                    <div class="od-phone">052 2138 980</div>
-                    <div>
-                        Số 107 Khuông Việt, Phường Phú Trung, Quận Tân Phú, TP.Hồ Chí Minh
-                    </div>
+                    <div class="od-recipient" id="shippingName"></div>
+                    <div class="od-phone" id="shippingPhone"></div>
+                    <div id="shippingAddress"></div>
                 </div>
             </div>
 
@@ -587,24 +558,23 @@
                 <h2 class="od-section-title">Thông tin thanh toán</h2>
                 <div class="od-detail">
                     <div class="od-detail-label">Phương thức thanh toán</div>
-                    <div class="od-detail-value">SePay</div>
+                    <div class="od-detail-value" id="paymentMethod"></div>
                 </div>
                 <div class="od-detail">
                     <div class="od-detail-label">Thời gian đặt hàng</div>
-                    <div class="od-detail-value">26/06/2025 14:30</div>
+                    <div class="od-detail-value" id="orderDate"></div>
                 </div>
                 <div class="od-detail">
                     <div class="od-detail-label">Thời gian thanh toán</div>
-                    <div class="od-detail-value">26/06/2025 14:31</div>
+                    <div class="od-detail-value" id="transactionDate"></div>
                 </div>
             </div>
 
             <div class="od-section">
-                <!--                <h2 class="od-section-title">Thông tin đơn hàng</h2>-->
                 <div class="od-detail">
                     <div class="od-detail-label">Mã đơn hàng</div>
                     <div class="od-detail-value">
-                        #DH20250626123
+                        <span id="orderId"></span>
                         <button class="od-copy-btn">Sao chép</button>
                     </div>
                 </div>
@@ -623,76 +593,83 @@
                         <th>Thành tiền</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td>
-                            <div style="display: flex; gap: 15px;">
-                                <img src="https://image.hm.com/assets/hm/51/ba/51ba40d8f0d80713246fad69ab3b99732af9bf36.jpg" alt="Product" class="od-product-img">
-                                <div>
-                                    <div class="od-product-name">Áo thun nam cổ tròn</div>
-                                    <div class="od-product-attr">Màu: Đen | Size: L</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="od-original-price">350,000đ</div>
-                            <div class="od-discounted-price">280,000đ</div>
-                        </td>
-                        <td>2</td>
-                        <td class="od-discounted-price">560,000đ</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div style="display: flex; gap: 15px;">
-                                <img src="https://image.hm.com/assets/hm/49/d5/49d532391fbb7ce88640c726644cc24b552aab27.jpg" alt="Product" class="od-product-img">
-                                <div>
-                                    <div class="od-product-name">Quần jeans nam</div>
-                                    <div class="od-product-attr">Màu: Xanh | Size: 32</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="od-original-price">500,000đ</div>
-                            <div class="od-discounted-price">400,000đ</div>
-                        </td>
-                        <td>1</td>
-                        <td class="od-discounted-price">400,000đ</td>
-                    </tr>
+                    <tbody id="productsTableBody">
+                    <!-- Sản phẩm sẽ được thêm động bằng JavaScript -->
                     </tbody>
                 </table>
 
                 <div class="od-total">
                     <button id="od-expand-btn" class="od-expand-btn">Xem chi tiết</button>
                     <div id="od-details-expanded" class="od-details-expanded">
-                        <div class="od-summary-item">
+                        <div class="od-summary-item" >
                             <span>Tổng tiền hàng:</span>
-                            <span>960,000đ</span>
+                            <span id="totalItemsPrice"></span>
                         </div>
-                        <div class="od-summary-item">
+                        <div class="od-summary-item" >
                             <span>Phí vận chuyển:</span>
-                            <span>20,000đ</span>
+                            <span id="shippingCost"></span>
                         </div>
-                        <div class="od-summary-item">
-                            <span>Giảm giá:</span>
-                            <span>-130,000đ</span>
+                        <div class="od-summary-item" >
+                            <span>Giảm giá của sản phẩm:</span>
+                            <span id="discountProductPrice"></span>
+                        </div>
+                        <div class="od-summary-item" >
+                            <span>Voucher:</span>
+                            <span id="discountVoucherPrice"></span>
                         </div>
                     </div>
                     <div class="od-summary-item od-summary-total">
                         <span>Tổng cộng:</span>
-                        <span>850,000đ</span>
+                        <span id="finalPrice"></span>
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
 
     <div class="od-actions">
         <button class="od-btn od-btn-cancel">Hủy đơn hàng</button>
-<!--        <button class="od-btn od-btn-track">Theo dõi đơn hàng</button>-->
     </div>
+
 </div>
+
+
+<script>
+    // Tính toán và cập nhật thanh tiến trình
+    function updateProgressBar() {
+        const activeSteps = document.querySelectorAll('.step-circle.completed').length;
+        const totalSteps = document.querySelectorAll('.progress-step').length;
+        const progressPercentage = (activeSteps / (totalSteps - 1)) * 100;
+
+        document.getElementById('progress-line-active').style.width = `${progressPercentage-3}%`;
+    }
+
+    // Thêm hiệu ứng khi trang được tải
+    document.addEventListener('DOMContentLoaded', function() {
+        updateProgressBar();
+
+        // Hiệu ứng cho các bước đã hoàn thành
+        const completedSteps = document.querySelectorAll('.step-circle.completed');
+        completedSteps.forEach((step, index) => {
+            setTimeout(() => {
+                step.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    step.style.transform = 'scale(1)';
+                }, 300);
+            }, index * 300);
+        });
+
+        // Hiệu ứng cho bước hiện tại
+        const activeStep = document.querySelector('.step-circle.active');
+        setTimeout(() => {
+            activeStep.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                activeStep.style.transform = 'scale(1)';
+            }, 300);
+        }, completedSteps.length * 300);
+    });
+</script>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -700,11 +677,11 @@
         const detailsSection = document.getElementById('od-details-expanded');
 
         expandBtn.addEventListener('click', function() {
-            if (detailsSection.style.display === 'block') {
-                detailsSection.style.display = 'none';
+            if (detailsSection.classList.contains('expanded')) {
+                detailsSection.classList.remove('expanded');
                 expandBtn.textContent = 'Xem chi tiết';
             } else {
-                detailsSection.style.display = 'block';
+                detailsSection.classList.add('expanded');
                 expandBtn.textContent = 'Ẩn chi tiết';
             }
         });
@@ -725,5 +702,7 @@
         });
     });
 </script>
+
+<script src="/js/orderDetail.js"></script>
 </body>
 </html>
