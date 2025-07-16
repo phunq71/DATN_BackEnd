@@ -1164,28 +1164,30 @@
              console.error("Lỗi khi tải dữ liệu địa chỉ:", error);
          });
 
-     function populateProvinces() {
-         provincesSelect.innerHTML = '<option value="">Chọn tỉnh/thành phố</option>';
-         dataAddress.forEach(province => {
-             let option = document.createElement('option');
-             option.value = province.ProvinceName;
-             option.textContent = province.ProvinceName;
-             provincesSelect.appendChild(option);
-         });
-     }
+         function populateProvinces() {
+             provincesSelect.innerHTML = '<option value="">Chọn tỉnh/thành phố</option>';
+             dataAddress.forEach(province => {
+                 let option = document.createElement('option');
+                 option.value = province.ProvinceID;
+                 option.textContent = province.ProvinceName;
+                 option.setAttribute('data-name', province.ProvinceName);
+                 provincesSelect.appendChild(option);
+             });
+         }
 
      provincesSelect.addEventListener('change', () => {
          clearSelect(districtsSelect);
          clearSelect(wardsSelect);
-         let selectedProvinceName = provincesSelect.value;
-         if (!selectedProvinceName) return;
-         let province = dataAddress.find(p => p.ProvinceName === selectedProvinceName);
+         let selectedProvinceID = parseInt(provincesSelect.value);
+         if (!selectedProvinceID) return;
+         let province = dataAddress.find(p => p.ProvinceID === selectedProvinceID);
          if (province) {
              districtsSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
              province.Districts.forEach(district => {
                  let option = document.createElement('option');
-                 option.value = district.DistrictName;
+                 option.value = district.DistrictID;
                  option.textContent = district.DistrictName;
+                 option.setAttribute('data-name', district.DistrictName);
                  districtsSelect.appendChild(option);
              });
          }
@@ -1193,18 +1195,21 @@
 
      districtsSelect.addEventListener('change', () => {
          clearSelect(wardsSelect);
-         let selectedProvinceName = provincesSelect.value;
-         let selectedDistrictName = districtsSelect.value;
-         if (!selectedProvinceName || !selectedDistrictName) return;
-         let province = dataAddress.find(p => p.ProvinceName === selectedProvinceName);
+         let selectedProvinceID = parseInt(provincesSelect.value);
+         let selectedDistrictID = parseInt(districtsSelect.value);
+         if (!selectedProvinceID || !selectedDistrictID) return;
+
+         let province = dataAddress.find(p => p.ProvinceID === selectedProvinceID);
          if (!province) return;
-         let district = province.Districts.find(d => d.DistrictName === selectedDistrictName);
+
+         let district = province.Districts.find(d => d.DistrictID === selectedDistrictID);
          if (district) {
              wardsSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
              district.Wards.forEach(ward => {
                  let option = document.createElement('option');
-                 option.value = ward.WardName;
+                 option.value = ward.WardCode;
                  option.textContent = ward.WardName;
+                 option.setAttribute('data-name', ward.WardName);
                  wardsSelect.appendChild(option);
              });
          }
@@ -1231,13 +1236,14 @@
              const gender = document.getElementById("gender").value;
              const password = document.getElementById("reg-password").value;
              const confirmPassword = document.getElementById("confirm-password").value;
-             const provinceName = provincesSelect.value;
-             const districtName = districtsSelect.value;
-             const wardName = wardsSelect.value;
              const addressDetail = document.getElementById("address").value;
-
+             const provinceID = provincesSelect.value;
+             const provinceName = provincesSelect.options[provincesSelect.selectedIndex].getAttribute('data-name');
+             const districtID = districtsSelect.value;
+             const districtName = districtsSelect.options[districtsSelect.selectedIndex].getAttribute('data-name');
+             const wardCode = wardsSelect.value;
+             const wardName = wardsSelect.options[wardsSelect.selectedIndex].getAttribute('data-name');
              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
              if (!email) {
                  Swal.fire({
                      icon: 'warning',
@@ -1348,6 +1354,7 @@
                  return false;
              }
 
+             const fullAddressID = `${provinceID}, ${districtID}, ${wardCode}, ${addressDetail}`;
              const fullAddress = `${addressDetail}, ${wardName}, ${districtName}, ${provinceName}`;
 
              pendingRegistrationData = {
@@ -1357,7 +1364,8 @@
                  fullname,
                  gender,
                  address: fullAddress,
-                 dob: birthday
+                 dob: birthday,
+                 fullAddressID: fullAddressID
              };
 
              return true;
@@ -1367,9 +1375,36 @@
              if (!validateRegistrationForm()) {
                  return;
              }
-             showOtpModal(pendingRegistrationData.email);
-             // Gửi OTP
-             sendOtpForRegistration();
+             // Gọi API để kiểm tra email
+             axios.get("/opulentia/check-email", {
+                 params: {
+                     email: pendingRegistrationData.email
+                 }
+             })
+                 .then(res => {
+                     if (res.data === true) {
+                         // Nếu email đã tồn tại
+                         Swal.fire({
+                             icon: 'error',
+                             title: 'Email đã tồn tại',
+                             text: 'Địa chỉ email này đã được sử dụng. Vui lòng dùng email khác.',
+                             confirmButtonColor: '#000000'
+                         });
+                     } else {
+                         // Nếu email chưa tồn tại → gửi OTP
+                         showOtpModal(pendingRegistrationData.email);
+                         sendOtpForRegistration();
+                     }
+                 })
+                 .catch(err => {
+                     console.error("Lỗi khi kiểm tra email:", err);
+                     Swal.fire({
+                         icon: 'error',
+                         title: 'Lỗi kiểm tra email',
+                         text: err.response?.data || "Không thể kiểm tra email.",
+                         confirmButtonColor: '#000000'
+                     });
+                 });
          }
 
          function sendOtpForRegistration() {
@@ -1389,13 +1424,6 @@
          function confirmOtp() {
              const otpInputs = document.querySelectorAll('#otpModal .otp-inputs input');
              const otp = Array.from(otpInputs).map(input => input.value).join('');
-             Swal.fire({
-                 icon: 'warning',
-                 title: 'Thiếu mã OTP',
-                 text: 'Vui lòng nhập đủ 6 chữ số OTP.',
-                 confirmButtonColor: '#000000'
-             });
-
              // Gửi OTP đến endpoint xác thực
              axios.post("/opulentia/confirm-otp-register", null, {
                  params: {
@@ -1446,7 +1474,6 @@
          });
      });
 
-     // Các hàm hỗ trợ OTP modal (giữ nguyên như trước)
      function showOtpModal(email) {
          const modal = document.getElementById('otpModal');
          document.getElementById('otpEmailInput').value = email;
@@ -1507,7 +1534,5 @@
      }
 
  </script>
-
 </body>
-
 </html>

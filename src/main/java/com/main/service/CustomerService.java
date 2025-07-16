@@ -17,4 +17,6 @@ public interface CustomerService {
     public Customer findByAccountID(String accountId);
 
     public boolean saveCustomerRegister(CustomerRegisterDTO customerRegisterDTO);
+
+    public byte[] generateQRCode(String text, int width, int height);
 }

@@ -149,6 +149,12 @@ public class HomeController {
 	public String orderDetail() {
 		return "View/orderDetail";
 	}
+
+    @GetMapping("/favicon.ico")
+    public String redirectFavicon() {
+        return "redirect:/logo/Opulentia.jpg";
+    }
+
 //
 //	@GetMapping("/return")
 //	public String RProduct() {

@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/opulentia/rest/**").permitAll()
                         .requestMatchers("/opulentia/**").permitAll()
                         .requestMatchers("/auth/**", "/index", "/logo/**", "/js/**", "/data/**",
-                                "/test/**", "/.well-known/**", "/uploads/**","/oauth2/**",
+                                "/test/**", "/.well-known/**", "/uploads/**","/oauth2/**","/favicon.ico",
                                 "/api/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/opulentia_user/**", "/edit-profile").hasRole("USER")

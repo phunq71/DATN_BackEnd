@@ -46,7 +46,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(accessTokenMaxAge)
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
         response.addHeader("Set-Cookie", accessTokenCookie.toString());
@@ -55,7 +55,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(refreshTokenMaxAge)
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
         response.addHeader("Set-Cookie", refreshTokenCookie.toString());
@@ -85,6 +85,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         flagCookie.setPath("/"); // Áp dụng toàn site
         flagCookie.setMaxAge(60); // Tồn tại 60s, hoặc bạn có thể để -1 (session)
         response.addCookie(flagCookie);
+        System.out.println(redirectUrl);
         response.sendRedirect(redirectUrl);
 
     }

@@ -255,6 +255,18 @@
             font-style: italic;
         }
 
+        .modal {
+            z-index: 1055 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1050 !important;
+        }
+
+        .modal-content {
+            position: relative;
+            z-index: 1060 !important;
+        }
 
 
     </style>
@@ -338,24 +350,32 @@
                                     <i class="fa-solid fa-user-pen me-2"></i>Thông tin cá nhân
                                 </a>
                             </li>
+                            <li>
+                                <a href="#" class="dropdown-item rounded-2 hover-bg-gray"
+                                   onclick="showQRModal(event)">
+                                    <i class="fa-solid fa-qrcode me-2"></i> Xem QR code
+                                </a>
+                            </li>
+
                             <li><hr class="dropdown-divider"></li>
 
                             <!-- Nếu chưa đăng nhập -->
-                            <li sec:authorize="isAnonymous()">
+                            <!-- Nếu chưa đăng nhập -->
+                            <li id="loginItem" style="display: none;">
                                 <a class="dropdown-item rounded-2 hover-bg-gray" href="/auth">
                                     <i class="fa-solid fa-right-to-bracket me-2"></i>Đăng nhập
                                 </a>
                             </li>
 
                             <!-- Nếu đã đăng nhập -->
-                            <li sec:authorize="isAuthenticated()">
+                            <li id="logoutItem" style="display: none;">
                                 <a class="dropdown-item rounded-2 hover-bg-gray" href="#" onclick="confirmLogout(event)">
                                     <i class="fa-solid fa-power-off me-2"></i>Đăng xuất
                                 </a>
                             </li>
+
                         </ul>
                     </div>
-
 
                     <!-- Form ẩn để POST logout -->
 <!--                    <th:block th:if="${#authorization.expression('isAuthenticated()')}">-->
@@ -372,6 +392,35 @@
             </div>
         </div>
     </div>
+
+
+    <!--    xử lý gửi yeu cau maQR-->
+    <script>
+        function loadQRCode() {
+            axios.get("/opulentia_user/qrImage", {
+                responseType: 'blob',
+            })
+                .then(res => {
+                    const imgUrl = URL.createObjectURL(res.data);
+                    document.getElementById("qrImage").src = imgUrl;
+
+                    // Gán link tải cho nút
+                    const downloadBtn = document.getElementById("downloadQRBtn");
+                    downloadBtn.href = imgUrl;
+                })
+                .catch(err => {
+                    console.error(err);
+                    window.location.href = "/auth";
+                });
+        }
+        function showQRModal(event) {
+            event.preventDefault();
+            loadQRCode();
+
+            const modal = new bootstrap.Modal(document.getElementById('qrModal'));
+            modal.show();
+        }
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -465,6 +514,21 @@
                 }
             });
         }
+        window.addEventListener("DOMContentLoaded", async () => {
+            const isLoggedInResult = await isLoggedIn();
+
+            // DOM toggle
+            const loginItem = document.getElementById("loginItem");
+            const logoutItem = document.getElementById("logoutItem");
+
+            if (isLoggedInResult) {
+                logoutItem.style.display = "block";
+                loginItem.style.display = "none";
+            } else {
+                loginItem.style.display = "block";
+                logoutItem.style.display = "none";
+            }
+        });
 
     </script>
 
@@ -516,6 +580,4 @@
     <script src="/js/header.js"></script>
 
 </header>
-
-
 </body>
