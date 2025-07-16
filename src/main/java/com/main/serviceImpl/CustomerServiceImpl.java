@@ -83,6 +83,7 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setAddress(customerDTO.getAddressDetail()+", "+ customerDTO.getWard()+", "+ customerDTO.getDistrict()+", "+ customerDTO.getProvince());
             customer.setDob(customerDTO.getDob());
             customer.setImageAvt(customerDTO.getImageAvt());
+            customer.setAddressIdGHN(customerDTO.getAddressIdGHN());
 
             Customer oldCustomer = customerRepository.findById(customer.getCustomerId()).get();
             Customer savedCustomer =mergeCustomer(oldCustomer, customer);

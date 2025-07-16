@@ -22,7 +22,8 @@ public interface CustomerRepository extends JpaRepository<Customer, String > {
          , c.gender
          , c.address
          , c.dob
-         , c.imageAvt FROM Customer c
+         , c.imageAvt
+         , c.addressIdGHN FROM Customer c
              WHERE c.customerId = :accountId
     """)
     CustomerDTO getCustomerByAccountID(@Param("accountId") String accountId);
