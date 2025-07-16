@@ -51,7 +51,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 picture = "https://example.com/default-avatar.png";
             }
 
-            Optional<Account> existingAccount = accountRepo.findByProviderAndProviderId(provider, providerId);
+            Optional<Account> existingAccount = accountRepo.findByProviderAndProviderIdAndStatusTrue(provider, providerId);
             Account account;
 
             if (existingAccount.isPresent()) {
