@@ -179,7 +179,8 @@ function save() {
     formData.append('district', districtsSelect.options[districtsSelect.selectedIndex].text);
     formData.append('ward', wardsSelect.options[wardsSelect.selectedIndex].text);
     formData.append('addressDetail', address.value);
-
+    formData.append('addressIdGHN', getAddressIdGHN());
+    console.log(getAddressIdGHN());
     if (!account.isOAuth2) {
         formData.append('imageAvt', imageInput.files[0]);
     }
@@ -195,7 +196,7 @@ function save() {
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#000000'
             });
-            displayName.innerText=account.fullName;
+            displayName.innerText=fullName.value;
         })
         .catch(error => {
             console.log(error);
@@ -207,6 +208,13 @@ function save() {
                 confirmButtonColor: '#000000'
             });
         });
+}
+
+function getAddressIdGHN(){
+    if(provincesSelect.value!=="" && districtsSelect.value!=="" && wardsSelect.value!=="" && address.value !==""){
+        return provincesSelect.value+"/"+districtsSelect.value+"/"+wardsSelect.value+"/"+address.value;
+    }
+    return "";
 }
 
 

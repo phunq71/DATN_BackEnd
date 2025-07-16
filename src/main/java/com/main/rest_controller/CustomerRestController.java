@@ -75,6 +75,7 @@ public class CustomerRestController {
             @RequestParam("district") String district,
             @RequestParam("ward") String ward,
             @RequestParam("addressDetail") String addressDetail,
+            @RequestParam("addressIdGHN") String addressIdGHN,
             @RequestParam(value = "imageAvt", required = false) MultipartFile avatar) {
 
         // 1. Authentication check
@@ -145,7 +146,8 @@ public class CustomerRestController {
                     ward,
                     district,
                     province,
-                    null
+                    null,
+                    addressIdGHN
             );
 
             CustomerDTO savedCustomer = customerService.saveCustomer(customerDTO, avatar);

@@ -133,10 +133,10 @@ public class HomeController {
 //		return "View/qrPay";
 //	}
 //
-	@GetMapping("/allOrders")
-	public String allOrders() {
-		return "View/allOrders";
-	}
+//	@GetMapping("/allOrders")
+//	public String allOrders() {
+//		return "View/allOrders";
+//	}
 //
     @GetMapping("/opulentia_user/edit-profile")
     public String editProfile(HttpServletRequest request) {
@@ -147,8 +147,14 @@ public class HomeController {
 	}
 	@GetMapping("/orderDetail")
 	public String orderDetail() {
-		return "View/orderDetail";
+        return "View/orderDetail";
 	}
+
+    @GetMapping("/favicon.ico")
+    public String redirectFavicon() {
+        return "redirect:/logo/Opulentia.jpg";
+    }
+
 //
 //	@GetMapping("/return")
 //	public String RProduct() {

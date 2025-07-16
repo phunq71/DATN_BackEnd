@@ -106,7 +106,7 @@
 	<header class="container" th:replace="~{Layout/header :: header}"></header>
     <main th:replace="${view}"></main>
 	<div th:replace="~{Layout/bottom-navigation :: b-nav}"></div>
-    <footer th:replace="~{Layout/footer :: footer}"></footer>
+
     <div th:if="${messageLayout}"
          th:id="'logout-alert'"
          class="alert-container"
@@ -123,6 +123,7 @@
     </div>
 
 </body>
+<footer th:replace="~{Layout/footer :: footer}"></footer>
 <script>
     window.addEventListener("DOMContentLoaded", () => {
         const footer = document.querySelector("footer");

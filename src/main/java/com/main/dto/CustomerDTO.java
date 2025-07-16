@@ -22,12 +22,15 @@ public class CustomerDTO {
     private String province;
     private Boolean isOAuth2;
 
-    public CustomerDTO(String customerId, String fullName, Boolean gender, String address, LocalDate dob, String imageAvt) {
+    private String addressIdGHN;
+
+    public CustomerDTO(String customerId, String fullName, Boolean gender, String address, LocalDate dob, String imageAvt, String addressIdGHN) {
         this.customerId = customerId;
         this.fullName = fullName;
         this.gender = gender;
         this.address = address;
         this.dob = dob;
         this.imageAvt = imageAvt;
+        this.addressIdGHN = addressIdGHN;
     }
 }

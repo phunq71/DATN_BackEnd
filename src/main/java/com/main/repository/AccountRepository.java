@@ -16,10 +16,12 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     @Query("SELECT MAX(a.accountId) FROM Account a WHERE a.accountId LIKE 'ACC%'")
     String findMaxAccountId();
 
-    Optional<Account> findByProviderAndProviderId(String provider, String providerId);
+    Optional<Account> findByProviderAndProviderIdAndStatusTrue(String provider, String providerId);
 
     // Hàm check email cho tài khoản thường
+    @Query("SELECT a FROM Account a WHERE a.email = :email AND a.provider IS NULL AND a.status = true")
     Optional<Account> findByEmailAndProviderIsNull(String email);
+
     boolean existsByEmailAndProviderIsNotNull(String email);
 
     Optional<Account> findByAccountId(String accountId);
