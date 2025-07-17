@@ -1007,7 +1007,7 @@
     }
 
     function sendOtpForDeactivation() {
-        axios.post("/opulentia/account/send-otp-deactivate")
+        axios.post("/opulentia_user/send-otp-deactivate")
             .then(res => {
                 showOtpModal();
                 document.getElementById("otpMessage").style.display = "none";
@@ -1044,7 +1044,7 @@
             return;
         }
 
-        axios.post("/opulentia/account/confirm-deactivate", {
+        axios.post("/opulentia_user/confirm-deactivate", {
             otpCode: parseInt(otp)
         })
             .then(res => {
@@ -1061,7 +1061,25 @@
                         confirmButtonColor: '#000000'
                     }).then(() => {
                         hideOtpModal();
-                        window.location.href = "api/auth/logout"; // hoặc / nếu về trang chủ
+
+                        // ⛔ QUAN TRỌNG: Gọi logout để xóa cookie
+                        axios.post('/api/auth/logout', {}, {
+                            withCredentials: true
+                        })
+                            .then(() => {
+                                window.location.href = "/index";
+                                axios.post('/opulentia_user/confirm-return', {}, {
+                                    withCredentials: true
+                                })
+                                    .then(() =>{
+                                        console.error("❌ Lỗi khi logout sau khi vô hiệu hóa:", error);
+                                    })
+                            })
+                            .catch(error => {
+                                console.error("❌ Lỗi khi logout sau khi vô hiệu hóa:", error);
+                                // Vẫn chuyển trang trong trường hợp logout lỗi, nhưng có thể log thêm nếu cần
+                                window.location.href = "/index";
+                            });
                     });
                 });
             })
@@ -1074,13 +1092,13 @@
                     text: errorMessage,
                     confirmButtonColor: '#000000'
                 }).then(() => {
-                    // Nếu lỗi là do còn đơn hàng => ẩn OTP modal
                     if (errorMessage.includes("đơn hàng")) {
                         hideOtpModal();
                     }
                 });
             });
     }
+
 
 
     document.addEventListener("DOMContentLoaded", function () {

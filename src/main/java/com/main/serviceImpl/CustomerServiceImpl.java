@@ -152,7 +152,7 @@ public class CustomerServiceImpl implements CustomerService {
             cus.setAddressIdGHN(customerRegisterDTO.getFullAddressID());
             cus.setDob(customerRegisterDTO.getDob());
             cus.setMembership(mber);
-            cus.setImageAvt("/avatar.png");
+            cus.setImageAvt("avatar.png");
             cus.setPhone("0000000000");
             customerRepository.save(cus);
             return true;
