@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public UserDetails loadUserByProvider(String provider, String providerId) throws UsernameNotFoundException {
-        return accountRepository.findByProviderAndProviderId(provider, providerId)
+        return accountRepository.findByProviderAndProviderIdAndStatusTrue(provider, providerId)
                 .map(CustomUserDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy tài khoản OAuth2"));
     }

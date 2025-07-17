@@ -165,6 +165,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     List<OrderItemDTO> getOrderItemsByOrderId(@Param("orderId") Integer orderId);
 
     boolean existsByOrderIDAndCustomer_CustomerId(Integer orderID, String customerCustomerId);
+
+    boolean existsByCustomer_CustomerIdAndStatusIn(String customerId, List<String> statuses);
 }
 
 

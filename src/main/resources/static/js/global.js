@@ -3,33 +3,36 @@
 let carts=[];
 
 async function isLoggedIn() {
-    let log = "🟡 [isLoggedIn] Bắt đầu kiểm tra login...\n";
+    let log = "🟡 [isLoggedIn] Bắt đầu kiểm tra trạng thái đăng nhập...\n";
 
     try {
+        // Kiểm tra access token còn hạn
         log += "🔍 Gọi /api/auth/check-login...\n";
         await axios.get("/api/auth/check-login", { withCredentials: true });
-        log += "✅ Access token còn hạn → Logged in\n";
+
+        log += "✅ Access token hợp lệ. Đã đăng nhập.\n";
         localStorage.setItem("isLoggedInLog", log);
         return true;
     } catch (err) {
         const status = err.response?.status;
-        log += `❌ Lỗi khi check-login (status: ${status})\n`;
+        log += `❌ Access token không hợp lệ (status: ${status})\n`;
 
         if (status === 401) {
-            try {
-                const rememberMe = localStorage.getItem("rememberMeChecked") === "true";
-                log += `🔁 Thử refresh token với rememberMe = ${rememberMe}\n`;
+            const rememberMe = localStorage.getItem("rememberMeChecked") === "true";
+            log += `🔁 Cố gắng refresh token (rememberMe = ${rememberMe})...\n`;
 
+            try {
                 await axios.post("/api/auth/refresh", { rememberMe }, {
                     withCredentials: true
                 });
 
-                log += "✅ Refresh thành công → thử lại check-login\n";
+                log += "✅ Refresh token thành công. Gọi lại check-login...\n";
+
                 await axios.get("/api/auth/check-login", {
                     withCredentials: true
                 });
 
-                log += "✅ Check-login lại thành công sau khi refresh\n";
+                log += "✅ Đăng nhập lại thành công sau khi refresh.\n";
                 localStorage.setItem("isLoggedInLog", log);
                 return true;
             } catch (refreshErr) {
@@ -40,11 +43,13 @@ async function isLoggedIn() {
             }
         }
 
-        log += "❌ Lỗi khác ngoài 401 (mạng/khác)\n";
+        // Lỗi khác (mạng, server...)
+        log += "❌ Lỗi không xác định khi kiểm tra đăng nhập.\n";
         localStorage.setItem("isLoggedInLog", log);
         return false;
     }
 }
+
 
 
 

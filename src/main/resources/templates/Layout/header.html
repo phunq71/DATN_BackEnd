@@ -142,6 +142,9 @@
             font-family: Arial, sans-serif;
             font-size: 14px;
             z-index: 9999;
+            max-height: 300px;   /* Giới hạn chiều cao */
+            overflow-y: auto;    /* Cho phép cuộn dọc khi tràn */
+            scrollbar-width: none;
 
             max-height: 300px;
             overflow-y: auto;
@@ -257,21 +260,6 @@
             color: #888 !important;
             font-style: italic;
         }
-
-        .modal {
-            z-index: 1055 !important;
-        }
-
-        .modal-backdrop {
-            z-index: 1050 !important;
-        }
-
-        .modal-content {
-            position: relative;
-            z-index: 1060 !important;
-        }
-
-
     </style>
 
     <div class="nav-container container ">
@@ -333,7 +321,7 @@
                         </a>
                         <div id="mini-cart" class="mini-cart">
                             <h5 class="cart-title">Sản phẩm mới thêm</h5>
-                            <table class="cart-table">
+                            <table class="cart-table" style="max-height: 100px; ">
                                 <tbody id="cart-items"></tbody>
                             </table>
                             <a href="/opulentia/cart" style="color: #1a52d1">>> Xem tất cả</a>
@@ -363,18 +351,20 @@
                             <li><hr class="dropdown-divider"></li>
 
                             <!-- Nếu chưa đăng nhập -->
-                            <li sec:authorize="isAnonymous()">
+                            <!-- Nếu chưa đăng nhập -->
+                            <li id="loginItem" style="display: none;">
                                 <a class="dropdown-item rounded-2 hover-bg-gray" href="/auth">
                                     <i class="fa-solid fa-right-to-bracket me-2"></i>Đăng nhập
                                 </a>
                             </li>
 
                             <!-- Nếu đã đăng nhập -->
-                            <li sec:authorize="isAuthenticated()">
+                            <li id="logoutItem" style="display: none;">
                                 <a class="dropdown-item rounded-2 hover-bg-gray" href="#" onclick="confirmLogout(event)">
                                     <i class="fa-solid fa-power-off me-2"></i>Đăng xuất
                                 </a>
                             </li>
+
                         </ul>
                     </div>
 
@@ -515,6 +505,21 @@
                 }
             });
         }
+        window.addEventListener("DOMContentLoaded", async () => {
+            const isLoggedInResult = await isLoggedIn();
+
+            // DOM toggle
+            const loginItem = document.getElementById("loginItem");
+            const logoutItem = document.getElementById("logoutItem");
+
+            if (isLoggedInResult) {
+                logoutItem.style.display = "block";
+                loginItem.style.display = "none";
+            } else {
+                loginItem.style.display = "block";
+                logoutItem.style.display = "none";
+            }
+        });
 
     </script>
 

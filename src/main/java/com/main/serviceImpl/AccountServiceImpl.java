@@ -2,6 +2,7 @@ package com.main.serviceImpl;
 
 import com.main.entity.Account;
 import com.main.repository.AccountRepository;
+import com.main.repository.OrderRepository;
 import com.main.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     private final AccountRepository accountRepository;
 
@@ -72,6 +77,42 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Optional<Account> findByEmailAndProviderIsNotNull(String email) {
         return accountRepository.findByEmailAndProviderIsNull(email);
+    }
+
+    //kiểm tra đơn hàng
+    @Override
+    public boolean hasPendingOrders(String accountId) {
+        Optional<Account> accOpt = accountRepository.findById(accountId);
+        if (accOpt.isEmpty() || accOpt.get().getCustomer() == null) {
+            return false;
+        }
+
+        String customerId = accOpt.get().getCustomer().getCustomerId();
+
+        List<String> pendingStatuses = List.of(
+                "ChoXacNhan",
+                "ChuanBiDon",
+                "SanSangGiao",
+                "DaYeuCauHuy",
+                "ChoGiaoHang",
+                "TraHang"
+        );
+
+        return orderRepository.existsByCustomer_CustomerIdAndStatusIn(customerId, pendingStatuses);
+    }
+
+    //vô hiệu hóa tk
+    @Override
+    public boolean deactivateAccount(String accountId) {
+        Optional<Account> accOpt = accountRepository.findById(accountId);
+        if (accOpt.isPresent()) {
+            Account acc = accOpt.get();
+            acc.setStatus(false); // Đặt trạng thái thành vô hiệu hóa
+            acc.setUpdateAt(LocalDate.now());
+            accountRepository.save(acc);
+            return true;
+        }
+        return false;
     }
 
 }
