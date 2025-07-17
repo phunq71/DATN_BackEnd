@@ -21,10 +21,38 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     FROM Order o
     WHERE o.customer.customerId=:customerId
     AND (:status='ALL' OR o.status=:status)
+    AND YEAR(o.orderDate) =:year
     ORDER BY o.orderDate DESC
     """
     )
-    List<OrderDTO> getOrdersByCustomerIdAndStatus(@Param("customerId") String customerId, @Param("status") String status);
+    List<OrderDTO> getOrdersByCustomerIdAndStatus(@Param("customerId") String customerId, @Param("status") String status, @Param("year") Integer year);
+
+    @Query("""
+    SELECT DISTINCT o.orderID
+        , o.orderDate
+        , o.status
+        , o.costShip
+    FROM Order o
+    LEFT JOIN o.orderDetails od
+    LEFT JOIN od.item i
+    LEFT JOIN i.variant v
+    LEFT JOIN v.product p
+    WHERE o.customer.customerId = :customerId
+    AND (:keyword IS NULL OR :keyword = ''
+         OR CAST(o.orderID AS string) LIKE %:keyword%
+         OR p.productName LIKE %:keyword%)
+    ORDER BY o.orderDate DESC
+    """
+    )
+    List<OrderDTO> getOrdersByCustomerIdAndKeywords(@Param("customerId") String customerId, @Param("keyword") String keyword);
+
+    @Query("""
+    SELECT DISTINCT YEAR(o.orderDate)
+    FROM Order o
+    WHERE o.customer.customerId = :customerId
+    ORDER BY YEAR(o.orderDate) DESC
+    """)
+    List<Integer> getOrderYearByCustomerId(@Param("customerId") String customerId);
 
     @Query("""
     SELECT o.orderID
@@ -40,11 +68,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     WHERE o.orderID=:orderId
     """)
     OrderDetailDTO getOrderDetailByOrderId(@Param("orderId") Integer orderId);
-
-    @Query(
-
-    )
-    List<OrderItemDTO> getOrderItemsByOrderID(Integer orderID);
 
 
     @Query(value = """
@@ -121,9 +144,11 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     LEFT JOIN PromotionProducts pp ON od.PPID = pp.PPID
     LEFT JOIN Vouchers v ON o.VoucherID = v.VoucherID
     WHERE o.CustomerID = :customerId
+    AND (:status = 'ALL' OR :status = o.status)
+    AND YEAR(o.OrderDate) = :year
     GROUP BY o.OrderID, v.discountType, v.discountValue
 """, nativeQuery = true)
-    List<Object[]> getOrderPricesByCustomer(@Param("customerId") String customerId);
+    List<Object[]> getOrderPricesByCustomer(@Param("customerId") String customerId, @Param("status") String status, @Param("year") Integer year);
 
     @Query("""
     SELECT od.item.itemId,

@@ -21,19 +21,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDTO> getOrdersByCustomerIdAndStatus(String customerId, String status) {
+    public List<OrderDTO> getOrdersByCustomerIdAndStatus(String customerId, String status, Integer year) {
         List<OrderDTO> orders = new ArrayList<>();
 
         if ("ChoLayHang".equals(status)) {
             List<String> statusList = List.of("ChuanBiDon", "SanSangGiao", "DaYeuCauHuy");
             for (String s : statusList) {
-                orders.addAll(orderRepository.getOrdersByCustomerIdAndStatus(customerId, s));
+                orders.addAll(orderRepository.getOrdersByCustomerIdAndStatus(customerId, s, year));
             }
         } else {
-            orders = orderRepository.getOrdersByCustomerIdAndStatus(customerId, status);
+            orders = orderRepository.getOrdersByCustomerIdAndStatus(customerId, status, year);
         }
 
-        List<OrderPriceDTO> orderPrices = getOrderPricesByCustomer(customerId);
+        List<OrderPriceDTO> orderPrices = getOrderPricesByCustomer(customerId, status, year);
 
         orders.forEach(order -> {
             OrderPriceDTO orderPriceDTO = orderPrices.stream()
@@ -112,9 +112,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderPriceDTO> getOrderPricesByCustomer(String customerId) {
+    public List<OrderPriceDTO> getOrderPricesByCustomer(String customerId, String status, Integer year) {
         List<OrderPriceDTO> orderPriceDTOs = new ArrayList<>();
-        List<Object[]> orderPrices = orderRepository.getOrderPricesByCustomer(customerId);
+        List<Object[]> orderPrices = orderRepository.getOrderPricesByCustomer(customerId, status ,year);
         orderPrices.forEach(orderPrice -> {
             Integer orderId = (Integer) orderPrice[0];
             BigDecimal totalPrice = new BigDecimal(orderPrice[1].toString());
@@ -150,5 +150,24 @@ public class OrderServiceImpl implements OrderService {
         orderDetailDTO.setItems(orderItemDTOS);
 
         return orderDetailDTO;
+    }
+
+    @Override
+    public List<Integer> getOrderYearByCustomerId(String customerId) {
+        return orderRepository.getOrderYearByCustomerId(customerId);
+    }
+
+    @Override
+    public List<OrderDTO> getOrdersByKeyword(String customerId, String keyword) {
+        List<OrderDTO> orders = orderRepository.getOrdersByCustomerIdAndKeywords(customerId, keyword);
+
+        orders.forEach(order -> {
+            order.setItems(orderRepository.getOrderItemsByOrderId(order.getOrderID()));
+            OrderPriceDTO priceDTO = getOrderPrice(order.getOrderID());
+            order.setTotalPrice(priceDTO.getFinalPrice().add(order.getShippingCosts()));
+        });
+
+
+        return orders;
     }
 }

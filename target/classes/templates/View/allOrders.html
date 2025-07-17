@@ -391,17 +391,46 @@
         align-items: center;
         gap: 0.75rem;
     }
+
+    #year-select {
+        font-size: 20px;         /* Giữ nguyên 20px như ông thích */
+        padding: 3px 8px;        /* Thêm padding ngang để ô rộng vừa đẹp */
+        background-color: #fff;  /* Nền trắng */
+        border: none;            /* Bỏ viền mặc định */
+        border-bottom: 2px solid #000;  /* Chỉ có border bottom đen */
+        border-radius: 0;        /* Không bo góc */
+        outline: none;           /* Bỏ viền xanh khi focus mặc định */
+        transition: all 0.2s ease; /* Mượt mà khi hover/click */
+    }
+
+    #year-select:hover {
+        background-color: #f5f5f5; /* Nền xám nhạt thật nhạt khi hover */
+    }
+
+    #year-select:focus {
+        background-color: #f2f5f7; /* Nền xám đậm hơn chút khi click */
+        border-bottom: 2px solid #222; /* Viền đen đậm hơn 1 xíu */
+    }
+
+    #year-select option {
+        font-size: 18px;         /* Option cỡ 17-18 như yêu cầu */
+        padding: 4px 8px;        /* Padding cho option dễ nhìn */
+    }
+
 </style>
 <div class="od-container">
     <div class="od-title">
-        Đơn hàng của bạn
+        Đơn hàng của bạn trong năm
+        <select id="year-select">
+            <option th:each="year : ${orderYears}" th:text="${year}" th:value="${year}"></option>
+        </select>
     </div>
 
     <!-- Thanh search -->
     <div class="od-search-bar">
         <button class="od-back-btn">←</button>
-        <input type="text" class="od-search-input" placeholder="Tìm kiếm đơn hàng theo ID, tên sản phẩm...">
-        <button class="od-search-btn">Tìm</button>
+        <input type="text" class="od-search-input" id="search-order-input" placeholder="Tìm kiếm đơn hàng theo ID, tên sản phẩm...">
+        <button class="od-search-btn" id="search-order-btn">Tìm</button>
     </div>
 
     <!-- Tabs -->
