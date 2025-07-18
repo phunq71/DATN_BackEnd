@@ -19,17 +19,18 @@ import java.util.Optional;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/opulentia/account")
+@RequestMapping("/opulentia_user")
 @RequiredArgsConstructor
 public class DisableAccountRestController {
     private final AccountService accountService;
     private final MailService mailService;
     private final AccountRepository accountRepository;
+    String accountId = "";
 
     //gửi otp
     @PostMapping("/send-otp-deactivate")
     public ResponseEntity<?> sendOtpForDeactivate(HttpSession session) {
-        String accountId = AuthUtil.getAccountID();
+        accountId = AuthUtil.getAccountID();
         if (accountId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("❌ Bạn cần đăng nhập.");
         }
@@ -64,7 +65,7 @@ public class DisableAccountRestController {
 
     @PostMapping("/confirm-deactivate")
     public ResponseEntity<?> confirmOtpAndDeactivate(@RequestBody DisableAccountDTO dto, HttpSession session) {
-        String accountId = AuthUtil.getAccountID();
+        accountId = AuthUtil.getAccountID();
         if (accountId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("❌ Bạn cần đăng nhập.");
         }
@@ -86,15 +87,20 @@ public class DisableAccountRestController {
             return ResponseEntity.badRequest().body("❌ Mã OTP không đúng.");
         }
 
-        boolean success = accountService.deactivateAccount(accountId);
-        if (!success) {
-            return ResponseEntity.internalServerError().body("❗ Vô hiệu hóa thất bại.");
-        }
-
         // Clear session OTP
         session.removeAttribute("deactivateOtp");
         session.removeAttribute("deactivateOtpTime");
 
         return ResponseEntity.ok("✅ Vô hiệu hóa tài khoản thành công!");
     }
+
+    @PostMapping("/confirm-return")
+    public ResponseEntity<?> confirmReturn() {
+        boolean success = accountService.deactivateAccount(accountId);
+        if (!success) {
+            return ResponseEntity.internalServerError().body("❗ Vô hiệu hóa thất bại.");
+        }
+        return ResponseEntity.ok("✅ Vô hiệu hóa tài khoản thành công!");
+    }
+
 }
