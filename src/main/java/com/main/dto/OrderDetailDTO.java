@@ -23,6 +23,7 @@ public class OrderDetailDTO {
     private BigDecimal discountVoucherPrice;
     private BigDecimal discountProductPrice;
 
+    private LocalDateTime updateStatusAt;
     private String shippingAddress;
     private String shippingName;
     private String shippingPhone;
@@ -43,7 +44,7 @@ public class OrderDetailDTO {
     }
 
 
-    public OrderDetailDTO(Integer orderID, LocalDateTime orderDate, String status, String shippingAddress, String shippingName, String shippingPhone, BigDecimal shippingCost, String paymentMethod, LocalDateTime transactionDate) {
+    public OrderDetailDTO(Integer orderID, LocalDateTime orderDate, String status, String shippingAddress, String shippingName, String shippingPhone, BigDecimal shippingCost, String paymentMethod, LocalDateTime transactionDate, LocalDateTime updateStatusAt) {
         this.orderID = orderID;
         this.orderDate = orderDate;
         this.status = status;
@@ -55,5 +56,6 @@ public class OrderDetailDTO {
         this.shippingCost = shippingCost;
         this.paymentMethod = paymentMethod;
         this.transactionDate = transactionDate;
+        this.updateStatusAt = updateStatusAt;
     }
 }
