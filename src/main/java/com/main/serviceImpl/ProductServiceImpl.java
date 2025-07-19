@@ -10,6 +10,7 @@ import com.main.utils.AuthUtil;
 import com.main.utils.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -230,11 +231,67 @@ public class ProductServiceImpl implements ProductService {
         }
         dto.setDiscountPercent(productRepository.findDiscountPercentByProductID(variant.getProduct().getProductID()));
         dto.setIsNew(variantRepository.isNewVariantOf(variantId)>0);
+
         Pageable pageable = PageRequest.of(0, 10);
         List <Product> products = productRepository.findTopSellingProducts(pageable);
         List<String> hotProductIDs = products.stream().map(Product::getProductID).toList();
+
         dto.setIsHot(hotProductIDs.contains(variant.getProduct().getProductID()));
         dto.setSoldQuantity(productRepository.countSoldQuantityByProductId(variant.getProduct().getProductID()));
         return dto;
+    }
+    public List<Product> findAll(){
+        return productRepository.findAll();
+    }
+    @Override
+    public Page<ProductViewDTO> filterProductsWithReviewOnly(
+            String color,
+            String brand,
+            BigDecimal priceFrom,
+            BigDecimal priceTo,
+            Double minRating,
+            String targetCustomer,
+            String categoryId,
+            String parentCategoryId,
+            Pageable pageable
+    ) {
+           Page<Product> pagePro = productRepository.filterProductsWithReviewOnly(
+                color,
+                brand,
+                priceFrom,
+                priceTo,
+                minRating,
+                targetCustomer,
+                categoryId,
+                parentCategoryId,
+                pageable
+        );
+           List<Product> products = pagePro.getContent();
+           System.err.println("Sizeeeeeeeeeeeee: " + products.size());
+           List<ProductViewDTO> dtos = new ArrayList<>();
+           Pageable pageable1 = PageRequest.of(0, 10);
+           List<Product> productss = productRepository.findTopSellingProducts(pageable1);
+           List<String> hotProductIDs = productss.stream().map(Product::getProductID).toList();
+           products.forEach(product -> {
+               ProductViewDTO dto = new ProductViewDTO();
+               dto.setProductID(product.getProductID());
+               enrichProductViewDTO(dto, product, hotProductIDs, productRepository.isNewProduct(product.getProductID())>0);
+               Variant variant = new Variant();
+               if (color!=null){
+                   product.getVariants().forEach(var -> {
+                       if (var.getColor().equalsIgnoreCase(color)){
+                           dto.setVariantID(var.getVariantID());
+                            for (Image img  : var.getImages()){
+                                if(img.getIsMainImage()) {
+                                    dto.setImageUrl(img.getImageUrl());
+                                }
+                            }
+                       }
+                   });
+               }
+                dtos.add(dto);
+           });
+        markFavorites(dtos);
+        return new PageImpl<>(dtos, pageable, pagePro.getTotalElements());
     }
 }

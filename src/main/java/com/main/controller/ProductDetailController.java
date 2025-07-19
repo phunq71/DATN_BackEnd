@@ -48,7 +48,6 @@ public class ProductDetailController {
         productList.removeIf(productViewDTO ->
                 productViewDTO.getProductID().equals(productId)
         );
-        System.out.println("Có mà"+productList.size());
         model.addAttribute("listProduct1", productList);
         //Image slider, màu sắc
         List<Variant_DetailDTO> listV = variantService.findByProduct(product.get());
@@ -58,7 +57,6 @@ public class ProductDetailController {
         //Tìm ds tìm item bằng biến thể để lấy size của biến thể
         List<Item> listI = itemService.findByVariant(variant.get());
         String formattedPrice = formatToVND(variant.get().getPrice());
-
         // Lấy số lượng đánh giá theo từng mức sao
         Map<Integer, Integer> ratingCounts = reviewService.getReviewRatingCounts(productId);
         // Đếm tổng số lượt đánh giá cho sản phẩm

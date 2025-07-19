@@ -11,14 +11,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ProductRepository  extends JpaRepository<Product, String> {
-    //Tìm sp bang id
-    Optional<Product> findByProductID(String id);
     List<Product> findByCategory(Category category);
 
     // Nếu có cả danh mục cha và con
@@ -100,4 +99,40 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
             "WHERE va.product.productID = :productId")
     long countSoldQuantityByProductId(@Param("productId") String productId);
 
+    @Query("""
+        SELECT DISTINCT p FROM Product p
+        JOIN Variant mainVar ON mainVar.product = p AND mainVar.isMainVariant = true
+        LEFT JOIN Item i ON i.variant = mainVar
+        LEFT JOIN OrderDetail od ON od.item = i
+        WHERE (:color IS NULL OR EXISTS (
+            SELECT 1 FROM Variant v2 WHERE v2.product = p AND v2.color = :color AND v2.isUse = true
+        ))
+        AND (:brand IS NULL OR p.brand = :brand)
+        AND (:targetCustomer IS NULL OR p.targetCustomer = :targetCustomer)
+        AND (:priceFrom IS NULL OR mainVar.price >= :priceFrom)
+        AND (:priceTo IS NULL OR mainVar.price <= :priceTo)
+        AND (:minRating IS NULL OR (
+            SELECT COALESCE(AVG(r2.rating), 0)
+            FROM Variant v2
+            JOIN Item i2 ON i2.variant = v2
+            JOIN OrderDetail od2 ON od2.item = i2
+            JOIN Review r2 ON r2.orderDetail = od2
+            WHERE v2.product = p
+        ) >= :minRating)
+        AND (
+              ((:categoryId IS NOT NULL AND :categoryId <> '') AND p.category.categoryId = :categoryId)
+                OR ((:categoryId IS NULL OR :categoryId = '') AND :parentCategoryId IS NOT NULL AND p.category.parent.categoryId = :parentCategoryId)
+        )
+        """)
+    Page<Product> filterProductsWithReviewOnly(
+            @Param("color") String color,
+            @Param("brand") String brand,
+            @Param("priceFrom") BigDecimal priceFrom,
+            @Param("priceTo") BigDecimal priceTo,
+            @Param("minRating") Double minRating,
+            @Param("targetCustomer") String targetCustomer,
+            @Param("categoryId") String categoryId,
+            @Param("parentCategoryId") String parentCategoryId,
+            Pageable pageable);
 }
+

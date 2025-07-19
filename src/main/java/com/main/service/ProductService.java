@@ -6,7 +6,10 @@ import com.main.entity.Category;
 import com.main.entity.Product;
 import com.main.dto.ProductByCategoryDTO;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +22,16 @@ public interface ProductService {
     List<ProductViewDTO> findBestSellingProducts();
     void markFavorites(List<ProductViewDTO> products);
     SupportDetailDTO getSupportDetail(String id);
+    List<Product> findAll();
+    Page<ProductViewDTO> filterProductsWithReviewOnly(
+                                String color,
+                                String brand,
+                                BigDecimal priceFrom,
+                                BigDecimal priceTo,
+                                Double minRating,
+                                String targetCustomer,
+                                String categoryId,
+                                String parentCategoryId,
+                                Pageable pageable
+    );
 }
