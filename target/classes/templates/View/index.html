@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OPULENTIA</title>
+  <!--  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
+  <!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">-->
+  <!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">-->
+  <!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">-->
+
+</head>
+<body>
+
+<style>
+  /* REELS EFFECT */
+  .reels-container {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .reels-row {
+    height: 100vh;
+    scroll-snap-align: start;
+  }
+
+  .hero {
+    width: 100%;
+    height: 100vh;
+  }
+
+  .hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Banner section - 1/3 chiều cao màn hình */
+  .banner-section {
+    height: 33.33vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.0);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .banner-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    animation: fadeInDown 1s ease;
+  }
+
+  .banner-subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    animation: fadeInUp 1s ease;
+  }
+
+  .discount-badge {
+    background-color: #ff4757;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+  }
+
+  /* Products section - 2/3 chiều cao màn hình */
+  .products-section {
+    height: 66.66vh;
+    padding: 20px 0;
+    background-color: #f8f9fa;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .section-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #ffff;
+    position: relative;
+    display: inline-block;
+    padding-top:40px;
+    margin-top: 20PX;
+    padding-bottom: 10px;
+
+    /* Viền đen cho chữ */
+    text-shadow:
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px  1px 0 #000,
+            1px  1px 0 #000;
+  }
+
+  .section-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: #ff4757;
+  }
+
+  /* Product card styles */
+  .products-carousel {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .product-container {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .product-wrapper {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .product-image {
+    background-color: #EEEEEE;
+    height: 300px;
+    width: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .product-wrapper:hover .product-image {
+    transform: scale(1.05);
+  }
+
+
+
+  .product-wrapper {
+    box-sizing: border-box; /* quan trọng */
+    border: 2px solid transparent; /* border luôn có, nhưng trong suốt */
+    transition: border 0.3s ease;
+  }
+
+  .product-wrapper:hover {
+    border: 2px solid #ffc001; /* đổi màu thôi, không đổi độ dày */
+  }
+
+
+  .new-label {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    background-color: #000;
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 2;
+    transform: rotate(-15deg);
+    transition: all 0.3s ease;
+    border-radius: 3px;
+  }
+
+  .discount-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    z-index: 2;
+    border-radius: 3px;
+  }
+
+  .product-wrapper:hover .discount-label {
+    padding: 7px 14px;
+  }
+
+  .product-wrapper:hover .new-label {
+    padding: 7px 14px;
+  }
+
+  .product-info {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgb(0, 0, 0, 0.9);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1;
+    color: #ffffff;
+    height: 100px;
+  }
+
+  .product-wrapper:hover .product-info {
+    transform: translateY(0);
+    opacity: 1;
+    bottom: 0px;
+  }
+
+  .price-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 14px;
+  }
+
+  .sale-price {
+    color: #ffffff;
+    font-size: 14px;
+  }
+
+  .favorite-btn {
+    position: absolute;
+    top: 63%;
+    right: 3%; /* ⛔️ Không dùng -230px */
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-size: larger;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 1;
+    transform: translateY(350%);
+  }
+
+
+  .product-container:hover .favorite-btn {
+    transform: translateY(-0);
+  }
+
+  .favorite-btn:hover {
+    color: #ff4757;
+    transform: scale(1.2) !important;
+  }
+
+  /* Owl Carousel navigation */
+  .owl-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .owl-prev,
+  .owl-next {
+    pointer-events: auto;
+    width: 40px;
+    height: 40px;
+    background-color: white !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    color: #333 !important;
+    font-size: 20px !important;
+  }
+
+  .owl-prev:hover,
+  .owl-next:hover {
+    background-color: #000000 !important;
+    color: white !important;
+  }
+
+  .owl-prev {
+    margin-left: -50px;
+  }
+
+  .owl-next {
+    margin-right: -50px;
+  }
+
+  .owl-dots {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .owl-dot span {
+    width: 12px;
+    height: 12px;
+    margin: 5px;
+    background: #ddd !important;
+    display: block;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+  }
+
+  .owl-dot.active span {
+    background: #ff4757 !important;
+    width: 30px;
+    border-radius: 10px;
+  }
+
+  /* Animations */
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .banner-title {
+      font-size: 2rem;
+    }
+    .banner-subtitle {
+      font-size: 1.2rem;
+    }
+    .discount-badge {
+      font-size: 1.2rem;
+      padding: 8px 15px;
+    }
+    .section-title {
+      font-size: 1.5rem;
+    }
+    .owl-prev {
+      margin-left: -20px;
+    }
+    .owl-next {
+      margin-right: -20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .banner-title {
+      font-size: 1.5rem;
+    }
+    .banner-subtitle {
+      font-size: 1rem;
+    }
+    .discount-badge {
+      font-size: 1rem;
+    }
+  }
+
+  /* Thêm vào phần CSS */
+  .view-all-btn {
+    position: absolute;
+    top: 10px;
+    right: 0.5%;
+    color: black;
+    padding: 8px 15px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-decoration: none;
+    z-index: 10;
+    transition: all 0.3s ease;
+  }
+
+  .view-all-btn:hover{
+    font-size: 0.8rem;
+    text-decoration: underline;
+  }
+
+  .products-section {
+    position: relative; /* Thêm vào để làm reference cho position absolute của nút */
+  }
+
+  @media (max-width: 768px) {
+    .view-all-btn {
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      right: 3%;
+    }
+  }
+
+  .color-options {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 0;
+    position: absolute;
+    overflow: hidden;
+    height: 0;
+    opacity: 0;
+    transition: all 0.3s ease;
+    left: 4%;
+    top: -35px;
+  }
+
+  .color-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid #0a0a0a;
+    cursor: pointer;
+    transform: translateY(-30px);
+    transition: transform 0.3s ease;
+  }
+
+
+  .product-wrapper:hover .color-options {
+    height: auto;
+    opacity: 1;
+  }
+
+  .product-wrapper:hover .color-circle {
+    transform: translateY(0);
+  }
+
+  .review {
+    position: absolute;
+    color: #ffffff;
+    bottom: 5px;
+    right: 5px;
+    font-size: 14px;
+  }
+
+  .new{
+    position: absolute;
+    color: #f80303;
+    bottom: 5px;
+    left: 15px;
+    font-size: 14px;
+
+  }
+</style>
+
+<div class="reels-container">
+  <div class="reels-row hero">
+    <img class="hero-image w-100 h-100"
+         src="https://theme.hstatic.net/200001023102/1001370296/14/slide_1_img.jpg?v=86" alt="hero">
+  </div>
+
+  <!-- First content section -->
+
+  <div class="reels-row">
+    <section class="banner-section">
+      <img src="https://levents.asia/cdn/shop/files/TRIPLE_STAR_WEB_PC.jpg"
+           alt="Khuyến mãi thời trang" class="banner-img">
+      <div class="banner-overlay">
+        <div class="section-header">
+          <h2 class="section-title">SẢN PHẨM KHUYẾN MÃI</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="products-section">
+      <a href="/opulentia/deals" class="view-all-btn">Xem tất cả >></a>
+      <div class="products-carousel owl-carousel owl-theme">
+        <!-- Product 1 -->
+
+        <div class="product-container item" th:each="pro : ${discountedProducts}">
+          <a th:href="@{'/opulentia/' + ${pro.parentCategoryId} + '/' + ${pro.childCategoryId} + '/' + ${pro.productID}
+                                + '/' + ${pro.variantID}}" style="text-decoration: none;">
+            <div class="product-wrapper">
+              <img th:src="@{'/uploads/' + ${pro.getImageUrl()}}"
+                   alt="Product" class="product-image">
+              <div th:if="${pro.isHot}"class="new-label">Bán chạy &nbsp; ●</div>
+              <div class="discount-label" th:text="'- ' + ${pro.getDiscountPercent() +' %'}">-15%</div>
+
+              <div class="product-info">
+                <div class="color-options">
+                  <div class="color-circle"
+                       th:each="color : ${pro.options}"
+                       th:style="'background-color:' + ${color.ma} + ';'">
+                  </div>
+                </div>
+                <div th:text="${pro.productName}" style="font-size: 14px">Áo Polo H&M</div>
+                <div class="price-container">
+                <span class="sale-price"
+                      th:if="${pro.discountPercent != null}"
+                      th:text="${#numbers.formatDecimal(pro.price.multiply(100 - pro.discountPercent).divide(100), 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+                  <span class="original-price text-decoration-line-through text-secondary"
+                        th:if="${pro.discountPercent != null}"
+                        th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+
+                  <!-- Nếu không giảm -->
+                  <span class="sale-price"
+                        th:unless="${pro.discountPercent != null}"
+                        th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+              </span>
+                </div>
+                <div class="review">
+                  <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                  <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
+                </div>
+                <div class="new"
+                     th:if="${pro.isNew}"> Mới
+                </div>
+              </div>
+            </div>
+          </a>
+          <button class="favorite-btn" th:attr="data-idpro=${pro.productID}">
+            <i th:class="${pro.isFavorite} ? 'fas fa-heart text-dark' : 'far fa-heart'"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Second content section -->
+  <div class="reels-row">
+    <section class="banner-section">
+      <img src="https://www.dsquared2.com/dw/image/v2/BJTL_PRD/on/demandware.static/-/Library-Sites-library-shared/default/dwb43f5fb8/Homepage%202025/PRE%20FW25/homepage_desktop.jpg?sw=1920&sh=1067&q=80"
+           alt="Khuyến mãi thời trang" class="banner-img">
+      <div class="banner-overlay">
+        <div class="section-header">
+          <h2 class="section-title">SẢN PHẨM MỚI RA MẮT</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="products-section">
+      <a href="/opulentia/news" class="view-all-btn">Xem tất cả >></a>
+      <div class="products-carousel owl-carousel owl-theme">
+        <!-- Product 1 -->
+        <div class="product-container item" th:each="pro : ${newProducts}">
+          <a th:href="@{'/opulentia/' + ${pro.parentCategoryId} + '/' + ${pro.childCategoryId} + '/' + ${pro.productID}
+                                + '/' + ${pro.variantID}}" style="text-decoration: none;">
+            <div class="product-wrapper">
+              <img th:src="@{'/uploads/' + ${pro.getImageUrl()}}"
+                   alt="Product" class="product-image">
+              <div th:if="${pro.isHot}"class="new-label">Bán chạy &nbsp; ●</div>
+              <div th:if="${pro.getDiscountPercent()}" class="discount-label" th:text="'- ' + ${pro.getDiscountPercent() +' %'}">-15%</div>
+
+              <div class="product-info">
+                <div class="color-options">
+                  <div class="color-circle"
+                       th:each="color : ${pro.options}"
+                       th:style="'background-color:' + ${color.ma} + ';'">
+                  </div>
+                </div>
+                <div th:text="${pro.productName}" style="font-size: 14px">Áo Polo H&M</div>
+                <div class="price-container">
+                <span class="sale-price"
+                      th:if="${pro.discountPercent != null}"
+                      th:text="${#numbers.formatDecimal(pro.price.multiply(100 - pro.discountPercent).divide(100), 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+                  <span class="original-price text-decoration-line-through text-secondary"
+                        th:if="${pro.discountPercent != null}"
+                        th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+
+                  <!-- Nếu không giảm -->
+                  <span class="sale-price"
+                        th:unless="${pro.discountPercent != null}"
+                        th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+              </span>
+                </div>
+                <div class="review">
+                  <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                  <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
+                </div>
+                <div class="new"
+                     th:if="${pro.isNew}"> Mới
+                </div>
+              </div>
+            </div>
+          </a>
+          <button class="favorite-btn" th:attr="data-idpro=${pro.productID}">
+            <i th:class="${pro.isFavorite} ? 'fas fa-heart text-dark' : 'far fa-heart'"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Third content section -->
+  <div class="reels-row">
+    <section class="banner-section">
+      <img src="https://img3.thuthuatphanmem.vn/uploads/2019/10/14/banner-thoi-trang-dang-cap-hien-dai_113856116.png"
+           alt="Khuyến mãi thời trang" class="banner-img">
+      <div class="banner-overlay">
+        <div class="section-header">
+          <h2 class="section-title">SẢN PHẨM BÁN CHẠY</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="products-section">
+      <a href="/opulentia/bestselling" class="view-all-btn">Xem tất cả >></a>
+      <div class="products-carousel owl-carousel owl-theme">
+        <!-- Product 1 -->
+        <div class="product-container item" th:each="pro : ${bestSellingProducts}">
+          <a th:href="@{'/opulentia/' + ${pro.parentCategoryId} + '/' + ${pro.childCategoryId} + '/' + ${pro.productID}
+                                + '/' + ${pro.variantID}}" style="text-decoration: none;">
+            <div class="product-wrapper">
+              <img th:src="@{'/uploads/' + ${pro.getImageUrl()}}"
+                   alt="Product" class="product-image">
+              <div th:if="${pro.isHot}"class="new-label">Bán chạy &nbsp; ●</div>
+              <div th:if="${pro.getDiscountPercent()}" class="discount-label" th:text="'- ' + ${pro.getDiscountPercent() +' %'}">-15%</div>
+
+              <div class="product-info">
+                <div class="color-options">
+                  <div class="color-circle"
+                       th:each="color : ${pro.options}"
+                       th:style="'background-color:' + ${color.ma} + ';'">
+                  </div>
+                </div>
+                <div th:text="${pro.productName}" style="font-size: 14px">Áo Polo H&M</div>
+                <div class="price-container">
+                <span class="sale-price"
+                      th:if="${pro.discountPercent != null}"
+                      th:text="${#numbers.formatDecimal(pro.price.multiply(100 - pro.discountPercent).divide(100), 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+                  <span class="original-price text-decoration-line-through text-secondary"
+                        th:if="${pro.discountPercent != null}"
+                        th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+
+                  <!-- Nếu không giảm -->
+                  <span class="sale-price"
+                        th:unless="${pro.discountPercent != null}"
+                        th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+              </span>
+                </div>
+                <div class="review">
+                  <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                  <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
+                </div>
+                <div class="new"
+                     th:if="${pro.isNew}"> Mới
+                </div>
+              </div>
+            </div>
+          </a>
+          <button class="favorite-btn" th:attr="data-idpro=${pro.productID}">
+            <i th:class="${pro.isFavorite} ? 'fas fa-heart text-dark' : 'far fa-heart'"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- top các sản phẩm được yêu thích nhất-->
+  <div class="reels-row">
+    <section class="banner-section">
+      <img src="https://www.thombrowne.com/cdn/shop/files/Thom_Browne_Summer_2025_Hero_Campaign_Image_3_16x9_453ec824-f301-41f7-a53a-0d96fc0a99d3.jpg?v=1752617298&width=1500"
+           alt="Khuyến mãi thời trang" class="banner-img">
+      <div class="banner-overlay">
+        <div class="section-header">
+          <h2 class="section-title">TOP SẢN PHẨM ĐƯỢC YÊU THÍCH NHIỀU NHẤT</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="products-section">
+      <a href="/opulentia/topfavorite" class="view-all-btn">Xem tất cả >></a>
+      <div class="products-carousel owl-carousel owl-theme">
+        <!-- Product 1 -->
+        <div class="product-container item" th:each="pro : ${topFavoritedProducts}">
+          <a th:href="@{'/opulentia/' + ${pro.parentCategoryId} + '/' + ${pro.childCategoryId} + '/' + ${pro.productID}
+                                + '/' + ${pro.variantID}}" style="text-decoration: none;">
+            <div class="product-wrapper">
+              <img th:src="@{'/uploads/' + ${pro.getImageUrl()}}"
+                   alt="Product" class="product-image">
+              <div th:if="${pro.isHot}"class="new-label">Bán chạy &nbsp; ●</div>
+              <div th:if="${pro.getDiscountPercent()}" class="discount-label" th:text="'- ' + ${pro.getDiscountPercent() +' %'}">-15%</div>
+
+              <div class="product-info">
+                <div class="color-options">
+                  <div class="color-circle"
+                       th:each="color : ${pro.options}"
+                       th:style="'background-color:' + ${color.ma} + ';'">
+                  </div>
+                </div>
+                <div th:text="${pro.productName}" style="font-size: 14px">Áo Polo H&M</div>
+                <div class="price-container">
+                <span class="sale-price"
+                      th:if="${pro.discountPercent != null}"
+                      th:text="${#numbers.formatDecimal(pro.price.multiply(100 - pro.discountPercent).divide(100), 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+                  <span class="original-price text-decoration-line-through text-secondary"
+                        th:if="${pro.discountPercent != null}"
+                        th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+
+                  <!-- Nếu không giảm -->
+                  <span class="sale-price"
+                        th:unless="${pro.discountPercent != null}"
+                        th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+              </span>
+                </div>
+                <div class="review">
+                  <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                  <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
+                </div>
+                <div class="new"
+                     th:if="${pro.isNew}"> Mới
+                </div>
+              </div>
+            </div>
+          </a>
+          <button class="favorite-btn" th:attr="data-idpro=${pro.productID}">
+            <i th:class="${pro.isFavorite} ? 'fas fa-heart text-dark' : 'far fa-heart'"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+<script>
+  $(document).ready(function () {
+    // Khởi tạo carousel
+    $(".products-carousel").owlCarousel({
+      loop: true,
+      margin: 20,
+      nav: true,
+      dots: true,
+      responsive: {
+        0: {
+          items: 1
+        },
+        600: {
+          items: 2
+        },
+        1000: {
+          items: 4
+        }
+      }
+    });
+
+
+    // Đặt chiều cao banner và sản phẩm theo viewport
+    function setHeights() {
+      const windowHeight = $(window).height();
+      $('.banner-section').css('height', windowHeight * 0.333 + 'px');
+      $('.products-section').css('height', windowHeight * 0.667 + 'px');
+    }
+
+    // Gọi hàm khi tải trang và khi thay đổi kích thước cửa sổ
+    setHeights();
+    $(window).resize(setHeights);
+
+    // REELS EFFECT
+    const container = document.querySelector('.reels-container');
+    let isScrolling;
+
+    container.addEventListener('scroll', () => {
+      clearTimeout(isScrolling);
+
+      isScrolling = setTimeout(() => {
+        const scrollTop = container.scrollTop;
+        const screenHeight = window.innerHeight;
+
+        const pageIndex = Math.round(scrollTop / screenHeight);
+        container.scrollTo({
+          top: pageIndex * screenHeight,
+          behavior: 'smooth'
+        });
+      }, 100);
+    });
+  });
+</script>
+
+<!--Hiệu ứng rớt từng ô màu-->
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Lặp qua tất cả các product-wrapper
+    document.querySelectorAll('.product-wrapper').forEach(wrapper => {
+      const colorCircles = wrapper.querySelectorAll('.color-circle');
+
+      // Nếu có các color-circle
+      if (colorCircles.length > 0) {
+        // Thêm style động cho mỗi circle
+        colorCircles.forEach((circle, index) => {
+          const delay = (index + 1) * 0.1; // 0.1s, 0.2s, 0.3s,...
+          circle.style.transitionDelay = `${delay}s`;
+        });
+
+        // Thêm style cho wrapper (tùy chọn)
+        const maxDelay = (colorCircles.length) * 0.1;
+        wrapper.style.setProperty('--max-transition-delay', `${maxDelay}s`);
+      }
+    });
+  });
+</script>
+</body>
+</html>

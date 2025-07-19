@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            max-width: 900px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(35, 35, 36, 0.3);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: scale(1.02);
+        }
+
+        .left,
+        .right {
+            flex: 1;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Left side (form) */
+        .left {
+            border-right: 1.5px solid #eee;
+        }
+
+        .left h2 {
+            font-weight: 700;
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            user-select: none;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type='email'],
+        input[type='password'],
+        input[type='xacnhan'] {
+            padding: 12px 15px;
+            border: 1.8px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.25s ease;
+            outline-offset: 2px;
+        }
+
+        input[type='email']:focus,
+        input[type='password']:focus {
+            border-color: black;
+            outline: none;
+            box-shadow: 0 0 8px #eceef2aa;
+        }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-wrapper input {
+            height: 45px;
+            line-height: 45px;
+            width: 100%;
+            padding-right: 50px;
+            box-sizing: border-box;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 55%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+            user-select: none;
+            width: 30px; /* cố định chiều rộng */
+            height: 30px;
+        }
+
+        .toggle-password:hover {
+            color: black;
+        }
+
+        button[type='submit'] {
+            margin-top: 15px;
+            padding: 15px;
+            background: black;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(151, 155, 161, 0.5);
+            transition: background-color 0.3s ease;
+            user-select: none;
+        }
+
+        button[type='submit']:hover {
+            background: white;
+            color: red;
+            box-shadow: 0 8px 20px black;
+        }
+
+        p {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        p a {
+            color: #2575fc;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        p a:hover {
+            color: #1a52d1;
+            text-decoration: underline;
+        }
+
+        /* Right side */
+        .right {
+            background: black;
+            color: white;
+            text-align: center;
+            padding: 50px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .right h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            letter-spacing: 1.2px;
+            user-select: none;
+        }
+
+        .right p {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 40px;
+            user-select: none;
+            color: white;
+        }
+
+        .right a {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .right button {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background-color: white;
+            color: black;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(231, 226, 226, 0.3);
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .right button:hover {
+            color: red;
+            box-shadow: 0 8px 20px white;
+            transform: translateY(-3px);
+        }
+
+        .social-login {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .social-login  a {
+            margin: 0 5px;
+            height: 40px;
+            width: 40px;
+        }
+
+        .social-login img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .divider {
+            text-align: center;
+            position: relative;
+            font-size: 0.9rem;
+            color: #888;
+            margin: 10px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background-color: #ccc;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="left">
+<!--Form đăng nhập-->
+        <h2>ĐĂNG NHẬP</h2>
+        <form action="/auth/login" method="POST" autocomplete="off">
+            <div class="social-login">
+                <a href="#">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/1280px-Facebook_f_logo_%282019%29.svg.png" alt="Facebook">
+                </a>
+                <a href="#">
+                    <img src="https://cdn-icons-png.flaticon.com/512/300/300221.png" alt="Google">
+                </a>
+            </div>
+            <div class="social-or">
+                <div class="divider">or</div>
+            </div>
+<!--Email cho đăng nhập-->
+            <label for="email">Địa chỉ email *</label>
+            <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Nhập email hợp lệ"
+                    required
+                    autocomplete="username"
+            />
+<!--Mật khẩu cho đăng nhập            -->
+            <label for="password">Mật khẩu *</label>
+            <div class="password-wrapper">
+                <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Mật khẩu"
+                        required
+                        autocomplete="current-password"
+                />
+                <span toggle="#password" class="toggle-password">
+            <i class="fa-solid fa-eye"></i>
+          </span>
+            </div>
+
+            <button type="submit">ĐĂNG NHẬP</button>
+
+            <p>
+                <a href="#">QUÊN MẬT KHẨU?</a>
+            </p>
+        </form>
+    </div>
+
+    <div class="right">
+        <h2>TẠO MỘT TÀI KHOẢN</h2>
+        <p>Hãy tạo tài khoản ngay! Bạn có thể nhận được các ưu đãi đặc biệt...</p>
+        <a href="Dangky.html" aria-label="Tạo tài khoản mới">
+            <button type="button">TẠO TÀI KHOẢN</button>
+        </a>
+    </div>
+</div>
+
+<script>
+    // Toggle password visibility
+    document.querySelector('.toggle-password').addEventListener('click', function () {
+        const passwordInput = document.querySelector('#password');
+        const icon = this.querySelector('i');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+</script>
+</body>
+</html>
