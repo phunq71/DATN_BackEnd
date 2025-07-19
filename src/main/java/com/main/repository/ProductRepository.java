@@ -100,4 +100,10 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
             "WHERE va.product.productID = :productId")
     long countSoldQuantityByProductId(@Param("productId") String productId);
 
+
+    //tìm sp theo tên
+    @Query("SELECT p FROM Product p WHERE LOWER(p.productName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Product> searchProductsByName(@Param("keyword") String keyword);
+
+
 }

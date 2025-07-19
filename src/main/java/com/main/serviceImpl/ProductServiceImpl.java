@@ -237,4 +237,38 @@ public class ProductServiceImpl implements ProductService {
         dto.setSoldQuantity(productRepository.countSoldQuantityByProductId(variant.getProduct().getProductID()));
         return dto;
     }
+
+    @Override
+    public List<ProductViewDTO> searchProducts(String keyword) {
+        if (keyword == null || keyword.trim().isBlank()) {
+            return new ArrayList<>();
+        }
+
+        // Cắt bỏ khoảng trắng đầu/cuối
+        keyword = keyword.trim();
+
+        // 1. Tìm các sản phẩm tên khớp với keyword
+        List<Product> products = productRepository.searchProductsByName(keyword);
+
+        // 2. Lấy danh sách sản phẩm bán chạy nhất (top 10)
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Product> topSellingProducts = productRepository.findTopSellingProducts(pageable);
+        List<String> hotProductIDs = topSellingProducts.stream()
+                .map(Product::getProductID)
+                .toList();
+
+        // 3. Map thành ProductViewDTO
+        List<ProductViewDTO> dtos = new ArrayList<>();
+        for (Product product : products) {
+            ProductViewDTO dto = new ProductViewDTO();
+            dto.setProductID(product.getProductID());
+            boolean isNew = productRepository.isNewProduct(product.getProductID()) > 0;
+            enrichProductViewDTO(dto, product, hotProductIDs, isNew);
+            dtos.add(dto);
+        }
+
+        // 4. Đánh dấu sản phẩm yêu thích (nếu có login)
+        markFavorites(dtos);
+        return dtos;
+    }
 }

@@ -303,14 +303,15 @@
 
 
             <div class="right-menu d-flex align-items-center">
-                <div class="search-box position-relative ms-3" style="width: 180px;">
-                    <input type="text" class=" rounded-pill ps-3 pe-4" placeholder="Tìm kiếm..."
+                <form th:action="@{/opulentia/search}" method="get" class="search-box position-relative ms-3" style="width: 180px;">
+                    <input type="text" name="keyword" class="rounded-pill ps-3 pe-4" placeholder="Tìm kiếm..."
                            style="background-color: rgba(255, 255, 255, 0.7); color: black; border: none;">
-                    <button class="btn position-absolute end-0 rounded-pill"
+                    <button type="submit" class="btn position-absolute end-0 rounded-pill"
                             style="background: none; border: none; height: 100%; width: 30px; padding: 0; top: 0;">
                         <i class="fas fa-search text-dark"></i>
                     </button>
-                </div>
+                </form>
+
 
                 <div class="icon-wrapper d-flex align-items-center">
                     <a href="/opulentia_user/favorites" class="text-white ms-3"><i class="fas fa-heart"></i></a>
