@@ -37,6 +37,6 @@ public class Review implements Serializable {
     @Column(nullable = false)
     private LocalDate createAt;
 
-    @OneToMany(mappedBy = "review")
+    @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE)
     private List<ReviewImage> reviewImages;
 }

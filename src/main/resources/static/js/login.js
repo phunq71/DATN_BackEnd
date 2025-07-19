@@ -75,26 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    async function mergeCartLocalStorageAndServer(){
-      const carts= JSON.parse(localStorage.getItem('carts'));
-      await checkMergeCart(carts);
-
-    }
-
-    function checkMergeCart(carts){
-        return axios.post("/opulentia_user/mergeCartLocalStorageAndServer", carts)
-            .then(response => {
-                return response.data;
-            }).catch(error => {
-                console.log(error);
-                return false;
-            })
-    }
-
-    function clearCartLocalStorage(){
-        localStorage.removeItem('carts');
-    }
-
 
 });
 

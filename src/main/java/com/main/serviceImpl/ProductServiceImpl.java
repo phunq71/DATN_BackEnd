@@ -164,7 +164,9 @@ public class ProductServiceImpl implements ProductService {
 
     private List<ColorOption> extractColorOptions(List<Variant> variants) {
         List<ColorOption> colorList = DataUtils.getListColors();
+
         return variants.stream()
+                .filter(Variant::getIsUse) // Lọc các variant đang hoạt động
                 .map(variant -> {
                     String colorName = variant.getColor();
                     return colorList.stream()
@@ -176,6 +178,7 @@ public class ProductServiceImpl implements ProductService {
                 .distinct()
                 .collect(Collectors.toList());
     }
+
 
 
     private void enrichProductViewDTO(ProductViewDTO dto, Product product, List<String> hotProductIDs, boolean isNew) {
@@ -245,7 +248,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductViewDTO> findTopFavorited() {
         Pageable pageable1 = PageRequest.of(0, 10);
-        List <Product> pros = productRepository.findTopSellingProducts(pageable1);
+        List<Product> pros = productRepository.findTopSellingProducts(pageable1);
         List<String> hotProductIDs = pros.stream().map(Product::getProductID).toList();
 
         List<Product> products = productRepository.findTop12RankedProducts();
@@ -253,9 +256,47 @@ public class ProductServiceImpl implements ProductService {
         products.forEach(product -> {
             ProductViewDTO dto = new ProductViewDTO();
             dto.setProductID(product.getProductID());
-            enrichProductViewDTO(dto, product, hotProductIDs, productRepository.isNewProduct(dto.getProductID())>0);
+            enrichProductViewDTO(dto, product, hotProductIDs, productRepository.isNewProduct(dto.getProductID()) > 0);
             dtos.add(dto);
         });
+        // 4. Đánh dấu sản phẩm yêu thích (nếu có login)
+        markFavorites(dtos);
+        return dtos;
+
+    }
+
+    @Override
+    public List<ProductViewDTO> searchProducts(String keyword) {
+        if (keyword == null || keyword.trim().isBlank()) {
+            return new ArrayList<>();
+        }
+
+        // Cắt bỏ khoảng trắng đầu/cuối
+        keyword = keyword.trim();
+
+        // 1. Tìm các sản phẩm tên khớp với keyword
+        List<Product> products = productRepository.searchProductsByName(keyword);
+
+        // 2. Lấy danh sách sản phẩm bán chạy nhất (top 10)
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Product> topSellingProducts = productRepository.findTopSellingProducts(pageable);
+        List<String> hotProductIDs = topSellingProducts.stream()
+                .map(Product::getProductID)
+                .toList();
+
+        // 3. Map thành ProductViewDTO
+        List<ProductViewDTO> dtos = new ArrayList<>();
+        for (Product product : products) {
+            ProductViewDTO dto = new ProductViewDTO();
+            dto.setProductID(product.getProductID());
+            boolean isNew = productRepository.isNewProduct(product.getProductID()) > 0;
+            enrichProductViewDTO(dto, product, hotProductIDs, isNew);
+            dtos.add(dto);
+        }
+
+        // 4. Đánh dấu sản phẩm yêu thích (nếu có login)
+        markFavorites(dtos);
         return dtos;
     }
+
 }

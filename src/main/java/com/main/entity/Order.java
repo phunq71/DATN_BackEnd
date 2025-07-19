@@ -25,6 +25,9 @@ public class Order {
     @Column(nullable = false, length = 45)
     private String status;
 
+    @Column
+    private LocalDateTime updateStatusAt;
+
     @Column(length = 150)
     private String shippingAddress;
 

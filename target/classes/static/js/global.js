@@ -184,4 +184,39 @@ async function attemptAutoLogin() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', async function () {
+   const isMergeCart = getCookie("isMergeCart");
+   deleteCookie("isMergeCart");
+  if(isMergeCart){
+      await mergeCartLocalStorageAndServer();
+      clearCartLocalStorage();
+      document.dispatchEvent(new Event('cartUpdated'));
+      window.location.href = "/opulentia/cart";
+  }
+});
 
+
+function deleteCookie(name) {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+}
+
+
+async function mergeCartLocalStorageAndServer(){
+    const carts= JSON.parse(localStorage.getItem('carts'));
+    await checkMergeCart(carts);
+
+}
+
+function checkMergeCart(carts){
+    return axios.post("/opulentia_user/mergeCartLocalStorageAndServer", carts)
+        .then(response => {
+            return response.data;
+        }).catch(error => {
+            console.log(error);
+            return false;
+        })
+}
+
+function clearCartLocalStorage(){
+    localStorage.removeItem('carts');
+}
