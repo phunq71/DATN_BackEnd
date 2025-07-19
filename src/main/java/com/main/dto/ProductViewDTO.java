@@ -25,6 +25,7 @@ public class ProductViewDTO {
     private Boolean isNew;
     private Double avg_rating;
     private List<ColorOption> options;
+    private Integer totalLikes;
 
     public ProductViewDTO(String productID,Byte discountPercent) {
         this.productID = productID;

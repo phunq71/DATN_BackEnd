@@ -517,7 +517,7 @@
 
   <div class="reels-row">
     <section class="banner-section">
-      <img src="https://dep.com.vn/wp-content/uploads/2020/07/dior-thu-2020-tie-dye-bst-deponline-banner-facebook-20200630.jpg"
+      <img src="https://levents.asia/cdn/shop/files/TRIPLE_STAR_WEB_PC.jpg"
            alt="Khuyến mãi thời trang" class="banner-img">
       <div class="banner-overlay">
         <div class="section-header">
@@ -564,8 +564,9 @@
                         th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
               </span>
                 </div>
-                <div class="review"
-                     th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : 'Chưa có đánh giá'}">
+                <div class="review">
+                  <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                  <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
                 </div>
                 <div class="new"
                      th:if="${pro.isNew}"> Mới
@@ -630,8 +631,9 @@
                         th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
               </span>
                 </div>
-                <div class="review"
-                   th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : 'Chưa có đánh giá'}">
+                <div class="review">
+                  <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                  <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
                 </div>
                 <div class="new"
                      th:if="${pro.isNew}"> Mới
@@ -696,8 +698,76 @@
                         th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
               </span>
                 </div>
-                <div class="review"
-                     th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : 'Chưa có đánh giá'}">
+                <div class="review">
+                  <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                  <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
+                </div>
+                <div class="new"
+                     th:if="${pro.isNew}"> Mới
+                </div>
+              </div>
+            </div>
+          </a>
+          <button class="favorite-btn" th:attr="data-idpro=${pro.productID}">
+            <i th:class="${pro.isFavorite} ? 'fas fa-heart text-dark' : 'far fa-heart'"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- top các sản phẩm được yêu thích nhất-->
+  <div class="reels-row">
+    <section class="banner-section">
+      <img src="https://www.thombrowne.com/cdn/shop/files/Thom_Browne_Summer_2025_Hero_Campaign_Image_3_16x9_453ec824-f301-41f7-a53a-0d96fc0a99d3.jpg?v=1752617298&width=1500"
+           alt="Khuyến mãi thời trang" class="banner-img">
+      <div class="banner-overlay">
+        <div class="section-header">
+          <h2 class="section-title">TOP SẢN PHẨM ĐƯỢC YÊU THÍCH NHIỀU NHẤT</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="products-section">
+      <a href="/opulentia/topfavorite" class="view-all-btn">Xem tất cả >></a>
+      <div class="products-carousel owl-carousel owl-theme">
+        <!-- Product 1 -->
+        <div class="product-container item" th:each="pro : ${topFavoritedProducts}">
+          <a th:href="@{'/opulentia/' + ${pro.parentCategoryId} + '/' + ${pro.childCategoryId} + '/' + ${pro.productID}
+                                + '/' + ${pro.variantID}}" style="text-decoration: none;">
+            <div class="product-wrapper">
+              <img th:src="@{'/uploads/' + ${pro.getImageUrl()}}"
+                   alt="Product" class="product-image">
+              <div th:if="${pro.isHot}"class="new-label">Bán chạy &nbsp; ●</div>
+              <div th:if="${pro.getDiscountPercent()}" class="discount-label" th:text="'- ' + ${pro.getDiscountPercent() +' %'}">-15%</div>
+
+              <div class="product-info">
+                <div class="color-options">
+                  <div class="color-circle"
+                       th:each="color : ${pro.options}"
+                       th:style="'background-color:' + ${color.ma} + ';'">
+                  </div>
+                </div>
+                <div th:text="${pro.productName}" style="font-size: 14px">Áo Polo H&M</div>
+                <div class="price-container">
+                <span class="sale-price"
+                      th:if="${pro.discountPercent != null}"
+                      th:text="${#numbers.formatDecimal(pro.price.multiply(100 - pro.discountPercent).divide(100), 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+                  <span class="original-price text-decoration-line-through text-secondary"
+                        th:if="${pro.discountPercent != null}"
+                        th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+
+                  <!-- Nếu không giảm -->
+                  <span class="sale-price"
+                        th:unless="${pro.discountPercent != null}"
+                        th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+              </span>
+                </div>
+                <div class="review">
+                  <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                  <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
                 </div>
                 <div class="new"
                      th:if="${pro.isNew}"> Mới

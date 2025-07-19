@@ -67,6 +67,19 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
 """)
     List<Product> findTopSellingProducts(Pageable pageable);
 
+    // lấy top sản phẩm được yêu thích nhất
+    @Query(value = """
+    SELECT p.* FROM products p
+    JOIN (
+        SELECT f.productId, COUNT(*) AS cnt,
+               RANK() OVER (ORDER BY COUNT(*) DESC) AS rank
+        FROM favorites f
+        GROUP BY f.productId
+    ) ranked ON p.productId = ranked.productId
+    WHERE ranked.rank <= 12
+    """, nativeQuery = true)
+    List<Product> findTop12RankedProducts();
+
 
     @Query("""
     SELECT COALESCE(pp.discountPercent, 0.0)
@@ -77,9 +90,10 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
       AND pr.startDate <= CURRENT_TIMESTAMP
       AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
       AND pr.type = 'ProductDiscount'
-
+      AND pp.quantityUsed < pp.quantityRemaining
     """)
     Byte findDiscountPercentByProductID(@Param("productID") String productID);
+
 
 
     @Query(value = """

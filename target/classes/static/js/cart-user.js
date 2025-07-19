@@ -540,3 +540,33 @@ function renderPrice(basisPrice, discountPercent){
     }
     return formatPrice(basisPrice);
 }
+
+
+function getCheckedItemIDs() {
+    return Array.from(document.querySelectorAll('.c-cart-checkbox:checked'))
+        .map(cb => cb.closest('.c-cart-item')?.getAttribute('data-item-id'))
+        .filter(id => id !== null);
+}
+
+function submitCheckout() {
+    const itemIDs = getCheckedItemIDs();
+
+    if (itemIDs.length === 0) {
+        alert('Vui lòng chọn ít nhất 1 sản phẩm để mua.');
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/checkout';
+
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'itemIDs';
+    input.value = JSON.stringify(itemIDs); // Gửi chuỗi JSON
+    form.appendChild(input);
+
+    document.body.appendChild(form);
+    form.submit(); // Gửi và chuyển trang
+}
+

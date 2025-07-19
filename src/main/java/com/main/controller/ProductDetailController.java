@@ -96,9 +96,6 @@ public class ProductDetailController {
         }
 
         // Nhân để ra giá sau khuyến mãi
-        model.addAttribute("variantIsHot", pro.getIsHot());
-        model.addAttribute("variantSoldQuantity", pro.getSoldQuantity());
-        model.addAttribute("variantNew", pro.getIsNew());
         model.addAttribute("pro", pro);
         model.addAttribute("sumRating", sumRating);
         model.addAttribute("ratingCounts", ratingCounts);

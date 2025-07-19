@@ -1,9 +1,6 @@
 package com.main.serviceImpl;
 
-import com.main.dto.OrderDTO;
-import com.main.dto.OrderDetailDTO;
-import com.main.dto.OrderItemDTO;
-import com.main.dto.OrderPriceDTO;
+import com.main.dto.*;
 import com.main.repository.OrderRepository;
 import com.main.service.OrderService;
 import org.springframework.stereotype.Service;
@@ -169,5 +166,10 @@ public class OrderServiceImpl implements OrderService {
 
 
         return orders;
+    }
+
+    @Override
+    public List<OrderPreviewDTO> getOrderPreviewProducts() {
+        return List.of();
     }
 }

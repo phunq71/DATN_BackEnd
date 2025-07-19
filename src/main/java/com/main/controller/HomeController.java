@@ -57,14 +57,19 @@ public class HomeController {
         List<ProductViewDTO> list3 = new ArrayList<>();
         list3 = productService.findBestSellingProducts();
 
+        List<ProductViewDTO> list4 = new ArrayList<>();
+        list4 = productService.findTopFavorited();
+
         productService.markFavorites(list);
         productService.markFavorites(list2);
         productService.markFavorites(list3);
+        productService.markFavorites(list4);
 
 
         model.addAttribute("discountedProducts", list);
         model.addAttribute("newProducts", list2);
         model.addAttribute("bestSellingProducts", list3);
+        model.addAttribute("topFavoritedProducts", list4);
 
         return "View/index";
     }
@@ -99,6 +104,16 @@ public class HomeController {
         return "View/Collection";
     }
 
+    @GetMapping("/opulentia/topfavorite")
+    public String getTopFavorite(Model model) {
+        List<ProductViewDTO> list = new ArrayList<>();
+        list = productService.findTopFavorited();
+        productService.markFavorites(list);
+        model.addAttribute("products", list);
+        model.addAttribute("title", "topFavorite");
+        return "View/Collection";
+    }
+
 
 
     @GetMapping("/index2")
@@ -123,10 +138,7 @@ public class HomeController {
 //		return "View/Cart";
 //	}
 //
-	@GetMapping("/checkout")
-	public String checkout() {
-		return "View/checkout";
-	}
+
 //
 //	@GetMapping("/qrPay")
 //	public String qrPay() {
@@ -137,6 +149,11 @@ public class HomeController {
 //	public String allOrders() {
 //		return "View/allOrders";
 //	}
+    @GetMapping("/testqrcode")
+    public String testqrcode() {
+        return "temp/testQR";
+    }
+
 //
     @GetMapping("/opulentia_user/edit-profile")
     public String editProfile(HttpServletRequest request) {

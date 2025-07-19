@@ -19,4 +19,5 @@ public interface ProductService {
     List<ProductViewDTO> findBestSellingProducts();
     void markFavorites(List<ProductViewDTO> products);
     SupportDetailDTO getSupportDetail(String id);
+    List<ProductViewDTO> findTopFavorited();
 }

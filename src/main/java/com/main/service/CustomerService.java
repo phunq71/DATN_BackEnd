@@ -18,5 +18,7 @@ public interface CustomerService {
 
     public boolean saveCustomerRegister(CustomerRegisterDTO customerRegisterDTO);
 
-    public byte[] generateQRCode(String text, int width, int height);
+    public byte[] createQRCode();
+
+    public Customer verifyQRCodeToken(String qrToken);
 }
