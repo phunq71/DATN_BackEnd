@@ -16,4 +16,10 @@ public interface AccountService {
     public boolean newPassword(String accountId, String password);
 
     public Optional<Account> findByEmailAndProviderIsNotNull(String email);
+
+    //kiểm tra đơn hàng
+    boolean hasPendingOrders(String accountId);
+
+    // vô hiệu hóa tk
+    boolean deactivateAccount(String accountId);
 }

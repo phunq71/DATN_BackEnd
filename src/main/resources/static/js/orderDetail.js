@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', async function(){
     document.getElementById('orderDate').textContent = formatDate(order.orderDate);
     document.getElementById('transactionDate').textContent = formatDate(order.transactionDate);
     document.getElementById('orderId').textContent = formatOrderId(order.orderID);
+    const actionDiv = document.getElementById("actions")
+
+    addActionButtons(order.status);
 
     // Fill in products table
     const productsTable = document.querySelector('.od-products tbody');
@@ -106,6 +109,122 @@ document.addEventListener('DOMContentLoaded', async function(){
 // Function to format order ID
     function formatOrderId(id) {
         return `#OD${String(id).padStart(6, '0')}`;
+    }
+
+
+
+    function addActionButtons(status){
+        if(status=== "DaYeuCauHuy" || status === "ChoGiaoHang") return;
+
+        const btn = document.createElement('button');
+        btn.className="od-btn od-btn-cancel";
+        if(status==="ChoXacNhan"){
+            btn.textContent="Hủy đơn hàng";
+        }else if(status==="ChuanBiDon" || status==="SanSangGiao"){
+            btn.textContent="Gửi yêu cầu hủy đơn";
+        }else if(status === "DaHuy"){
+            btn.textContent="Mua lại";
+        }
+        else if (status === "DaGiao") {
+            const updateStatusAt = new Date(order.updateStatusAt);
+            const now = new Date();
+
+            const diffTime = now - updateStatusAt; // chênh lệch mili giây
+            const diffDays = diffTime / (1000 * 60 * 60 * 24); // đổi ra ngày
+
+            if (diffDays <= 15) {
+                console.log("Chưa quá 15 ngày → hiện nút");
+
+                const reviewBtn = document.createElement('button');
+                reviewBtn.className = "od-btn od-btn-review";
+                reviewBtn.id = "reviewBtn";
+                reviewBtn.textContent = "Đánh giá sản phẩm";
+                actionDiv.appendChild(reviewBtn);
+
+            } else {
+                console.log("Quá 15 ngày");
+                // TẤT CẢ isReviewed == false ?
+                const allFalse = order.items.every(item => item.isReviewed !== true);
+
+                if (!allFalse) {
+                    console.log("Có ÍT NHẤT 1 isReviewed == true → hiện nút");
+                    const reviewBtn = document.createElement('button');
+                    reviewBtn.className = "od-btn od-btn-review";
+                    reviewBtn.id = "reviewBtn";
+                    reviewBtn.textContent = "Đánh giá sản phẩm";
+                    actionDiv.appendChild(reviewBtn);
+                } else {
+                    console.log("Tất cả isReviewed == false → KHÔNG hiện nút");
+                }
+            }
+
+            btn.textContent = "Mua lại";
+        }
+
+        actionDiv.appendChild(btn);
+    }
+
+
+    // Lấy các phần tử DOM
+    const openModalBtn = document.getElementById("reviewBtn");
+    const modalOverlay = document.getElementById('rvReviewModal');
+    const closeModalBtn = document.querySelector('.rv-close-button');
+
+    // Mở modal khi click nút
+    if(openModalBtn)
+    openModalBtn.addEventListener('click', function() {
+        modalOverlay.style.display = 'flex';
+        initItemReview(order.items);
+    });
+
+    // Đóng modal khi click nút đóng hoặc bên ngoài modal
+    function closeModal() {
+        modalOverlay.style.display = 'none';
+    }
+
+    closeModalBtn.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+            closeModal();
+        }
+    });
+
+    function initItemReview(items) {
+        const container = document.getElementById('rv-items-container');
+
+        let htmlString = '';
+
+        items.forEach(item => {
+            htmlString += `
+        <div class="rv-product-item">
+            <img src="/uploads/${item.image}" alt="Product Image" class="rv-product-image">
+            <div class="rv-product-info">
+                <div class="rv-product-name">${item.productName}</div>
+                <div class="rv-product-details">
+                    <span>Màu: ${item.color}</span> |
+                    <span>Size: ${item.size}</span>
+                </div>
+            </div>
+            <a href="/opulentia_user/review/${item.orderDetailID}" class="rv-review-button${item.isReviewed ? ' reviewed' : ''}" 
+            style="display: ${!item.isReviewed && isOver15days() ? 'none' : 'block'}"
+            >
+                 ${item.isReviewed ? 'Xem đánh giá' : 'Đánh giá'}
+            </a>
+        </div>
+        `;
+        });
+
+        container.innerHTML = htmlString;
+    }
+
+    function isOver15days(){
+        const updateStatusAt = new Date(order.updateStatusAt);
+        const now = new Date();
+
+        const diffTime = now - updateStatusAt; // chênh lệch mili giây
+        const diffDays = diffTime / (1000 * 60 * 60 * 24); // đổi ra ngày
+
+        return diffDays > 15;
     }
 });
 

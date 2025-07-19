@@ -7,7 +7,6 @@
 <body>
 <!-- Thêm thanh search mới -->
 <div th:fragment="b-nav" >
-<div class="fn-search-bar">
   <style>
     /* Footer styles */
     .footer-heading {
@@ -230,10 +229,14 @@
       color: black;
     }
   </style>
-  <input type="text" placeholder="Nhập từ khóa để tìm kiếm">
-</div>
+  <form class="fn-search-bar" action="/opulentia/search" method="get">
+    <input type="text" name="keyword" id="search-input" placeholder="Nhập từ khóa..." required>
+    <button type="submit" style="display: none;"></button> <!-- Để enter hoạt động -->
+  </form>
 
-<div class="fn-container fn-container-center">
+
+
+  <div class="fn-container fn-container-center">
   <div class="fn-nav">
     <a href="/index">
     <div class="fn-item fn-item-home">

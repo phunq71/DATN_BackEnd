@@ -897,8 +897,9 @@
                                       th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
               </span>
                             </div>
-                            <div class="review"
-                                 th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : 'Chưa có đánh giá'}">
+                            <div class="review">
+                                <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                                <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
                             </div>
                             <div class="new"
                                  th:if="${pro.isNew}"> Mới

@@ -9,12 +9,15 @@ import com.main.dto.CustomerDTO;
 import com.main.dto.CustomerRegisterDTO;
 import com.main.entity.Account;
 import com.main.entity.Customer;
+import com.main.entity.Image;
 import com.main.entity.Membership;
 import com.main.repository.AccountRepository;
 import com.main.repository.CustomerRepository;
 import com.main.repository.MembershipRepository;
 import com.main.service.CustomerService;
 import com.main.utils.AddressUtil;
+import com.main.utils.AuthUtil;
+import com.main.utils.CommonUtils;
 import com.main.utils.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,10 +25,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -152,7 +162,7 @@ public class CustomerServiceImpl implements CustomerService {
             cus.setAddressIdGHN(customerRegisterDTO.getFullAddressID());
             cus.setDob(customerRegisterDTO.getDob());
             cus.setMembership(mber);
-            cus.setImageAvt("/avatar.png");
+            cus.setImageAvt("avatar.png");
             cus.setPhone("0000000000");
             customerRepository.save(cus);
             return true;
@@ -161,18 +171,97 @@ public class CustomerServiceImpl implements CustomerService {
             return false;
         }
     }
+
+
     @Override
-    public byte[] generateQRCode(String content, int width, int height) {
+    public byte[] createQRCode() {
+        String customerID, code;
+        customerID = AuthUtil.getAccountID();
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[48]; // 48 bytes ≈ 64 ký tự khi mã hóa Base64
+        random.nextBytes(bytes);
+        code = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        long expireAt = System.currentTimeMillis() / 1000 + 300;
+        // Gộp chuỗi raw
+        String raw = customerID + ":" + code + ":" + expireAt;
+        // Mã hóa toàn bộ chuỗi bằng Base64
+        String encodedToken = Base64.getUrlEncoder().withoutPadding().encodeToString(raw.getBytes());
+        Customer customer = new Customer();
+        customer = customerRepository.findByCustomerId(customerID);
+        customer.setQrToken(encodedToken);
+
+        customerRepository.save(customer);
+
+
+        String fileName = customer.getImageAvt();
+        BufferedImage avatar;
+        String img = customer.getImageAvt();
+
         try {
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
-            return outputStream.toByteArray();
-        } catch (WriterException | IOException e) {
-            throw new RuntimeException("Lỗi khi tạo mã QR", e);
+            if (img.startsWith("http://") || img.startsWith("https://")) {
+                // Ảnh từ mạng (OAuth2)
+                URL imageUrl = new URL(img);
+                avatar = ImageIO.read(imageUrl);
+            } else {
+                // Ảnh từ file hệ thống
+                String filePath = "uploads/" + img;
+                File imageFile = new File(filePath);
+                if (!imageFile.exists()) {
+                    throw new RuntimeException("File không tồn tại: " + filePath);
+                }
+                avatar = ImageIO.read(imageFile);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Không thể đọc ảnh avatar: " + img, e);
+        }
+
+        return CommonUtils.generateQRCodeWithAvatar(encodedToken, 300, 300, avatar);
+
+    }
+
+    public Customer verifyQRCodeToken(String qrToken) {
+        try {
+            // 1. Giải mã token từ base64
+            byte[] decodedBytes = Base64.getUrlDecoder().decode(qrToken);
+            String raw = new String(decodedBytes); // VD: "CUS00000026:randomCode:1721222000"
+
+            // 2. Tách chuỗi thành 3 phần: customerID, code, expireAt
+            String[] parts = raw.split(":");
+            if (parts.length != 3) {
+                throw new IllegalArgumentException("Mã QR không hợp lệ");
+            }
+
+            String customerId = parts[0];
+            String code = parts[1];
+            long expireAt = Long.parseLong(parts[2]);
+
+            // 3. Kiểm tra thời gian hết hạn
+            long now = System.currentTimeMillis() / 1000;
+            if (now > expireAt) {
+                throw new IllegalArgumentException("Mã QR đã hết hạn");
+            }
+
+            // 4. Kiểm tra trong DB (chắc chắn token tồn tại và chưa bị reset)
+            Customer customer = customerRepository.findByQrToken(qrToken);
+            if (customer == null || !customer.getCustomerId().equals(customerId)) {
+                throw new IllegalArgumentException("Không tìm thấy khách hàng phù hợp");
+            }
+
+            // 5. Xóa QR token sau khi xác thực (1 lần dùng)
+            customer.setQrToken(null);
+            customerRepository.save(customer);
+
+            return customer;
+
+        } catch (Exception e) {
+            // Có thể log ra chi tiết nếu cần
+            return null; // Hoặc ném exception cụ thể tùy mục đích dùng
         }
     }
+
+
+
+
 }
 
 

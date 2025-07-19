@@ -18,4 +18,6 @@ public class OrderItemDTO {
     private BigDecimal price;
     private Byte discountPercent;
     private Integer quantity;
+    private Boolean isReviewed;
+    private Integer orderDetailID;
 }

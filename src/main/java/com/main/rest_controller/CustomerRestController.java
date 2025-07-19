@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -196,9 +197,30 @@ public class CustomerRestController {
     }
     @GetMapping("/opulentia_user/qrImage")
     public ResponseEntity<byte[]> generateQRCode(HttpServletRequest request) throws Exception {
-        String accountId = AuthUtil.getAccountID();
-        System.out.println("co acoount rrrrrrrr"+accountId);
-        byte[] qrImage = customerService.generateQRCode(accountId, 250, 250);
+        byte[] qrImage = null;
+        qrImage = customerService.createQRCode();
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(qrImage);
     }
+
+    @GetMapping("/opulentia/verify-code")
+    public ResponseEntity<?> verifyQr(@RequestParam("code") String code) {
+        Customer customer = customerService.verifyQRCodeToken(code);
+        if (customer == null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("valid", false);
+            response.put("message", "Mã QR không hợp lệ hoặc đã hết hạn");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("valid", true);
+        response.put("accountId", customer.getAccount().getAccountId());
+        response.put("message", "Mã hợp lệ");
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
 }

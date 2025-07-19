@@ -34,4 +34,8 @@ public interface ProductService {
                                 String parentCategoryId,
                                 Pageable pageable
     );
+    List<ProductViewDTO> findTopFavorited();
+
+    List<ProductViewDTO> searchProducts(String keyword);
+
 }

@@ -23,15 +23,15 @@ public class OrderRestController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/opulentia_user/orders/allOrders/{status}")
-    public ResponseEntity<List<OrderDTO>> allOrder(@PathVariable String status) {
+    @GetMapping("/opulentia_user/orders/allOrders/{status}/{year}")
+    public ResponseEntity<List<OrderDTO>> allOrder(@PathVariable String status, @PathVariable Integer year) {
         String accountId = AuthUtil.getAccountID();
 
         if(accountId == null){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        List<OrderDTO> orderDTOs = orderService.getOrdersByCustomerIdAndStatus(accountId, status);
+        List<OrderDTO> orderDTOs = orderService.getOrdersByCustomerIdAndStatus(accountId, status, year);
         return ResponseEntity.ok(orderDTOs);
     }
 
@@ -51,5 +51,15 @@ public class OrderRestController {
         OrderDetailDTO orderDetailDTO = orderService.getOrderDetailByOrderID(orderId);
 
         return ResponseEntity.ok(orderDetailDTO);
+    }
+
+    @GetMapping("/opulentia_user/orders/findByKeyword/{keyword}")
+    public ResponseEntity<List<OrderDTO>> findByKeyword(@PathVariable String keyword) {
+        String accountId = AuthUtil.getAccountID();
+        if(accountId == null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        return ResponseEntity.ok(orderService.getOrdersByKeyword(accountId, keyword));
     }
 }

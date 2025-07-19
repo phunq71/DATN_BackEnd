@@ -480,6 +480,150 @@
            font-weight: bold;
        }
 </style>
+<!--Xử lý model OTP-->
+<style>
+    /* Thêm vào CSS hiện có của bạn */
+    .otp-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1050;
+    }
+    .otp-container {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        background: url('https://example.com/your-background-image.jpg') center/cover no-repeat;
+    }
+
+    .otp-container::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: -1;
+    }
+
+    .otp-box {
+        position: relative; /* ✅ Thêm dòng này để làm cha chứa tuyệt đối */
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 450px;
+        animation: fadeInUp 0.5s ease-out;
+        text-align: center;
+    }
+
+    .otp-title {
+        font-weight: bold;
+        font-size: 1.8rem;
+        color: #081c34;
+        margin-bottom: 1rem;
+    }
+
+    .otp-inputs {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 1rem 0;
+    }
+
+    .otp-inputs input {
+        width: 3rem;
+        height: 3.2rem;
+        font-size: 1.5rem;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .otp-inputs input:focus {
+        border-color: #4a90e2;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    }
+
+    .note {
+        color: #333;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .msg {
+        color: red;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .btn-submit, .btn-resend {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.95rem;
+        border-radius: 6px;
+        border: none;
+        margin-top: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    /* Nút xác thực OTP - đậm */
+    .btn-submit {
+        background-color: #003366; /* xanh đậm */
+        color: #fff;
+    }
+
+    .btn-submit:hover {
+        background-color: #00509e;
+    }
+
+    /* Nút gửi lại - xám nhạt khi disabled */
+    .btn-resend {
+        background-color: #bbb;
+        color: #fff;
+    }
+
+    /* Enabled thì đổi màu xanh nhẹ */
+    .btn-resend.enabled {
+        background-color: #28a745;
+    }
+
+    .btn-resend.enabled:hover {
+        background-color: #218838;
+    }
+    .btn-cancel {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        color: #333;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    .btn-cancel:hover {
+        color: red;
+    }
+
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
 
 
 <div class="container-fluid all">
@@ -499,10 +643,10 @@
                 <div class="collapse ps-3" id="securityMenu">
                     <a class="e-sub-link" id="changePassword">Đổi mật khẩu</a>
                     <a class="e-sub-link" id="changePhone">Đổi số điện thoại</a>
+                    <a class="e-sub-link" id="disableAccount">Vô hiệu hóa tài khoản</a>
                 </div>
 
                 <a href="#" class="active"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a>
-                <a href="#"><i class="fas fa-user-slash me-2"></i>Vô hiệu hóa tài khoản</a>
 
                 <!-- Menu lớn: Thứ hạng -->
                 <a class="e-toggle d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#rankingMenu" role="button" aria-expanded="false">
@@ -766,6 +910,232 @@
         });
     });
 </script>
+
+<!--modal otp-->
+<div id="otpModal" class="otp-modal" style="display: none;">
+    <div class="otp-container">
+        <div class="otp-box">
+            <h2 class="otp-title">Nhập mã OTP</h2>
+            <p class="note">Mã OTP đã được gửi qua email và có hiệu lực trong 5 phút.</p>
+            <!-- ✅ Đổi từ <form> sang <div> -->
+            <div id="verifyOtpForm">
+                <div class="otp-inputs">
+                    <input type="text" maxlength="1" name="digit1" required>
+                    <input type="text" maxlength="1" name="digit2" required>
+                    <input type="text" maxlength="1" name="digit3" required>
+                    <input type="text" maxlength="1" name="digit4" required>
+                    <input type="text" maxlength="1" name="digit5" required>
+                    <input type="text" maxlength="1" name="digit6" required>
+                </div>
+                <input type="hidden" name="otp" id="otpInput">
+                <input type="hidden" name="email" id="otpEmailInput">
+                <p id="otpMessage" style="color:orangered; display:none;"></p>
+                <button id="confirmOtpBtn" type="button" class="btn-submit">Xác thực OTP</button>
+
+
+            </div>
+
+
+            <button id="resendBtn" class="btn-resend" disabled>Gửi lại mã (60s)</button>
+        </div>
+    </div>
+</div>
+
+<!--js xử lý vô hiệu hóa tk-->
+<script>
+    let otpTimer = null;
+
+    function showOtpModal() {
+        const modal = document.getElementById('otpModal');
+        modal.style.display = 'block';
+        startOtpCountdown();
+        setupOtpInputs();
+    }
+
+    function hideOtpModal() {
+        document.getElementById('otpModal').style.display = 'none';
+        clearInterval(otpTimer);
+    }
+
+    function startOtpCountdown() {
+        let countdown = 60;
+        const resendBtn = document.getElementById('resendBtn');
+
+        clearInterval(otpTimer);
+        resendBtn.disabled = true;
+        resendBtn.classList.remove('enabled');
+        resendBtn.textContent = `Gửi lại mã (${countdown}s)`;
+
+        otpTimer = setInterval(() => {
+            countdown--;
+            resendBtn.textContent = `Gửi lại mã (${countdown}s)`;
+            if (countdown <= 0) {
+                clearInterval(otpTimer);
+                resendBtn.disabled = false;
+                resendBtn.classList.add('enabled');
+                resendBtn.textContent = 'Gửi lại mã';
+            }
+        }, 1000);
+    }
+
+    function setupOtpInputs() {
+        const inputs = document.querySelectorAll('#otpModal .otp-inputs input');
+        inputs.forEach(input => input.value = '');
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !input.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        if (inputs.length > 0) {
+            inputs[0].focus();
+        }
+    }
+
+    function getOtpValue() {
+        const otpInputs = document.querySelectorAll('#otpModal .otp-inputs input');
+        return Array.from(otpInputs).map(input => input.value).join('');
+    }
+
+    function sendOtpForDeactivation() {
+        axios.post("/opulentia_user/send-otp-deactivate")
+            .then(res => {
+                showOtpModal();
+                document.getElementById("otpMessage").style.display = "none";
+            })
+            .catch(err => {
+                const errorMessage = err.response?.data || "Gửi OTP thất bại";
+
+                // Nếu lỗi là do còn đơn hàng
+                if (errorMessage.includes("đơn hàng")) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Không thể vô hiệu hóa',
+                        text: errorMessage,
+                        confirmButtonColor: '#000000'
+                    });
+                } else {
+                    // Các lỗi khác (ví dụ: chưa đăng nhập, spam gửi OTP)
+                    document.getElementById("otpMessage").textContent = errorMessage;
+                    document.getElementById("otpMessage").style.display = "block";
+                }
+            });
+    }
+
+
+    function confirmOtpForDeactivation() {
+        const otp = getOtpValue();
+        if (otp.length !== 6 || isNaN(otp)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Thiếu mã OTP',
+                text: 'Vui lòng nhập đủ 6 chữ số OTP.',
+                confirmButtonColor: '#000000'
+            });
+            return;
+        }
+
+        axios.post("/opulentia_user/confirm-deactivate", {
+            otpCode: parseInt(otp)
+        })
+            .then(res => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Tài khoản đã bị vô hiệu hóa',
+                    text: res.data,
+                    confirmButtonColor: '#000000'
+                }).then(() => {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Cảm ơn bạn đã đồng hành cùng chúng tôi!',
+                        text: 'Hy vọng sẽ gặp lại bạn trong tương lai.',
+                        confirmButtonColor: '#000000'
+                    }).then(() => {
+                        hideOtpModal();
+
+                        // ⛔ QUAN TRỌNG: Gọi logout để xóa cookie
+                        axios.post('/api/auth/logout', {}, {
+                            withCredentials: true
+                        })
+                            .then(() => {
+                                window.location.href = "/index";
+                                axios.post('/opulentia_user/confirm-return', {}, {
+                                    withCredentials: true
+                                })
+                                    .then(() =>{
+                                        console.error("❌ Lỗi khi logout sau khi vô hiệu hóa:", error);
+                                    })
+                            })
+                            .catch(error => {
+                                console.error("❌ Lỗi khi logout sau khi vô hiệu hóa:", error);
+                                // Vẫn chuyển trang trong trường hợp logout lỗi, nhưng có thể log thêm nếu cần
+                                window.location.href = "/index";
+                            });
+                    });
+                });
+            })
+            .catch(err => {
+                const errorMessage = err.response?.data || "Vô hiệu hóa thất bại";
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Không thể vô hiệu hóa',
+                    text: errorMessage,
+                    confirmButtonColor: '#000000'
+                }).then(() => {
+                    if (errorMessage.includes("đơn hàng")) {
+                        hideOtpModal();
+                    }
+                });
+            });
+    }
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const disableLink = document.getElementById("disableAccount");
+        const confirmOtpBtn = document.getElementById("confirmOtpBtn");
+        const resendBtn = document.getElementById("resendBtn");
+
+        disableLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            Swal.fire({
+                title: "Bạn có chắc muốn vô hiệu hóa tài khoản?",
+                html: "Tài khoản sẽ bị khóa vĩnh viễn và không thể đăng nhập lại bằng email này.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Vô hiệu hóa"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sendOtpForDeactivation();
+                }
+            });
+        });
+
+        confirmOtpBtn.addEventListener("click", function () {
+            confirmOtpForDeactivation();
+        });
+
+        resendBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            if (!this.disabled) {
+                sendOtpForDeactivation();
+            }
+        });
+    });
+</script>
+
 
 
 <script>

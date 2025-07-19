@@ -4,10 +4,12 @@ import com.main.dto.ColorOption;
 import com.main.dto.ProductViewDTO;
 import com.main.dto.SupportDetailDTO;
 import com.main.entity.*;
+import com.main.mapper.VariantMapper;
 import com.main.repository.*;
 import com.main.service.ProductService;
 import com.main.utils.AuthUtil;
 import com.main.utils.DataUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.parameters.P;
@@ -30,22 +32,20 @@ import org.springframework.data.domain.Pageable;
 
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    @Autowired
-    private ProductRepository productRepository;
 
-    @Autowired
-    private VariantRepository variantRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final VariantRepository variantRepository;
 
-    @Autowired
-    private ReviewRepository reviewRepository;
+    private final AccountRepository accountRepository;
 
-    @Autowired
-    private ProductMapper productMapper;
+    private final ReviewRepository reviewRepository;
 
+    private final ProductMapper productMapper;
+
+    private final FavoriteRepository favoriteRepository;
 
     //Tim sp cho trang chi tiet sp
     @Override
@@ -110,6 +110,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductViewDTO> findProductNews() {
         List<ProductViewDTO> result = new ArrayList<>();
         List<Product> listPro = productRepository.findRecentProducts();
+
         Pageable pageable = PageRequest.of(0, 10);
         List<Product> products = productRepository.findTopSellingProducts(pageable);
         List<String> hotProductIDs = products.stream().map(Product::getProductID).toList();
@@ -164,7 +165,9 @@ public class ProductServiceImpl implements ProductService {
 
     private List<ColorOption> extractColorOptions(List<Variant> variants) {
         List<ColorOption> colorList = DataUtils.getListColors();
+
         return variants.stream()
+                .filter(Variant::getIsUse) // Lọc các variant đang hoạt động
                 .map(variant -> {
                     String colorName = variant.getColor();
                     return colorList.stream()
@@ -176,6 +179,7 @@ public class ProductServiceImpl implements ProductService {
                 .distinct()
                 .collect(Collectors.toList());
     }
+
 
 
     private void enrichProductViewDTO(ProductViewDTO dto, Product product, List<String> hotProductIDs, boolean isNew) {
@@ -191,6 +195,8 @@ public class ProductServiceImpl implements ProductService {
         dto.setIsNew(isNew);
         dto.setAvg_rating(calculateAvgRating(product.getProductID()));
         dto.setOptions(extractColorOptions(product.getVariants()));
+        // bổ sung thuộc tính số totalLikes
+        dto.setTotalLikes(favoriteRepository.countFavoriteByProduct_ProductID(product.getProductID()));
     }
 
     @Override
@@ -238,6 +244,7 @@ public class ProductServiceImpl implements ProductService {
 
         dto.setIsHot(hotProductIDs.contains(variant.getProduct().getProductID()));
         dto.setSoldQuantity(productRepository.countSoldQuantityByProductId(variant.getProduct().getProductID()));
+        dto.setFavorites(favoriteRepository.countFavoriteByProduct_ProductID(variant.getProduct().getProductID()));
         return dto;
     }
     public List<Product> findAll(){
@@ -293,5 +300,59 @@ public class ProductServiceImpl implements ProductService {
            });
         markFavorites(dtos);
         return new PageImpl<>(dtos, pageable, pagePro.getTotalElements());
+    }
+
+    @Override
+    public List<ProductViewDTO> findTopFavorited() {
+        Pageable pageable1 = PageRequest.of(0, 10);
+        List<Product> pros = productRepository.findTopSellingProducts(pageable1);
+        List<String> hotProductIDs = pros.stream().map(Product::getProductID).toList();
+
+        List<Product> products = productRepository.findTop12RankedProducts();
+        List<ProductViewDTO> dtos = new ArrayList<>();
+        products.forEach(product -> {
+            ProductViewDTO dto = new ProductViewDTO();
+            dto.setProductID(product.getProductID());
+            enrichProductViewDTO(dto, product, hotProductIDs, productRepository.isNewProduct(dto.getProductID()) > 0);
+            dtos.add(dto);
+        });
+        // 4. Đánh dấu sản phẩm yêu thích (nếu có login)
+        markFavorites(dtos);
+        return dtos;
+
+    }
+
+    @Override
+    public List<ProductViewDTO> searchProducts(String keyword) {
+        if (keyword == null || keyword.trim().isBlank()) {
+            return new ArrayList<>();
+        }
+
+        // Cắt bỏ khoảng trắng đầu/cuối
+        keyword = keyword.trim();
+
+        // 1. Tìm các sản phẩm tên khớp với keyword
+        List<Product> products = productRepository.searchProductsByName(keyword);
+
+        // 2. Lấy danh sách sản phẩm bán chạy nhất (top 10)
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Product> topSellingProducts = productRepository.findTopSellingProducts(pageable);
+        List<String> hotProductIDs = topSellingProducts.stream()
+                .map(Product::getProductID)
+                .toList();
+
+        // 3. Map thành ProductViewDTO
+        List<ProductViewDTO> dtos = new ArrayList<>();
+        for (Product product : products) {
+            ProductViewDTO dto = new ProductViewDTO();
+            dto.setProductID(product.getProductID());
+            boolean isNew = productRepository.isNewProduct(product.getProductID()) > 0;
+            enrichProductViewDTO(dto, product, hotProductIDs, isNew);
+            dtos.add(dto);
+        }
+
+        // 4. Đánh dấu sản phẩm yêu thích (nếu có login)
+        markFavorites(dtos);
+        return dtos;
     }
 }

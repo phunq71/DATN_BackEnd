@@ -41,12 +41,65 @@ const choGiaoHang= document.getElementById("cho-giao-hang");
 const daGiao = document.getElementById("da-giao");
 const daHuy = document.getElementById("da-huy");
 
+const yearSelect = document.getElementById("year-select");
+
+yearSelect.addEventListener('change', function(){
+    triggerClickOnActiveTab();
+});
+
+const searchBtn =document.getElementById("search-order-btn");
+searchBtn.addEventListener('click',async function () {
+   const keyword= document.getElementById("search-order-input").value;
+   if(keyword.trim() !==""){
+       orders = await getOrdersByKeyword(keyword);
+       if(orders.length<1){
+           Swal.fire({
+               icon: 'info',
+               title: 'Thông báo',
+               text: 'Không tìm thấy đơn hàng với từ khóa của bạn',
+               confirmButtonText: 'OK',
+               confirmButtonColor: '#000000',
+           });
+       }else initOrder(orders);
+   }
+   else{
+       Swal.fire({
+           icon: 'error',
+           title: 'Thông báo',
+           text: 'Bạn vui lòng nhập id đơn hàng hoặc tên sản phẩm để tìm kiếm',
+           confirmButtonText: 'OK',
+           confirmButtonColor: '#000000',
+       });
+   }
+});
+
+function triggerClickOnActiveTab() {
+    const activeTab = document.querySelector('.od-tab.active');
+    if (activeTab) {
+        activeTab.click();
+    } else {
+        console.log('Không tìm thấy tab nào đang active.');
+    }
+}
+
 let orders=[];
 
 function getOrders(status){
-    return axios.get(`/opulentia_user/orders/allOrders/${status}`)
+    let year = yearSelect.value;
+    return axios.get(`/opulentia_user/orders/allOrders/${status}/${year}`)
         .then(response =>{
             console.log(status, response.data);
+            return response.data
+        }).catch(error => {
+            console.log(error);
+            return [];
+        });
+}
+
+function getOrdersByKeyword(keyword){
+    return axios.get(`/opulentia_user/orders/findByKeyword/${keyword}`)
+        .then(response =>{
+            console.log(keyword, response.data);
             return response.data
         }).catch(error => {
             console.log(error);
