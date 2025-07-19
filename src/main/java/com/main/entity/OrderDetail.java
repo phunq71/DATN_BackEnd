@@ -45,4 +45,8 @@ public class OrderDetail {
 
     @OneToMany(mappedBy = "orderDetail")
     private List<Review> reviews;
+
+    public OrderDetail(Integer orderDetailID) {
+        this.orderDetailID = orderDetailID;
+    }
 }

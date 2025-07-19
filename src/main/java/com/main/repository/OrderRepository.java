@@ -64,6 +64,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         , o.costShip
         , o.transaction.paymentMethod
         , o.transaction.transactionDate
+        , o.updateStatusAt
     FROM Order o
     WHERE o.orderID=:orderId
     """)
@@ -158,7 +159,11 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     od.item.size.code,
     od.item.variant.price,
     od.promotionProduct.discountPercent,
-    od.quantity
+    od.quantity,
+        CASE WHEN EXISTS (
+                        SELECT 1 FROM Review r WHERE r.orderDetail = od
+                    ) THEN true ELSE false END
+            ,od.orderDetailID
     FROM OrderDetail od
     WHERE od.order.orderID = :orderId
     """)

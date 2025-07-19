@@ -86,6 +86,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         flagCookie.setMaxAge(60); // Tồn tại 60s, hoặc bạn có thể để -1 (session)
         response.addCookie(flagCookie);
         System.out.println(redirectUrl);
+        if(redirectUrl.equals("/opulentia_user/checkout")) {
+            Cookie isMergeCart = new Cookie("isMergeCart", "true");
+            isMergeCart.setPath("/");
+            isMergeCart.setMaxAge(60);
+            response.addCookie(isMergeCart);
+        }
         response.sendRedirect(redirectUrl);
 
     }

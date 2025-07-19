@@ -7,17 +7,12 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @AllArgsConstructor
-@Data
 @NoArgsConstructor
-public class OrderItemDTO {
-    private Integer itemID;
+@Data
+public class ReviewItemDTO {
+    private Integer ItemID;
     private String productName;
-    private String image;
+    private String imageItem;
     private String color;
     private String size;
-    private BigDecimal price;
-    private Byte discountPercent;
-    private Integer quantity;
-    private Boolean isReviewed;
-    private Integer orderDetailID;
 }
