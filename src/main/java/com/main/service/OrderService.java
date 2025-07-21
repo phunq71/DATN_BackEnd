@@ -1,9 +1,6 @@
 package com.main.service;
 
-import com.main.dto.OrderDTO;
-import com.main.dto.OrderDetailDTO;
-import com.main.dto.OrderItemDTO;
-import com.main.dto.OrderPriceDTO;
+import com.main.dto.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 
@@ -26,8 +23,12 @@ public interface OrderService {
 
     List<OrderDTO> getOrdersByKeyword(String customerId, String keyword);
 
+
+    List<OrderPreviewDTO> getOrderPreviewProducts();
+
     Boolean checkOrderDetailByCustomerIDAndODID(String customerId, Integer orderDetailID);
 
 
     ResponseEntity<?> handleReviewAccess(Integer orderDetailID, String customerId);
+
 }

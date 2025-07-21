@@ -16,6 +16,10 @@ public interface CustomerRepository extends JpaRepository<Customer, String > {
 
     Customer findByAccount_AccountId(String accountID);
 
+    Customer findByCustomerId(String customerID);
+
+    Customer findByQrToken(String qrToken);
+
     @Query("""
     SELECT c.customerId
          , c.fullName

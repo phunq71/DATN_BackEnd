@@ -255,7 +255,7 @@
         justify-content: center;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
-
+        z-index: -1; /* đủ lớn */
         transform: translateY(350%);
     }
 
@@ -819,39 +819,13 @@
     }
 </style>
 <div class="reels-row">
-    <section class="banner-section" th:if="${title == 'deals'}">
-        <img src="https://levents.asia/cdn/shop/files/TRIPLE_STAR_WEB_PC.jpg"
+    <section class="banner-section">
+        <img src="https://theme.hstatic.net/1000306633/1001194548/14/slideshow_2.jpg?v=383"
              alt="Khuyến mãi thời trang" class="banner-img">
         <div class="banner-overlay">
             <div class="section-header">
-                <h2 class="section-title">SẢN PHẨM KHUYẾN MÃI</h2>
-            </div>
-        </div>
-    </section>
-    <section class="banner-section" th:if="${title == 'news'}">
-        <img src="https://www.dsquared2.com/dw/image/v2/BJTL_PRD/on/demandware.static/-/Library-Sites-library-shared/default/dwb43f5fb8/Homepage%202025/PRE%20FW25/homepage_desktop.jpg?sw=1920&sh=1067&q=80"
-             alt="Khuyến mãi thời trang" class="banner-img">
-        <div class="banner-overlay">
-            <div class="section-header">
-                <h2 class="section-title">SẢN PHẨM MỚI RA MẮT</h2>
-            </div>
-        </div>
-    </section>
-    <section class="banner-section"  th:if="${title == 'bestSelling'}">
-        <img src="https://img3.thuthuatphanmem.vn/uploads/2019/10/14/banner-thoi-trang-dang-cap-hien-dai_113856116.png"
-             alt="Khuyến mãi thời trang" class="banner-img">
-        <div class="banner-overlay">
-            <div class="section-header">
-                <h2 class="section-title">SẢN PHẨM BÁN CHẠY</h2>
-            </div>
-        </div>
-    </section>
-    <section class="banner-section"  th:if="${title == 'topFavorite'}">
-        <img src="https://www.thombrowne.com/cdn/shop/files/Thom_Browne_Summer_2025_Hero_Campaign_Image_3_16x9_453ec824-f301-41f7-a53a-0d96fc0a99d3.jpg?v=1752617298&width=1500"
-             alt="Khuyến mãi thời trang" class="banner-img">
-        <div class="banner-overlay">
-            <div class="section-header">
-                <h2 class="section-title">TOP SẢN PHẨM ĐƯỢC YÊU THÍCH NHIỀU NHẤT</h2>
+                <h2 class="section-title" th:if="${childCategoryName == null}" th:text="${parentCategoryName}"></h2>
+                <h2 class="section-title" th:unless="${childCategoryName == null}" th:text="${childCategoryName}"></h2>
             </div>
         </div>
     </section>
@@ -859,59 +833,450 @@
     <section class="products-section">
         <div class="products-grid">
             <div class="product-container item" th:each="pro : ${products}">
-                <a th:href="@{'/opulentia/' +  ${pro.parentCategoryId} + '/' + ${pro.childCategoryId} + '/' + ${pro.productID}
-                                + '/' + ${pro.variantID}}" style="text-decoration: none;">
+                <a th:href="@{'/opulentia/' + ${pro.parentCategoryId} + '/' + ${pro.childCategoryId} + '/' + ${pro.productID} + '/' + ${pro.variantID}}" style="text-decoration: none;">
                     <div class="product-wrapper">
-                        <img th:src="@{'/uploads/' + ${pro.getImageUrl()}}"
+                        <img th:src="@{'/uploads/' + ${pro.imageUrl}}"
                              alt="Product" class="product-image">
+
+                        <!-- Bán chạy -->
                         <div th:if="${pro.isHot}" class="new-label">Bán chạy &nbsp; ●</div>
-                        <div class="discount-label"  th:if="${pro.getDiscountPercent()}" th:text="'- ' + ${pro.getDiscountPercent() +' %'}">-15%</div>
+
+                        <!-- Giảm giá -->
+                        <div class="discount-label" th:if="${pro.discountPercent}" th:text="'- ' + ${pro.discountPercent} + '%'">-15%</div>
 
                         <div class="product-info">
+                            <!-- Màu sắc -->
                             <div class="color-options">
                                 <div class="color-circle"
                                      th:each="color : ${pro.options}"
-                                     th:style="'background-color:' + ${color.ma} + ';'">
+                                     th:style="'background-color:' + ${color.ma}">
                                 </div>
                             </div>
-                            <div th:text="${pro.productName}" style="font-size: 14px">Áo Polo H&M</div>
+
+                            <!-- Tên sản phẩm -->
+                            <div th:text="${pro.productName}" style="font-size: 14px">Áo Polo</div>
+
+                            <!-- Giá -->
                             <div class="price-container">
-                <span class="sale-price"
-                      th:if="${pro.discountPercent != null}"
-                      th:text="${#numbers.formatDecimal(pro.price.multiply(100 - pro.discountPercent).divide(100), 0, 'COMMA', 0, 'POINT') + 'đ'}">
-                </span>
+                        <span class="sale-price"
+                              th:if="${pro.discountPercent != null}"
+                              th:text="${#numbers.formatDecimal(pro.price.multiply(100 - pro.discountPercent).divide(100), 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                        </span>
+
                                 <span class="original-price text-decoration-line-through text-secondary"
                                       th:if="${pro.discountPercent != null}"
                                       th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
-                </span>
+                        </span>
 
-                                <!-- Nếu không giảm -->
                                 <span class="sale-price"
                                       th:unless="${pro.discountPercent != null}"
                                       th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
-              </span>
+                        </span>
                             </div>
-                            <div class="review">
-                                <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
-                                <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
+
+                            <!-- Đánh giá -->
+                            <div class="review"
+                                 th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : 'Chưa có đánh giá'}">
                             </div>
-                            <div class="new"
-                                 th:if="${pro.isNew}"> Mới
-                            </div>
+
+                            <!-- Mới -->
+                            <div class="new" th:if="${pro.isNew}">Mới</div>
                         </div>
                     </div>
                 </a>
+
+                <!-- Yêu thích -->
                 <button class="favorite-btn" th:attr="data-idpro=${pro.productID}">
                     <i th:class="${pro.isFavorite} ? 'fas fa-heart text-dark' : 'far fa-heart'"></i>
                 </button>
             </div>
         </div>
+
     </section>
 </div>
 
 
+<!-- Modal Filter -->
+<div id="filterModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Bộ lọc sản phẩm</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <!-- Giới tính -->
+            <div class="filter-section">
+                <h3 class="filter-title">Giới tính <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="gender" value="Nam">
+                        <span class="checkmark"></span> Nam
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="gender" value="Nữ">
+                        <span class="checkmark"></span> Nữ
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="gender" value="Unisex">
+                        <span class="checkmark"></span> Unisex
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="gender" value="Trẻ em">
+                        <span class="checkmark"></span> Trẻ em
+                    </label>
+                </div>
+            </div>
 
+            <!-- Size -->
+            <div class="filter-section">
+                <h3 class="filter-title">Kích cỡ <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <div class="size-options">
+                        <label class="size-option">S</label>
+                        <label class="size-option">M</label>
+                        <label class="size-option">L</label>
+                        <label class="size-option">XL</label>
+                        <label class="size-option">XXL</label>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Màu sắc -->
+            <div class="filter-section">
+                <h3 class="filter-title">Màu sắc <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <label class="color-option">
+                        <input type="checkbox" name="color" value="Đen">
+                        <span class="color-box" style="background-color: #000;"></span> Đen
+                    </label>
+                    <label class="color-option">
+                        <input type="checkbox" name="color" value="Trắng">
+                        <span class="color-box" style="background-color: #fff; border: 1px solid #ddd;"></span> Trắng
+                    </label>
+                    <label class="color-option">
+                        <input type="checkbox" name="color" value="Xám">
+                        <span class="color-box" style="background-color: #808080;"></span> Xám
+                    </label>
+                    <label class="color-option">
+                        <input type="checkbox" name="color" value="Đỏ">
+                        <span class="color-box" style="background-color: #ff0000;"></span> Đỏ
+                    </label>
+                    <label class="color-option">
+                        <input type="checkbox" name="color" value="Xanh dương">
+                        <span class="color-box" style="background-color: #0000ff;"></span> Xanh dương
+                    </label>
+                </div>
+            </div>
+
+            <!-- Mức giá -->
+            <div class="filter-section">
+                <h3 class="filter-title">Mức giá <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <div class="price-range">
+                        <div class="price-values">
+                            <span id="minPrice">100.000đ</span>
+                            <span id="maxPrice">5.000.000đ</span>
+                        </div>
+                        <div class="range-slider">
+                            <input type="range" min="100000" max="5000000" value="100000" class="slider" id="priceMin">
+                            <input type="range" min="100000" max="5000000" value="5000000" class="slider" id="priceMax">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thương hiệu -->
+            <div class="filter-section">
+                <h3 class="filter-title">Thương hiệu <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="brand" value="Nike">
+                        <span class="checkmark"></span> Nike
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="brand" value="Adidas">
+                        <span class="checkmark"></span> Adidas
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="brand" value="Puma">
+                        <span class="checkmark"></span> Puma
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="brand" value="Gucci">
+                        <span class="checkmark"></span> Gucci
+                    </label>
+                </div>
+            </div>
+
+            <!-- Đánh giá -->
+            <div class="filter-section">
+                <h3 class="filter-title">Đánh giá <i class="fas fa-chevron-down"></i></h3>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="rating" value="3">
+                        <span class="checkmark"></span>
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i> & up
+                        </div>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="rating" value="4">
+                        <span class="checkmark"></span>
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i> & up
+                        </div>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="rating" value="5">
+                        <span class="checkmark"></span>
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button class="reset-btn">Đặt lại</button>
+            <button class="apply-btn">Áp dụng</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tìm phần tử giỏ hàng bằng class
+        const cartItem = document.querySelector('.fn-item.fn-item-cart');
+
+        if (cartItem) {
+            // Thêm ID openFilterBtn
+            cartItem.id = 'openFilterBtn';
+
+            // Thay đổi icon từ giỏ hàng sang filter
+            const icon = cartItem.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-shopping-cart');
+                icon.classList.add('fa-filter');
+            }
+
+            // Thêm title/tooltip
+            cartItem.title = "Bộ lọc sản phẩm";
+
+            // Thêm badge counter
+            const badge = document.createElement('span');
+            badge.className = 'filter-badge';
+            badge.textContent = '0';
+            cartItem.appendChild(badge);
+
+            // Có thể thêm style nếu cần
+            cartItem.style.cursor = 'pointer';
+            cartItem.style.position = 'relative';
+        }
+
+        // Hàm đếm số thuộc tính được chọn
+        function countSelectedFilters() {
+            let count = 0;
+
+            // Đếm checkbox được chọn (giới tính, màu sắc, thương hiệu, đánh giá, khuyến mãi)
+            count += document.querySelectorAll('input[type="checkbox"]:checked').length;
+
+            // Đếm size được chọn
+            count += document.querySelectorAll('.size-option.active').length;
+
+            // Kiểm tra price range có khác mặc định không
+            const priceMin = document.getElementById('priceMin');
+            const priceMax = document.getElementById('priceMax');
+            if (parseInt(priceMin.value) !== 100000 || parseInt(priceMax.value) !== 5000000) {
+                count += 1;
+            }
+
+            return count;
+        }
+
+        // Hàm cập nhật badge
+        function updateFilterBadge() {
+            const badge = document.querySelector('.filter-badge');
+            if (badge) {
+                const count = countSelectedFilters();
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'block' : 'none';
+            }
+        }
+
+        // Cập nhật badge khi có thay đổi
+        document.querySelectorAll('input[type="checkbox"], .size-option, #priceMin, #priceMax').forEach(element => {
+            element.addEventListener('change', updateFilterBadge);
+        });
+
+        // Hàm ngăn scroll body
+        function preventBodyScroll(prevent) {
+            if (prevent) {
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.width = '100%';
+            } else {
+                document.body.style.overflow = 'auto';
+                document.body.style.position = 'static';
+            }
+        }
+
+        const filterModal = document.getElementById('filterModal');
+        const closeBtn = document.querySelector('.close');
+
+        // Xử lý click để mở modal filter
+        const openFilterBtn = document.getElementById('openFilterBtn');
+        if (openFilterBtn && filterModal) {
+            openFilterBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                filterModal.style.display = 'block';
+                //preventBodyScroll(true);
+                updateFilterBadge(); // Cập nhật badge khi mở modal
+            });
+        }
+
+        closeBtn.addEventListener('click', function() {
+            filterModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            updateFilterBadge(); // Cập nhật badge khi đóng modal
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === filterModal) {
+                filterModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                updateFilterBadge(); // Cập nhật badge khi đóng modal
+            }
+        });
+
+        // Đóng/mở các section filter
+        const filterTitles = document.querySelectorAll('.filter-title');
+
+        filterTitles.forEach(title => {
+            title.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const options = this.nextElementSibling;
+
+                options.classList.toggle('show');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        });
+
+        // Xử lý size option
+        const sizeOptions = document.querySelectorAll('.size-option');
+
+        sizeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                this.classList.toggle('active');
+                updateFilterBadge(); // Cập nhật badge khi thay đổi size
+            });
+        });
+
+        // Xử lý price range slider
+        const priceMin = document.getElementById('priceMin');
+        const priceMax = document.getElementById('priceMax');
+        const minPriceDisplay = document.getElementById('minPrice');
+        const maxPriceDisplay = document.getElementById('maxPrice');
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+        }
+
+        priceMin.addEventListener('input', function() {
+            if (parseInt(this.value) > parseInt(priceMax.value)) {
+                priceMax.value = this.value;
+                maxPriceDisplay.textContent = formatPrice(priceMax.value);
+            }
+            minPriceDisplay.textContent = formatPrice(this.value);
+            updateFilterBadge(); // Cập nhật badge khi thay đổi giá
+        });
+
+        priceMax.addEventListener('input', function() {
+            if (parseInt(this.value) < parseInt(priceMin.value)) {
+                priceMin.value = this.value;
+                minPriceDisplay.textContent = formatPrice(priceMin.value);
+            }
+            maxPriceDisplay.textContent = formatPrice(this.value);
+            updateFilterBadge(); // Cập nhật badge khi thay đổi giá
+        });
+
+        // Đặt giá trị ban đầu
+        minPriceDisplay.textContent = formatPrice(priceMin.value);
+        maxPriceDisplay.textContent = formatPrice(priceMax.value);
+
+        // Reset button
+        const resetBtn = document.querySelector('.reset-btn');
+
+        resetBtn.addEventListener('click', function() {
+            // Reset checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Reset size options
+            sizeOptions.forEach(option => {
+                option.classList.remove('active');
+            });
+
+            // Reset price range
+            priceMin.value = 100000;
+            priceMax.value = 5000000;
+            minPriceDisplay.textContent = formatPrice(priceMin.value);
+            maxPriceDisplay.textContent = formatPrice(priceMax.value);
+
+            updateFilterBadge(); // Cập nhật badge khi reset
+        });
+
+        // Apply button
+        const applyBtn = document.querySelector('.apply-btn');
+
+        applyBtn.addEventListener('click', function() {
+            // Đóng modal sau khi áp dụng
+            filterModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+
+            const selectedCount = countSelectedFilters();
+            //  alert(`Bộ lọc đã được áp dụng với ${selectedCount} thuộc tính được chọn!`);
+        });
+
+        // Thêm CSS cho badge
+        const style = document.createElement('style');
+        style.textContent = `
+            .filter-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background-color: #ff0000;
+                color: white;
+                border-radius: 50%;
+                width: 18px;
+                height: 18px;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                display: none;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Khởi tạo badge lần đầu
+        updateFilterBadge();
+    });
+</script>
 
 <!--Hiệu ứng rớt từng ô màu-->
 <script>
@@ -936,11 +1301,5 @@
         });
     });
 </script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-
-</script>
-
-
 </body>
 </html>
