@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     document.getElementById('orderDate').textContent = formatDate(order.orderDate);
     document.getElementById('transactionDate').textContent = formatDate(order.transactionDate);
     document.getElementById('orderId').textContent = formatOrderId(order.orderID);
+    document.getElementById('orderStatus').textContent= order.statusName;
     const actionDiv = document.getElementById("actions")
 
     addActionButtons(order.status);
