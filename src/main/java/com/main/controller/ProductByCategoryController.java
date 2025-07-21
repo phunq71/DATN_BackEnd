@@ -38,7 +38,7 @@ public class ProductByCategoryController {
     @Autowired
     private JwtService jwtService;
 
-    //hiển thị ds sp theo danh mục, có phân trang
+    //hiển thị ds sp theo danh mục, có phân trang và lọc
     @GetMapping("/opulentia/{parent}/{child}/{page}")
     public String viewProductsByCategory(
             @PathVariable("parent") String parent,
@@ -53,9 +53,14 @@ public class ProductByCategoryController {
             @RequestParam(required = false) String sort,
             Model model )
     {
-                if (child != null && child.isBlank()) child = null;
-                if (parent != null && parent.isBlank()) parent = null;
-                System.err.println("CL: " + color + " " + brand + " " + priceMin + " " + priceMax + " " + minRating + " " + targetCustomer + " " + sort + " " + child + " " + parent);
+        if (child != null && (child.isBlank() || child.equalsIgnoreCase("null"))) {
+            child = null;
+        }
+        if (parent != null && (parent.isBlank() || parent.equalsIgnoreCase("null"))) {
+            parent = null;
+        }
+
+        System.err.println("CL: " + color + " " + brand + " " + priceMin + " " + priceMax + " " + minRating + " " + targetCustomer + " " + sort + " " + child + " " + parent);
                 Pageable pageable = PageRequest.of(page, 12);
                 Page<ProductViewDTO> productss = productService.filterProductsWithReviewOnly(
                         color,
