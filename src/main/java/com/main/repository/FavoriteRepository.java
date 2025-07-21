@@ -18,4 +18,6 @@ public interface FavoriteRepository  extends JpaRepository<Favorite, FavoriteId>
     // Tìm bản ghi yêu thích theo mã khách hàng và mã sản phẩm
     Favorite findByCustomer_CustomerIdAndProduct_ProductID(String customerId, String productId);
 
+    Integer countFavoriteByProduct_ProductID(String productId);
+
 }

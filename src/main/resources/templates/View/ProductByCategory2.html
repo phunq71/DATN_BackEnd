@@ -445,7 +445,7 @@
         padding: 20px;
         border: 1px solid #ddd;
         width: 80%;
-        max-width: 600px;
+        max-width: 700px;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         animation: slideIn 0.3s;
@@ -516,14 +516,17 @@
     }
 
     .filter-options {
-        display: none;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
         padding-left: 10px;
     }
 
     .filter-options.show {
-        display: block;
+        max-height: 700px; /* hoặc cao hơn nếu nội dung nhiều */
         animation: fadeIn 0.3s;
     }
+
 
     /* Filter Options */
     .filter-option {
@@ -817,6 +820,35 @@
         left: 15px;
         font-size: 14px;
     }
+    .color-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 8px;
+    }
+
+    .color-option {
+        width: calc(33.33% - 6px);
+        box-sizing: border-box;
+    }
+
+    .color-label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .color-box {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+
 </style>
 <div class="reels-row">
     <section class="banner-section">
@@ -865,8 +897,9 @@
                                       th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
               </span>
                             </div>
-                            <div class="review"
-                                 th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : 'Chưa có đánh giá'}">
+                            <div class="review">
+                                <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                                <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
                             </div>
                             <div class="new"
                                  th:if="${pro.isNew}"> Mới
@@ -981,163 +1014,135 @@
 
 
 <!-- Modal Filter -->
-<div id="filterModal" class="modal">
-    <div class="modal-content">
+<div id="filterModal" class="modal">'/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + 0
+    <form class="modal-content" th:action="@{'/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + 0}" method="get">
         <div class="modal-header">
             <h2>Bộ lọc sản phẩm</h2>
             <span class="close">&times;</span>
         </div>
-        <div class="modal-body">
-            <!-- Giới tính -->
-            <div class="filter-section">
-                <h3 class="filter-title">Giới tính <i class="fas fa-chevron-down"></i></h3>
-                <div class="filter-options">
-                    <label class="filter-option">
-                        <input type="checkbox" name="gender" value="Nam">
-                        <span class="checkmark"></span> Nam
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="gender" value="Nữ">
-                        <span class="checkmark"></span> Nữ
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="gender" value="Unisex">
-                        <span class="checkmark"></span> Unisex
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="gender" value="Trẻ em">
-                        <span class="checkmark"></span> Trẻ em
-                    </label>
+            <div class="modal-body">
+                <!-- Giới tính -->
+                <div class="filter-section">
+                    <h3 class="filter-title">Giới tính <i class="fas fa-chevron-down"></i></h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="targetCustomer" value="Nam">
+                            <span class="checkmark"></span> Nam
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="targetCustomer" value="Nữ">
+                            <span class="checkmark"></span> Nữ
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="targetCustomer" value="Unisex">
+                            <span class="checkmark"></span> Unisex
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="targetCustomer" value="Trẻ em">
+                            <span class="checkmark"></span> Trẻ em
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="targetCustomer" value="Trung niên">
+                            <span class="checkmark"></span> Trung niên
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Size -->
-            <div class="filter-section">
-                <h3 class="filter-title">Kích cỡ <i class="fas fa-chevron-down"></i></h3>
-                <div class="filter-options">
-                    <div class="size-options">
-                        <label class="size-option">S</label>
-                        <label class="size-option">M</label>
-                        <label class="size-option">L</label>
-                        <label class="size-option">XL</label>
-                        <label class="size-option">XXL</label>
+                <!-- Màu sắc -->
+                <div class="filter-section">
+                    <h3 class="filter-title">Màu sắc <i class="fas fa-chevron-down"></i></h3>
+                    <div class="filter-options color-grid">
+                        <div th:each="color : ${colors}" class="color-option">
+                            <label class="color-label">
+                                <input type="checkbox" name="color" th:value="${color.ten}">
+                                <span class="color-box" th:style="'background-color:' + ${color.ma}"></span>
+                                <span th:text="${color.ten}" class="color-name"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mức giá -->
+                <div class="filter-section">
+                    <h3 class="filter-title">Mức giá <i class="fas fa-chevron-down"></i></h3>
+                    <div class="filter-options">
+                        <div class="price-range">
+                            <div class="price-values">
+                                <span id="minPrice">100.000đ</span>
+                                <span id="maxPrice">5.000.000đ</span>
+                            </div>
+                            <div class="range-slider">
+                                <input type="range" min="100000" max="5000000" value="100000" class="slider" id="priceMin" name="priceMin">
+                                <input type="range" min="100000" max="5000000" value="5000000" class="slider" id="priceMax" name="priceMax">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thương hiệu -->
+                <div class="filter-section">
+                    <h3 class="filter-title">Thương hiệu <i class="fas fa-chevron-down"></i></h3>
+                    <div class="filter-options">
+                        <label class="filter-option" th:each="brand : ${brandProducts}">
+                            <input type="checkbox" name="brand" th:value="${brand}">
+                            <span class="checkmark"></span>
+                            <span th:text="${brand}">Tên thương hiệu</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Đánh giá -->
+                <div class="filter-section">
+                    <h3 class="filter-title">Đánh giá <i class="fas fa-chevron-down"></i></h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="rating" value="3">
+                            <span class="checkmark"></span>
+                            <div class="rating-stars">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                <i class="far fa-star"></i><i class="far fa-star"></i> & up
+                            </div>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="rating" value="4">
+                            <span class="checkmark"></span>
+                            <div class="rating-stars">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="far fa-star"></i> & up
+                            </div>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="rating" value="5">
+                            <span class="checkmark"></span>
+                            <div class="rating-stars">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Sắp xếp theo giá -->
+                <div class="filter-section">
+                    <h3 class="filter-title">Sắp xếp theo giá <i class="fas fa-chevron-down"></i></h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="radio" name="sortPrice" value="asc">
+                            <span class="checkmark"></span> Giá thấp đến cao
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="sortPrice" value="desc">
+                            <span class="checkmark"></span> Giá cao đến thấp
+                        </label>
                     </div>
                 </div>
             </div>
 
-            <!-- Màu sắc -->
-            <div class="filter-section">
-                <h3 class="filter-title">Màu sắc <i class="fas fa-chevron-down"></i></h3>
-                <div class="filter-options">
-                    <label class="color-option">
-                        <input type="checkbox" name="color" value="Đen">
-                        <span class="color-box" style="background-color: #000;"></span> Đen
-                    </label>
-                    <label class="color-option">
-                        <input type="checkbox" name="color" value="Trắng">
-                        <span class="color-box" style="background-color: #fff; border: 1px solid #ddd;"></span> Trắng
-                    </label>
-                    <label class="color-option">
-                        <input type="checkbox" name="color" value="Xám">
-                        <span class="color-box" style="background-color: #808080;"></span> Xám
-                    </label>
-                    <label class="color-option">
-                        <input type="checkbox" name="color" value="Đỏ">
-                        <span class="color-box" style="background-color: #ff0000;"></span> Đỏ
-                    </label>
-                    <label class="color-option">
-                        <input type="checkbox" name="color" value="Xanh dương">
-                        <span class="color-box" style="background-color: #0000ff;"></span> Xanh dương
-                    </label>
-                </div>
+            <div class="modal-footer">
+                <button type="reset" class="reset-btn">Đặt lại</button>
+                <button type="submit" class="apply-btn">Áp dụng</button>
             </div>
-
-            <!-- Mức giá -->
-            <div class="filter-section">
-                <h3 class="filter-title">Mức giá <i class="fas fa-chevron-down"></i></h3>
-                <div class="filter-options">
-                    <div class="price-range">
-                        <div class="price-values">
-                            <span id="minPrice">100.000đ</span>
-                            <span id="maxPrice">5.000.000đ</span>
-                        </div>
-                        <div class="range-slider">
-                            <input type="range" min="100000" max="5000000" value="100000" class="slider" id="priceMin">
-                            <input type="range" min="100000" max="5000000" value="5000000" class="slider" id="priceMax">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Thương hiệu -->
-            <div class="filter-section">
-                <h3 class="filter-title">Thương hiệu <i class="fas fa-chevron-down"></i></h3>
-                <div class="filter-options">
-                    <label class="filter-option">
-                        <input type="checkbox" name="brand" value="Nike">
-                        <span class="checkmark"></span> Nike
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="brand" value="Adidas">
-                        <span class="checkmark"></span> Adidas
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="brand" value="Puma">
-                        <span class="checkmark"></span> Puma
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="brand" value="Gucci">
-                        <span class="checkmark"></span> Gucci
-                    </label>
-                </div>
-            </div>
-
-            <!-- Đánh giá -->
-            <div class="filter-section">
-                <h3 class="filter-title">Đánh giá <i class="fas fa-chevron-down"></i></h3>
-                <div class="filter-options">
-                    <label class="filter-option">
-                        <input type="checkbox" name="rating" value="3">
-                        <span class="checkmark"></span>
-                        <div class="rating-stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i> & up
-                        </div>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="rating" value="4">
-                        <span class="checkmark"></span>
-                        <div class="rating-stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i> & up
-                        </div>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="rating" value="5">
-                        <span class="checkmark"></span>
-                        <div class="rating-stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                    </label>
-                </div>
-            </div>
-
-        </div>
-        <div class="modal-footer">
-            <button class="reset-btn">Đặt lại</button>
-            <button class="apply-btn">Áp dụng</button>
-        </div>
-    </div>
+    </form>
 </div>
 
 <script>
@@ -1356,7 +1361,21 @@
             }
         `;
         document.head.appendChild(style);
+        const singleSelectNames = ['gender', 'color', 'rating']; // tên nhóm muốn chỉ chọn 1
 
+        singleSelectNames.forEach(name => {
+            const group = document.querySelectorAll(`input[name="${name}"]`);
+            group.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        group.forEach(cb => {
+                            if (cb !== this) cb.checked = false;
+                        });
+                        updateFilterBadge(); // Cập nhật khi chọn
+                    }
+                });
+            });
+        });
         // Khởi tạo badge lần đầu
         updateFilterBadge();
     });
@@ -1364,7 +1383,6 @@
 
 <!--Hiệu ứng rớt từng ô màu-->
 <script>
-
     document.addEventListener('DOMContentLoaded', function() {
         // Lặp qua tất cả các product-wrapper
         document.querySelectorAll('.product-wrapper').forEach(wrapper => {

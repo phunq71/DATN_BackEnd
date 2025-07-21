@@ -1021,7 +1021,7 @@
 
             <!-- Hiển thị ảnh "NEW" nếu variantNew == true -->
             <img class="new-badge"
-                 th:if="${variantNew}"
+                 th:if="${pro.isNew}"
                  src="/uploads/NewImage.png"
                  alt="New"/>
 
@@ -1052,9 +1052,9 @@
             Vui lòng chọn size
         </div>
         <div>
-            <span th:text="'Số sản phẩm đã bán: ' + ${variantSoldQuantity}"></span>
+            <span th:text="'Số sản phẩm đã bán: ' + ${pro.getSoldQuantity()}"></span>
 
-            <img th:if="${variantIsHot}"
+            <img th:if="${pro.isHot}"
                  src="/uploads/hoticon.png"
                  style="height: 50px; width: 50px; margin-top: -10px;"
                  alt="Hot product" />
@@ -1063,7 +1063,10 @@
         <div class="rating">
             <div class="rating-box">
                 <!-- Hiển thị rating trung bình -->
-                <div style="color:#666" th:text="'★ ' + ${#numbers.formatDecimal(averageRating, 1, 1)}"></div>
+                <div>
+                    <span style="color:#666" th:text="${pro.favorites + ' ❤ '}"></span>
+                    <span style="color:#666" th:text="${#numbers.formatDecimal(averageRating, 1, 1)} + ' ★'"></span>
+                </div>
                 <!-- Thanh progress tổng thể -->
                 <div class="rating-progress">
                     <div class="rating-progress-bar"

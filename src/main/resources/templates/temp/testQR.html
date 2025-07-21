@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quét mã QR</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #e0f7fa, #fffde7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .scanner-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            width: 350px;
+            text-align: center;
+            position: relative;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        #reader {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #result {
+            margin-top: 15px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #444;
+            min-height: 30px;
+        }
+
+        #accountId {
+            margin-top: 10px;
+            color: #00796b;
+            font-weight: bold;
+            font-size: 16px;
+            transition: opacity 0.3s ease;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #43a047;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(67, 160, 71, 0.3);
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background: #2e7d32;
+            transform: scale(1.03);
+        }
+
+        .loading::after {
+            content: '⏳ Đang xác minh...';
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #999;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="scanner-container">
+    <div id="reader"></div>
+    <p id="result">Vui lòng quét mã QR</p>
+    <div id="accountId"></div>
+    <button id="okButton" style="display: none;">OK</button>
+</div>
+
+<script>
+    const html5QrCode = new Html5Qrcode("reader");
+
+    function onScanSuccess(decodedText) {
+        document.getElementById("result").innerText = `Đã quét được mã: ${decodedText}`;
+        document.getElementById("result").classList.add("loading");
+
+        // Gửi mã QR lên server để kiểm tra hợp lệ
+        fetch(`/opulentia/verify-code?code=${decodedText}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").classList.remove("loading");
+                document.getElementById("result").innerText = data.message;
+
+                if (data.valid) {
+                    document.getElementById("accountId").innerText = `✔️ Account ID: ${data.accountId}`;
+                    document.getElementById("accountId").style.opacity = "1";
+                    document.getElementById("okButton").style.display = "inline-block";
+                } else {
+                    document.getElementById("accountId").innerText = "";
+                    document.getElementById("okButton").style.display = "none";
+                }
+            });
+
+        // Dừng quét sau khi có mã
+        html5QrCode.stop().catch(err => console.error("Stop failed", err));
+    }
+
+    html5QrCode.start(
+        { facingMode: "user" },
+        {
+            fps: 15,
+            qrbox: { width: 250, height: 250 },
+            disableFlip: false,
+            videoConstraints: {
+                facingMode: "user",
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        },
+        onScanSuccess
+    ).then(() => {
+        // Thêm transform sau khi video được tải
+        const videoElement = document.querySelector('#reader video');
+        if (videoElement) {
+            videoElement.style.transform = 'scaleX(-1)';
+        }
+    }).catch(err => {
+        console.error("Camera start error:", err);
+        document.getElementById("result").innerText = "Không thể mở camera!";
+    });
+
+    document.getElementById("okButton").addEventListener("click", function () {
+        alert("✅ Xác nhận thành công!");
+        // Có thể chuyển trang, gửi API hoặc redirect...
+    });
+</script>
+
+</body>
+</html>

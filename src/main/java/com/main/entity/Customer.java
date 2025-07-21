@@ -35,6 +35,9 @@ public class Customer implements Serializable {
     @Column(name = "Dob")
     private LocalDate dob;
 
+    @Column(name = "qr_token", length = 512)
+    private String qrToken;
+
     @Column(name = "ImageAvt", nullable = false, length = 255)
     private String imageAvt;
 

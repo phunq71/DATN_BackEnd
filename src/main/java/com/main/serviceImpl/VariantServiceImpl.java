@@ -19,7 +19,7 @@ public class VariantServiceImpl implements VariantService {
     private VariantRepository variantRepository;
     @Override
     public List<Variant_DetailDTO> findByProduct(Product product) {
-        return variantRepository.findByProduct(product)
+        return variantRepository.findByProductAndIsUseTrue(product)
                 .stream()
                 .map(VariantMapper::toDTO)
                 .collect(Collectors.toList());

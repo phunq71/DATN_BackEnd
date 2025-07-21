@@ -45,17 +45,12 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center">
             <div class="modal-header">
-                <h5 class="modal-title" id="qrModalLabel">Mã QR của bạn</h5>
+                <h5 class="modal-title" id="qrModalLabel" style="color: black; font-weight: bold">Mã QR của bạn</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
             <div class="modal-body m-3">
-                <p class="m-0 d-flex align-items-center justify-content-center gap-2 qr-heading">
-                    <i class="fas fa-qrcode"></i>
-                    Mã QR của bạn nè!
-                    <i class="fas fa-laugh-beam text-warning"></i>
-                </p>
-
                 <img sec:authorize="isAuthenticated()" id="qrImage" alt="QR sẽ hiển thị ở đây" class="img-fluid px-5"/>
+                <p style="color: red">Mã xác nhận có giá trị trong 5 phút và không thể sử dụng lại!</p>
                 <a id="downloadQRBtn" class="btn btn-dark" download="yourQR.png">
                     <i class="fa-solid fa-download me-1"></i> Lưu ảnh
                 </a>

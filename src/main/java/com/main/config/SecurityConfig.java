@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/opulentia/**").permitAll()
                         .requestMatchers("/auth/**", "/index", "/logo/**", "/js/**", "/data/**",
                                 "/test/**", "/.well-known/**", "/uploads/**","/oauth2/**","/favicon.ico",
-                                "/api/auth/**").permitAll()
+                                "/api/auth/**", "/testqrcode").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/opulentia_user/**", "/edit-profile").hasRole("USER")
                         .anyRequest().authenticated()
@@ -84,10 +84,6 @@ public class SecurityConfig {
                 );
         return http.build();
     }
-
-
-
-
 
 
     @Bean

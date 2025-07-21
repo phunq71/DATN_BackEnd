@@ -1,8 +1,10 @@
 package com.main.serviceImpl;
 
 import com.main.dto.*;
+
 import com.main.entity.OrderDetail;
 import com.main.repository.OrderDetailRepository;
+
 import com.main.repository.OrderRepository;
 import com.main.repository.ReviewRepository;
 import com.main.service.OrderService;
@@ -186,6 +188,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<OrderPreviewDTO> getOrderPreviewProducts() {
+        return List.of();
+    }
+
     public Boolean checkOrderDetailByCustomerIDAndODID(String customerId, Integer orderDetailID) {
         Optional<OrderDetail> orderDetailOptional= orderDetailRepository.findById(orderDetailID);
         if(orderDetailOptional.isPresent()) {
@@ -282,5 +288,6 @@ public class OrderServiceImpl implements OrderService {
             }
         }
     }
+
 
 }

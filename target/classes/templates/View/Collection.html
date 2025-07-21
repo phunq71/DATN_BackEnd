@@ -820,7 +820,7 @@
 </style>
 <div class="reels-row">
     <section class="banner-section" th:if="${title == 'deals'}">
-        <img src="https://dep.com.vn/wp-content/uploads/2020/07/dior-thu-2020-tie-dye-bst-deponline-banner-facebook-20200630.jpg"
+        <img src="https://levents.asia/cdn/shop/files/TRIPLE_STAR_WEB_PC.jpg"
              alt="Khuyến mãi thời trang" class="banner-img">
         <div class="banner-overlay">
             <div class="section-header">
@@ -843,6 +843,15 @@
         <div class="banner-overlay">
             <div class="section-header">
                 <h2 class="section-title">SẢN PHẨM BÁN CHẠY</h2>
+            </div>
+        </div>
+    </section>
+    <section class="banner-section"  th:if="${title == 'topFavorite'}">
+        <img src="https://www.thombrowne.com/cdn/shop/files/Thom_Browne_Summer_2025_Hero_Campaign_Image_3_16x9_453ec824-f301-41f7-a53a-0d96fc0a99d3.jpg?v=1752617298&width=1500"
+             alt="Khuyến mãi thời trang" class="banner-img">
+        <div class="banner-overlay">
+            <div class="section-header">
+                <h2 class="section-title">TOP SẢN PHẨM ĐƯỢC YÊU THÍCH NHIỀU NHẤT</h2>
             </div>
         </div>
     </section>
@@ -882,8 +891,9 @@
                                       th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
               </span>
                             </div>
-                            <div class="review"
-                                 th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : 'Chưa có đánh giá'}">
+                            <div class="review">
+                                <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                                <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
                             </div>
                             <div class="new"
                                  th:if="${pro.isNew}"> Mới
