@@ -71,5 +71,10 @@ public class Order {
 
     @OneToOne(mappedBy = "order")
     private Transaction transaction;
+
+
+    public Order(Integer orderID) {
+        this.orderID = orderID;
+    }
 }
 

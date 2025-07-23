@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async function(){
     document.getElementById('orderDate').textContent = formatDate(order.orderDate);
     document.getElementById('transactionDate').textContent = formatDate(order.transactionDate);
     document.getElementById('orderId').textContent = formatOrderId(order.orderID);
+    document.getElementById('orderStatus').textContent= order.statusName;
     const actionDiv = document.getElementById("actions")
 
     addActionButtons(order.status);
@@ -77,6 +78,22 @@ document.addEventListener('DOMContentLoaded', async function(){
                 clearInterval(timerInterval);
             }
         });
+        if (isNaN(orderId) || orderId === null || orderId === '' || Number(orderId) <= 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Thông báo',
+                text: 'Bạn không có quyền mở trang này!',
+                confirmButtonText: 'Quay lại trang chủ',
+                confirmButtonColor: '#000000',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false
+            }).then(() => {
+                window.location.href="/index";
+            });
+            return;
+        }
+
         return axios.get(`/opulentia_user/orders/${orderId}`)
             .then(response => {
                 Swal.close();
@@ -214,6 +231,8 @@ document.addEventListener('DOMContentLoaded', async function(){
             const diffTime = now - updateStatusAt; // chênh lệch mili giây
             const diffDays = diffTime / (1000 * 60 * 60 * 24); // đổi ra ngày
 
+
+
             if (diffDays <= 15) {
                 console.log("Chưa quá 15 ngày → hiện nút");
 
@@ -239,6 +258,18 @@ document.addEventListener('DOMContentLoaded', async function(){
                     console.log("Tất cả isReviewed == false → KHÔNG hiện nút");
                 }
             }
+
+            if (diffDays <=7 ){
+                const returnRequest = document.createElement("button");
+                returnRequest.className = "od-btn od-btn-cancel";
+                returnRequest.id="returnRequestBtn";
+                returnRequest.textContent="Gửi yêu cầu hoàn trả";
+                returnRequest.addEventListener("click", () => {
+                    window.location.href="/opulentia_user/returnRequest/"+orderId;
+                });
+                actionDiv.appendChild(returnRequest);
+            }
+
 
             btn.textContent = "Mua lại";
         }

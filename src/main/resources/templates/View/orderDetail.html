@@ -649,7 +649,6 @@
         <div class="progress-bar">
             <div class="progress-line"></div>
             <div class="progress-line-active" id="progress-line-active"></div>
-
             <div class="progress-step" data-step="DonHangDaDat">
                 <div class="step-circle">
                     <i class="fas fa-folder step-icon"></i>
@@ -694,8 +693,6 @@
         </tbody>
     </table>
 </div>
-
-
 <div class="od-container">
     <div class="od-title-wrapper">
         <button class="back-button" title="Quay lại">
@@ -895,11 +892,10 @@
         const progressWidth = targetIndex * stepWidth;
 
         progressLine.style.width = `${progressWidth}%`;
-
-        animateSteps();
     }
-
-    function animateSteps() {
+    // Thêm hiệu ứng khi trang được tải
+    document.addEventListener('DOMContentLoaded', function () {
+        updateProgressBar();
         const completedSteps = document.querySelectorAll('.step-circle.completed');
         completedSteps.forEach((step, index) => {
             setTimeout(() => {
@@ -915,10 +911,8 @@
                 setTimeout(() => activeStep.style.transform = 'scale(1)', 300);
             }, completedSteps.length * 300);
         }
-    }
+    });
 </script>
-
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const expandBtn = document.getElementById('od-expand-btn');
@@ -950,7 +944,6 @@
         });
     });
 </script>
-
 <script src="/js/orderDetail.js"></script>
 </body>
 </html>
