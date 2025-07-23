@@ -18,6 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         , o.orderDate
         , o.status
         , o.costShip
+        , o.shippingCode
     FROM Order o
     WHERE o.customer.customerId=:customerId
     AND (:status='ALL' OR o.status=:status)
@@ -39,12 +40,30 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     LEFT JOIN v.product p
     WHERE o.customer.customerId = :customerId
     AND (:keyword IS NULL OR :keyword = ''
-         OR CAST(o.orderID AS string) LIKE %:keyword%
          OR p.productName LIKE %:keyword%)
     ORDER BY o.orderDate DESC
     """
     )
     List<OrderDTO> getOrdersByCustomerIdAndKeywords(@Param("customerId") String customerId, @Param("keyword") String keyword);
+
+    @Query("""
+    SELECT DISTINCT o.orderID
+        , o.orderDate
+        , o.status
+        , o.costShip
+    FROM Order o
+    LEFT JOIN o.orderDetails od
+    LEFT JOIN od.item i
+    LEFT JOIN i.variant v
+    LEFT JOIN v.product p
+    WHERE o.customer.customerId = :customerId
+    AND (:keyword IS NULL OR :keyword = ''
+         OR CAST(o.orderID AS string) LIKE %:keyword%
+         )
+    ORDER BY o.orderDate DESC
+    """
+    )
+    List<OrderDTO> getOrdersByCustomerIdAndOrderID(@Param("customerId") String customerId, @Param("keyword") String keyword);
 
     @Query("""
     SELECT DISTINCT YEAR(o.orderDate)
@@ -65,6 +84,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         , o.transaction.paymentMethod
         , o.transaction.transactionDate
         , o.updateStatusAt
+        , o.shippingCode
     FROM Order o
     WHERE o.orderID=:orderId
     """)
@@ -172,6 +192,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     boolean existsByOrderIDAndCustomer_CustomerId(Integer orderID, String customerCustomerId);
 
     boolean existsByCustomer_CustomerIdAndStatusIn(String customerId, List<String> statuses);
+
+    Order findByOrderID(Integer orderID);
 }
 
 

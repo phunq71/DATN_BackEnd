@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded",async function() {
+    document.addEventListener("DOMContentLoaded",async function() {
    orders= await getOrders("ALL");
     initOrder(orders);
 
@@ -60,7 +60,9 @@ searchBtn.addEventListener('click',async function () {
                confirmButtonText: 'OK',
                confirmButtonColor: '#000000',
            });
-       }else initOrder(orders);
+
+       }
+       initOrder(orders);
    }
    else{
        Swal.fire({
@@ -85,19 +87,37 @@ function triggerClickOnActiveTab() {
 let orders=[];
 
 function getOrders(status){
+    let timerInterval;
+    Swal.fire({
+        title: 'Đang lấy dữ liệu',
+        html: 'Vui lòng chờ trong giây lát...',
+        timerProgressBar: true,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        didOpen: () => {
+            Swal.showLoading();
+        },
+        willClose: () => {
+            clearInterval(timerInterval);
+        }
+    });
     let year = yearSelect.value;
     return axios.get(`/opulentia_user/orders/allOrders/${status}/${year}`)
         .then(response =>{
+            Swal.close();
             console.log(status, response.data);
             return response.data
         }).catch(error => {
+            Swal.close();
             console.log(error);
             return [];
         });
 }
 
 function getOrdersByKeyword(keyword){
-    return axios.get(`/opulentia_user/orders/findByKeyword/${keyword}`)
+
+    return axios.get(`/opulentia_user/orders/findByKeyword/${extractKeyword(keyword)}`)
         .then(response =>{
             console.log(keyword, response.data);
             return response.data
@@ -106,6 +126,20 @@ function getOrdersByKeyword(keyword){
             return [];
         });
 }
+
+    function extractKeyword(input) {
+        if (typeof input !== 'string') return input;
+
+        const trimmed = input.trim();
+        const regex = /^#?OD(\d+)$/i;
+
+        const match = trimmed.match(regex);
+        if (match) {
+            return match[1]; // Trả về phần số sau OD
+        }
+
+        return trimmed; // Nếu không phải dạng OD thì trả về nguyên input
+    }
 
 function initOrder(orders) {
     const orderListContainer = document.getElementById('order-list-container');

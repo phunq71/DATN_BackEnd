@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', async function(){
     const orderId = new URL(window.location.href).pathname.split("/").pop();
+    let lastRendered = new Set();
     const order= await getOrder(orderId);
+
     console.log("orderId: "+orderId, order);
 
-
+    updateProgressBar(order.status);
 
     // Fill in basic information
     document.getElementById('shippingName').textContent = order.shippingName;
@@ -59,13 +61,40 @@ document.addEventListener('DOMContentLoaded', async function(){
     document.querySelector('.od-summary-total span:last-child').textContent = formatCurrency(order.finalPrice);
 
 
-
     function getOrder(orderId) {
+        let timerInterval;
+        Swal.fire({
+            title: 'Đang lấy dữ liệu',
+            html: 'Vui lòng chờ trong giây lát...',
+            timerProgressBar: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            willClose: () => {
+                clearInterval(timerInterval);
+            }
+        });
         return axios.get(`/opulentia_user/orders/${orderId}`)
             .then(response => {
-                return response.data;
+                Swal.close();
+                const data = response.data;
+
+                // Hiển thị tất cả các trạng thái trong trackingHistory
+                if (data.trackingHistory && data.trackingHistory.length>0) {
+                    data.trackingHistory.forEach(entry => {
+                        renderShippingStatus(entry.status, entry.updatedTime);
+                    });
+                } else {
+                    document.getElementById('shipping-status-table').style.display='none';
+                }
+
+                return data;
             })
             .catch(error => {
+                Swal.close();
                 if (error.response && error.response.status === 400) {
                     Swal.fire({
                         icon: 'error',
@@ -77,13 +106,66 @@ document.addEventListener('DOMContentLoaded', async function(){
                         allowEscapeKey: false,
                         allowEnterKey: false
                     }).then(() => {
-                        window.location.href="/index";
+                        window.location.href = "/index";
                     });
                 } else {
                     console.log(error);
                 }
             });
     }
+
+
+
+    function formatVNDateTime(dateString) {
+        const date = new Date(dateString);
+        const hours = date.getHours().toString().padStart(2, "0");
+        const minutes = date.getMinutes().toString().padStart(2, "0");
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${hours}:${minutes} ${day}/${month}/${year}`;
+    }
+
+    function renderShippingStatus(status, updateTime) {
+        const formattedTime = formatVNDateTime(updateTime);
+        const translatedStatus = translateShippingStatus(status);
+        const key = formattedTime + translatedStatus;
+
+        // Không thêm trùng dòng đã render
+        if (lastRendered.has(key)) return;
+        lastRendered.add(key);
+        const tbody = document.getElementById("shipping-status-body");
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${formattedTime}</td>
+        <td>${translatedStatus}</td>
+    `;
+        tbody.appendChild(row);
+    }
+
+
+    function translateShippingStatus(status) {
+        const statusMap = {
+            "ready_to_pick": "Chờ lấy hàng",
+            "picking": "Đang lấy hàng",
+            "money_collect_picking": "Lấy hàng và thu tiền",
+            "picked": "Đã lấy hàng",
+            "storing": "Đang lưu kho",
+            "transporting": "Đang vận chuyển",
+            "sorting": "Đang phân loại",
+            "delivering": "Đang giao hàng",
+            "money_collect_delivering": "Giao hàng và thu tiền",
+            "delivered": "Đã giao hàng",
+            "delivery_fail": "Giao hàng thất bại",
+            "cancel": "Đã hủy",
+            "return": "Hoàn hàng",
+            "returned": "Đã hoàn hàng"
+        };
+
+        return statusMap[status] || status; // Nếu không khớp thì trả về nguyên trạng
+    }
+
+
     function calculateTotalPriceWithoutDiscount(order) {
         let total = 0;
 

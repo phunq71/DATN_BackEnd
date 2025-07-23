@@ -31,6 +31,9 @@ public class Order {
     @Column(length = 150)
     private String shippingAddress;
 
+    @Column(length = 50)
+    private String shippingCode;
+
     @Column(length = 300)
     private String note;
 
