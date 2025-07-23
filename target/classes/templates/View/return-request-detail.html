@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin đơn hàng</title>
+
+</head>
+<body>
+<style>
+
+    .od-container {
+        color: black;
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #fff;
+        margin-top: 80px;
+        padding: 20px;
+    }
+
+    .od-header {
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+
+    .od-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+    }
+
+    .od-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0; /* Bỏ margin-bottom của h1 */
+        color: #000;
+    }
+
+    .back-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: none;
+        margin: 0; /* Đảm bảo không có margin */
+    }
+
+    .od-delivery-date {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .od-status {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        font-weight: bold;
+        color: black;
+    }
+
+    .od-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+    }
+
+    .od-col {
+        flex: 1;
+        min-width: 300px;
+        padding: 0 15px;
+    }
+
+    .od-section {
+        margin-bottom: 20px;
+    }
+
+    .od-section-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #000;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+    }
+
+    .od-address {
+        line-height: 1.6;
+    }
+
+    .od-recipient {
+        font-weight: bold;
+        color: #000;
+    }
+
+    .od-phone {
+        color: #777;
+    }
+
+    .od-products {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .od-products th {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        color: #777;
+        font-weight: normal;
+    }
+
+    .od-products td {
+        padding: 15px 10px;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+    }
+
+    .od-product-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+    .od-product-name {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .od-product-attr {
+        color: #777;
+        font-size: 14px;
+    }
+
+    .od-original-price {
+        text-decoration: line-through;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .od-discounted-price {
+        color: #000;
+        font-weight: bold;
+    }
+
+    .od-total {
+        text-align: right;
+        margin-top: 20px;
+    }
+
+    .od-summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee;
+    }
+
+    .od-summary-total {
+        font-size: 18px;
+        font-weight: bold;
+        color: #000;
+    }
+
+    .od-expand-btn {
+        background: none;
+        border: none;
+        color: #777;
+        cursor: pointer;
+        text-decoration: underline;
+        font-size: 14px;
+        padding: 0;
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    .od-expand-btn:hover {
+        color: #333;
+    }
+
+    .od-detail {
+        margin-bottom: 10px;
+    }
+
+    .od-detail-label {
+        color: #777;
+        margin-bottom: 5px;
+    }
+
+    .od-detail-value {
+        font-weight: bold;
+    }
+
+    .od-copy-btn {
+        background: none;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 2px 8px;
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 12px;
+    }
+
+    .od-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .od-btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .od-btn-cancel {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        color: #333;
+    }
+
+    .od-btn-review {
+        background-color: #000000;
+        border: 1px solid #ddd;
+        color: #ffffff;
+        transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+
+    /* Hover state */
+    .od-btn-review:hover {
+        background-color: #333333; /* Đen nhạt hơn xíu khi hover */
+        border-color: #bbb; /* Cho border bớt cứng */
+    }
+
+    /* Click (active) state */
+    .od-btn-review:active {
+        background-color: #555555; /* Sáng hơn xíu khi nhấn */
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Hover state */
+    .od-btn-cancel:hover {
+        background-color: #e0e0e0; /* Màu xám hơi đậm hơn khi hover */
+        border-color: #ccc;
+    }
+
+    /* Click (active) state */
+    .od-btn-cancel:active {
+        background-color: #d5d5d5; /* Màu xám đậm hơn nữa khi nhấn */
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .od-btn-track {
+        background-color: #000;
+        border: 1px solid #000;
+        color: #fff;
+    }
+
+    .od-details-expanded {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 1s ease;
+    }
+
+    .od-details-expanded.expanded {
+        max-height: 500px; /* Giá trị này đủ lớn hơn chiều cao thực tế */
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .back-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: none;
+    }
+
+    .back-button i {
+        color: #191b1f;
+        font-size: 24px;
+        transform: scaleX(-1); /* Lật ngang icon */
+    }
+
+    .back-button:hover {
+        background-color: #f0f0f0; /* Màu hover nhẹ nhàng */
+        transform: translateY(-2px) scale(1.05); /* Thêm hiệu ứng phóng to nhẹ */
+    }
+
+    .back-button:active {
+        background-color: #e1f2ff;
+        transform: translateY(0) scale(0.98); /* Hiệu ứng nhấn xuống */
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* Hiệu ứng bóng bên trong */
+    }
+
+
+
+    /* Open Modal Button */
+    .rv-open-modal-btn {
+        padding: 10px 20px;
+        background-color: #222;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+
+    .rv-open-modal-btn:hover {
+        background-color: #444;
+    }
+
+    /* Modal Styles */
+    .rv-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none; /* Ẩn modal mặc định */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .rv-modal-container {
+        background-color: white;
+        width: 90%;
+        max-width: 800px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .rv-modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        background-color: #f8f8f8;
+        color: #333;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .rv-modal-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .rv-product-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .rv-product-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background-color: #fafafa;
+        border: 1px solid #e0e0e0;
+    }
+
+    .rv-product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        margin-right: 15px;
+        background-color: #eee;
+    }
+
+    .rv-product-info {
+        flex: 1;
+    }
+
+    .rv-product-name {
+        font-weight: 600;
+        color: #222;
+        margin-bottom: 5px;
+    }
+
+    .rv-product-details {
+        display: flex;
+        gap: 15px;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .rv-review-button {
+        padding: 8px 15px;
+        background-color: #222;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .rv-review-button:hover {
+        background-color: #444;
+    }
+
+    .rv-review-button.reviewed {
+        background-color: #666;
+    }
+
+    .rv-modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: flex-end;
+        background-color: #f8f8f8;
+    }
+
+    .rv-close-button {
+        padding: 8px 20px;
+        background-color: #222;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .rv-close-button:hover {
+        background-color: #444;
+    }
+
+    /* Scrollbar styling */
+    .rv-modal-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .rv-modal-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .rv-modal-content::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    .rv-modal-content::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+
+
+<style>
+    .status-detail {
+        margin: 0 100px;
+        display: flex;
+        margin-bottom: 100px;
+    }
+
+    .order-table {
+        color: black;
+        border-collapse: collapse;
+        border: 1px solid #ccc;
+        font-family: Arial, sans-serif;
+        margin-left: auto;
+        width: 50%;
+    }
+
+    .order-table td {
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .order-table .last-row {
+        text-align: right;
+    }
+
+    .toggle-btn {
+        background: none;
+        border: none;
+        color: #0066cc;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+
+    }
+
+    .hidden-row {
+        display: none;
+    }
+
+
+    /* Modal Styles */
+    .img-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .img-modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 1000px;
+        border-radius: 5px;
+        height: 80vh;
+        overflow-y: auto;
+        scrollbar-width: none;
+        color: black;
+    }
+
+    .img-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .img-close-btn {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .img-close-btn:hover {
+        color: #777;
+    }
+
+    .img-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .img-container img {
+        width: 100%;
+        height: 100%;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    /* Button Styles */
+    #openModalBtn {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .img-close-btn {
+        background-color: #d3d3d3; /* Màu xám bạc */
+        color: #333;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .img-close-btn:hover {
+        background-color: #c0c0c0;
+    }
+</style>
+
+<div class="od-container">
+    <div class="od-title-wrapper">
+        <button class="back-button" title="Quay lại">
+            <i class="fa-solid fa-share"></i>
+        </button>
+        <h1 class="od-title">Thông tin đơn hoàn tiền</h1>
+    </div>
+    <div class="od-header">
+
+
+        <span class="od-status" id="orderStatus">Trạng thái</span>
+    </div>
+
+
+    <div class="od-row">
+<!--        <div class="od-col">-->
+<!--            <div class="od-section">-->
+<!--                <h2 class="od-section-title">Địa chỉ nhận hàng</h2>-->
+<!--                <div class="od-address">-->
+<!--                    <div class="od-recipient" id="shippingName"></div>-->
+<!--                    <div class="od-phone" id="shippingPhone"></div>-->
+<!--                    <div id="shippingAddress"></div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-section">-->
+<!--                <h2 class="od-section-title">Thông tin thanh toán</h2>-->
+<!--                <div class="od-detail">-->
+<!--                    <div class="od-detail-label">Phương thức thanh toán</div>-->
+<!--                    <div class="od-detail-value" id="paymentMethod"></div>-->
+<!--                </div>-->
+<!--                <div class="od-detail">-->
+<!--                    <div class="od-detail-label">Thời gian đặt hàng</div>-->
+<!--                    <div class="od-detail-value" id="orderDate"></div>-->
+<!--                </div>-->
+<!--                <div class="od-detail">-->
+<!--                    <div class="od-detail-label">Thời gian thanh toán</div>-->
+<!--                    <div class="od-detail-value" id="transactionDate"></div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-section">-->
+<!--                <div class="od-detail">-->
+<!--                    <div class="od-detail-label">Mã đơn hàng</div>-->
+<!--                    <div class="od-detail-value">-->
+<!--                        <span id="orderId"></span>-->
+<!--                        <button class="od-copy-btn">Sao chép</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <div class="od-col">
+            <div class="od-section">
+                <h2 class="od-section-title">Sản phẩm hoàn trả</h2>
+                <table class="od-products">
+                    <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền</th>
+                        <th>Lý do</th>
+                        <th>Ảnh đính kèm</th>
+                    </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                    <!-- Sản phẩm sẽ được thêm động bằng JavaScript -->
+                    </tbody>
+                </table>
+
+                <div class="od-total">
+
+
+                    <div class="od-summary-item od-summary-total">
+                        <span>Tổng cộng:</span>
+                        <span id="finalPrice"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="od-actions" id="actions">
+             <button class="od-btn od-btn-cancel" id="action-btn">Xem lại đơn hàng đã đặt</button>
+    </div>
+
+</div>
+
+<div class="status-detail">
+    <table class="order-table">
+<!--        <tr>-->
+<!--            <td>10:30 25/06/2024</td>-->
+<!--            <td><b>Đang vận chuyển</b></td>-->
+<!--        </tr>-->
+<!--        <tr class="hidden-row">-->
+<!--            <td>09:15 24/06/2024</td>-->
+<!--            <td>Đã nhập kho</td>-->
+<!--        </tr>-->
+<!--        <tr class="hidden-row">-->
+<!--            <td>14:20 23/06/2024</td>-->
+<!--            <td>Đơn vị vận chuyển lấy hàng thành công</td>-->
+<!--        </tr>-->
+<!--        <tr class="hidden-row">-->
+<!--            <td>11:05 23/06/2024</td>-->
+<!--            <td>Đặt hàng thành công</td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <td colspan="2" class="last-row">-->
+<!--                <button class="toggle-btn">Xem chi tiết</button>-->
+<!--            </td>-->
+<!--        </tr>-->
+    </table>
+</div>
+
+<div id="img-modal" class="img-modal">
+    <div class="img-modal-content">
+        <div class="img-modal-header">
+            <h2>Ảnh minh chứng</h2>
+            <span class="img-close-btn">&times;</span>
+        </div>
+        <div class="img-modal-body">
+            <div class="img-container">
+<!--                <img src="https://via.placeholder.com/400x300?text=Image+1" alt="Image 1">-->
+<!--                <img src="https://via.placeholder.com/400x300?text=Image+2" alt="Image 2">-->
+<!--                <img src="https://via.placeholder.com/400x300?text=Image+3" alt="Image 3">-->
+<!--                <img src="https://via.placeholder.com/400x300?text=Image+4" alt="Image 4">-->
+<!--                <img src="https://via.placeholder.com/400x300?text=Image+5" alt="Image 5">-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelector('.toggle-btn').addEventListener('click', function () {
+        const hiddenRows = document.querySelectorAll('.hidden-row');
+        const btn = this;
+
+        hiddenRows.forEach(row => {
+            if (row.style.display === 'none' || row.style.display === '') {
+                row.style.display = 'table-row';
+                btn.textContent = 'Ẩn chi tiết';
+            } else {
+                row.style.display = 'none';
+                btn.textContent = 'Xem chi tiết';
+            }
+        });
+    });
+</script>
+
+<script src="/js/return-request-detail.js"></script>
+</body>
+</html>

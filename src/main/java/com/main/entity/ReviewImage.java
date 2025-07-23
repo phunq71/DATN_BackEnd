@@ -20,11 +20,20 @@ public class ReviewImage {
     private String imageUrl;
 
     @ManyToOne
-    @JoinColumn( name = "reviewID", nullable = false)
+    @JoinColumn( name = "reviewID")
     private Review review;
+
+    @ManyToOne
+    @JoinColumn(name = "returnItemID")
+    private ReturnItem returnItem;
 
     public ReviewImage(Review review, String imageUrl) {
         this.review = review;
         this.imageUrl = imageUrl;
+    }
+
+    public ReviewImage(Integer returnItemID, String imageUrl) {
+        this.imageUrl = imageUrl;
+        this.returnItem = new ReturnItem(returnItemID);
     }
 }

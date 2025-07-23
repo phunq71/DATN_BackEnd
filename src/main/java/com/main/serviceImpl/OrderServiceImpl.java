@@ -38,18 +38,23 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDTO> getOrdersByCustomerIdAndStatus(String customerId, String status, Integer year) {
         List<OrderDTO> orders = new ArrayList<>();
+        List<OrderPriceDTO> orderPrices;
 
         if ("ChoLayHang".equals(status)) {
+            orderPrices = new ArrayList<>();
             List<String> statusList = List.of("ChuanBiDon", "SanSangGiao", "DaYeuCauHuy");
             for (String s : statusList) {
                 orders.addAll(orderRepository.getOrdersByCustomerIdAndStatus(customerId, s, year));
+                orderPrices.addAll(getOrderPricesByCustomer(customerId, s, year));
             }
         } else {
             orders = orderRepository.getOrdersByCustomerIdAndStatus(customerId, status, year);
+            orderPrices= getOrderPricesByCustomer(customerId, status, year);
         }
 
-        List<OrderPriceDTO> orderPrices = getOrderPricesByCustomer(customerId, status, year);
 
+
+        orderPrices.forEach(System.err::println);
         orders.forEach(order -> {
             OrderPriceDTO orderPriceDTO = orderPrices.stream()
                     .filter(orderPrice -> orderPrice.getOrderId().equals(order.getOrderID()))
@@ -92,12 +97,12 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal voucherDiscount = convertToBigDecimal(resultArray[3]);
         BigDecimal finalPrice = convertToBigDecimal(resultArray[4]);
 
-//        // Log các giá trị
-//        System.out.println("OrderID: " + orderIdResult);
-//        System.out.println("TotalPrice: " + totalPrice);
-//        System.out.println("ProductDiscount: " + productDiscount);
-//        System.out.println("VoucherDiscount: " + voucherDiscount);
-//        System.out.println("FinalPrice: " + finalPrice);
+        // Log các giá trị
+        System.out.println("OrderID: " + orderIdResult);
+        System.out.println("TotalPrice: " + totalPrice);
+        System.out.println("ProductDiscount: " + productDiscount);
+        System.out.println("VoucherDiscount: " + voucherDiscount);
+        System.out.println("FinalPrice: " + finalPrice);
 
         return new OrderPriceDTO(
                 orderIdResult,

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @Entity
 @Data
@@ -31,4 +33,12 @@ public class ReturnItem {
     @OneToOne
     @JoinColumn(name = "OrderDetailID", nullable = false)
     private OrderDetail orderDetail;
+
+    @OneToMany(mappedBy = "returnItem")
+    private List<ReviewImage> reviewImages;
+
+
+    public ReturnItem(Integer returnItemId) {
+        this.returnItemId = returnItemId;
+    }
 }
