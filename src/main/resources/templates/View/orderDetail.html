@@ -257,7 +257,7 @@
     /* Click (active) state */
     .od-btn-cancel:active {
         background-color: #d5d5d5; /* Màu xám đậm hơn nữa khi nhấn */
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .od-btn-track {
@@ -277,8 +277,12 @@
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
     }
 
     .back-button {
@@ -308,9 +312,8 @@
     .back-button:active {
         background-color: #e1f2ff;
         transform: translateY(0) scale(0.98); /* Hiệu ứng nhấn xuống */
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* Hiệu ứng bóng bên trong */
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng bên trong */
     }
-
 
 
     /* Open Modal Button */
@@ -486,7 +489,7 @@
         flex-direction: row;
         justify-content: space-between;
         position: relative;
-        margin-bottom: 70px; /* Tăng margin-bottom để chứa label */
+        margin-bottom: 70px;
         width: 100%;
     }
 
@@ -510,8 +513,32 @@
         justify-content: center;
         margin-bottom: 10px;
         position: relative;
+        z-index: 3; /* Đảm bảo icon nằm trên progress line */
+        background-color: white; /* Nền trắng để che progress line */
     }
 
+    .progress-line {
+        position: absolute;
+        height: 2px;
+        background-color: #e0e0e0;
+        top: 27px; /* 27px = (55px height của circle / 2) - (2px height của line / 2) */
+        left: calc(27.5px + 5%); /* Bắt đầu từ giữa icon đầu tiên + padding container */
+        right: calc(27.5px + 5%); /* Kết thúc ở giữa icon cuối cùng + padding container */
+        z-index: 1;
+    }
+
+    .progress-line-active {
+        position: absolute;
+        height: 2px;
+        background-color: #28a745;
+        top: 27px;
+        left: calc(27.5px + 5%); /* Cùng vị trí với progress-line */
+        z-index: 2;
+        transition: width 0.5s ease;
+        width: 0;
+    }
+
+    /* Phần còn lại giữ nguyên */
     .step-circle.pending {
         border: 2px solid #ccc;
         background-color: white;
@@ -540,7 +567,7 @@
         transform: translateX(-50%);
         color: black;
         font-weight: bold;
-        white-space: nowrap; /* Ngăn chữ xuống dòng */
+        white-space: nowrap;
     }
 
     .step-time {
@@ -550,59 +577,55 @@
         width: 100%;
         margin-top: 5px;
         position: absolute;
-        top: 70px; /* Điều chỉnh vị trí thời gian */
+        top: 70px;
         left: 0;
         right: 0;
         white-space: nowrap;
     }
 
-    .progress-line {
-        position: absolute;
-        height: 2px;
-        background-color: #e0e0e0;
-        top: 27px;
-        left: 0;
-        right: 0;
-        z-index: 1;
-    }
-
-    .progress-line-active {
-        position: absolute;
-        height: 2px;
-        background-color: #28a745;
-        top: 27px;
-        left: 0;
-        z-index: 1;
-        transition: width 0.5s ease;
-        width: 0;
-    }
-
     .step-icon {
-        font-size: 24px; /* Giảm kích thước icon một chút */
+        font-size: 24px;
     }
 
 </style>
 
 <style>
-    .status-detail{
+    .status-detail {
         margin: 0 100px;
         display: flex;
+        justify-content: right;
+        align-items: flex-start;
     }
 
     .order-table {
-        color: black;
+        color: #222;
         border-collapse: collapse;
         border: 1px solid #ccc;
         font-family: Arial, sans-serif;
-        margin-left: auto;
         width: 50%;
+        background-color: #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
+
+    .order-table th {
+        background-color: #f5f5f5;
+        color: #333;
+        font-weight: bold;
+        padding: 10px;
+        text-align: left;
+        border-bottom: 2px solid #ddd;
+    }
+
     .order-table td {
-        padding: 8px;
+        padding: 10px;
         border-bottom: 1px solid #eee;
     }
 
-    .order-table .last-row{
+    .order-table tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .order-table .last-row {
         text-align: right;
     }
 
@@ -613,104 +636,63 @@
         cursor: pointer;
         text-decoration: underline;
         padding: 0;
-
+        font-size: 14px;
     }
+
     .hidden-row {
         display: none;
     }
-</style>
 
+</style>
 <div class="order-status">
     <div class="progress-container">
-    <div class="progress-bar">
-        <div class="progress-line"></div>
-        <div class="progress-line-active" id="progress-line-active"></div>
-
-        <div class="progress-step">
-            <div class="step-circle completed">
-                <i class="fas fa-folder step-icon"></i>
+        <div class="progress-bar">
+            <div class="progress-line"></div>
+            <div class="progress-line-active" id="progress-line-active"></div>
+            <div class="progress-step" data-step="DonHangDaDat">
+                <div class="step-circle">
+                    <i class="fas fa-folder step-icon"></i>
+                </div>
+                <div class="step-label">Đơn hàng đã đặt</div>
             </div>
-            <div class="step-label">Đơn hàng đã đặt</div>
-            <div class="step-time">21:19 24/06/2025</div>
-        </div>
 
-        <div class="progress-step">
-            <div class="step-circle completed">
-                <i class="fas fa-money-bill-wave step-icon"></i>
+            <div class="progress-step" data-step="DaXacNhan">
+                <div class="step-circle">
+                    <i class="fas fa-money-bill-wave step-icon"></i>
+                </div>
+                <div class="step-label">Đã xác nhận</div>
             </div>
-            <div class="step-label">Đã xác nhận</div>
-            <div class="step-time">21:20 24/06/2025</div>
-        </div>
 
-        <div class="progress-step">
-            <div class="step-circle completed">
-                <i class="fas fa-truck step-icon"></i>
+            <div class="progress-step" data-step="DaLayHang">
+                <div class="step-circle">
+                    <i class="fas fa-truck step-icon"></i>
+                </div>
+                <div class="step-label">Đã lấy hàng</div>
             </div>
-            <div class="step-label">Đã lấy hàng</div>
-            <div class="step-time">17:49 25/06/2025</div>
-        </div>
 
-        <div class="progress-step">
-            <div class="step-circle active">
-                <i class="fas fa-box-open step-icon"></i>
+            <div class="progress-step" data-step="HoanThanh">
+                <div class="step-circle">
+                    <i class="fas fa-star step-icon"></i>
+                </div>
+                <div class="step-label">Hoàn thành</div>
             </div>
-            <div class="step-label">Đã giao hàng</div>
-            <div class="step-time"></div>
-        </div>
-
-        <div class="progress-step">
-            <div class="step-circle pending">
-                <i class="fas fa-star step-icon"></i>
-            </div>
-            <div class="step-label">Đã hoàn thành</div>
-            <div class="step-time"></div>
         </div>
     </div>
 </div>
-</div>
 
 <div class="status-detail">
-    <table class="order-table">
-    <tr>
-        <td>10:30 25/06/2024</td>
-        <td><b>Đang vận chuyển</b></td>
-    </tr>
-    <tr class="hidden-row">
-        <td>09:15 24/06/2024</td>
-        <td>Đã nhập kho</td>
-    </tr>
-    <tr class="hidden-row">
-        <td>14:20 23/06/2024</td>
-        <td>Đơn vị vận chuyển lấy hàng thành công</td>
-    </tr>
-    <tr class="hidden-row">
-        <td>11:05 23/06/2024</td>
-        <td>Đặt hàng thành công</td>
-    </tr>
-    <tr>
-        <td colspan="2" class="last-row">
-            <button class="toggle-btn">Xem chi tiết</button>
-        </td>
-    </tr>
-</table>
+    <table class="order-table" id="shipping-status-table" border="1" style=" border-collapse: collapse;">
+        <thead>
+        <tr>
+            <th>Thời gian cập nhật</th>
+            <th>Trạng thái đơn hàng</th>
+        </tr>
+        </thead>
+        <tbody id="shipping-status-body">
+        <!-- Các dòng sẽ được thêm tại đây -->
+        </tbody>
+    </table>
 </div>
-<script>
-    document.querySelector('.toggle-btn').addEventListener('click', function() {
-        const hiddenRows = document.querySelectorAll('.hidden-row');
-        const btn = this;
-
-        hiddenRows.forEach(row => {
-            if (row.style.display === 'none' || row.style.display === '') {
-                row.style.display = 'table-row';
-                btn.textContent = 'Ẩn chi tiết';
-            } else {
-                row.style.display = 'none';
-                btn.textContent = 'Xem chi tiết';
-            }
-        });
-    });
-</script>
-
 <div class="od-container">
     <div class="od-title-wrapper">
         <button class="back-button" title="Quay lại">
@@ -724,8 +706,6 @@
         <div class="od-delivery-date">Ngày nhận hàng dự kiến 30/06/2025</div>
         <span class="od-status" id="orderStatus"></span>
     </div>
-
-
 
 
     <div class="od-row">
@@ -786,19 +766,19 @@
                 <div class="od-total">
                     <button id="od-expand-btn" class="od-expand-btn">Xem chi tiết</button>
                     <div id="od-details-expanded" class="od-details-expanded">
-                        <div class="od-summary-item" >
+                        <div class="od-summary-item">
                             <span>Tổng tiền hàng:</span>
                             <span id="totalItemsPrice"></span>
                         </div>
-                        <div class="od-summary-item" >
+                        <div class="od-summary-item">
                             <span>Phí vận chuyển:</span>
                             <span id="shippingCost"></span>
                         </div>
-                        <div class="od-summary-item" >
+                        <div class="od-summary-item">
                             <span>Giảm giá của sản phẩm:</span>
                             <span id="discountProductPrice"></span>
                         </div>
-                        <div class="od-summary-item" >
+                        <div class="od-summary-item">
                             <span>Voucher:</span>
                             <span id="discountVoucherPrice"></span>
                         </div>
@@ -813,8 +793,8 @@
     </div>
 
     <div class="od-actions" id="actions">
-<!--        <button class="od-btn od-btn-cancel" id="action-btn">-</button>-->
-<!--        <button class="od-btn od-btn-review" id="review-btn">Đánh giá sản phẩm</button>-->
+        <!--        <button class="od-btn od-btn-cancel" id="action-btn">-</button>-->
+        <!--        <button class="od-btn od-btn-review" id="review-btn">Đánh giá sản phẩm</button>-->
 
     </div>
 
@@ -825,11 +805,12 @@
         <div class="rv-modal-header">
             Đánh giá sản phẩm
         </div>
-        <div class="rv-modal-content" >
+        <div class="rv-modal-content">
             <div class="rv-product-list" id="rv-items-container">
                 <!-- Product 1 -->
                 <div class="rv-product-item">
-                    <img src="CIRCLE_EMBROIDERED_LOGO_T-SHIRT_BROWN_01.png" alt="Product Image" class="rv-product-image">
+                    <img src="CIRCLE_EMBROIDERED_LOGO_T-SHIRT_BROWN_01.png" alt="Product Image"
+                         class="rv-product-image">
                     <div class="rv-product-info">
                         <div class="rv-product-name">Circle Embroidered Logo T-Shirt</div>
                         <div class="rv-product-details">
@@ -842,7 +823,8 @@
 
                 <!-- Product 2 -->
                 <div class="rv-product-item">
-                    <img src="BEVERLY_HILLS_LOGO-EMBROIDERED_T-SHIRT_BLACK_01.png" alt="Product Image" class="rv-product-image">
+                    <img src="BEVERLY_HILLS_LOGO-EMBROIDERED_T-SHIRT_BLACK_01.png" alt="Product Image"
+                         class="rv-product-image">
                     <div class="rv-product-info">
                         <div class="rv-product-name">Beverly Hills Logo-Embroidered T-Shirt</div>
                         <div class="rv-product-details">
@@ -855,7 +837,8 @@
 
                 <!-- Product 3 -->
                 <div class="rv-product-item">
-                    <img src="BEVERLY_HILLS_LOGO-EMBROIDERED_T-SHIRT_WHITE_01.png" alt="Product Image" class="rv-product-image">
+                    <img src="BEVERLY_HILLS_LOGO-EMBROIDERED_T-SHIRT_WHITE_01.png" alt="Product Image"
+                         class="rv-product-image">
                     <div class="rv-product-info">
                         <div class="rv-product-name">Beverly Hills Logo-Embroidered T-Shirt</div>
                         <div class="rv-product-details">
@@ -873,50 +856,69 @@
     </div>
 </div>
 
-
 <script>
-    // Tính toán và cập nhật thanh tiến trình
-    function updateProgressBar() {
-        const activeSteps = document.querySelectorAll('.step-circle.completed').length;
-        const totalSteps = document.querySelectorAll('.progress-step').length;
-        const progressPercentage = (activeSteps / (totalSteps - 1)) * 100;
+    const statusToStepMap = {
+        'ChoXacNhan': 'DonHangDaDat',
+        'ChuanBiDon': 'DaXacNhan',
+        'SanSangGiao': 'DaXacNhan',
+        'DaYeuCauHuy': 'DaXacNhan',
+        'ChoGiaoHang': 'DaLayHang',
+        'DaGiao': 'HoanThanh'
+    };
 
-        document.getElementById('progress-line-active').style.width = `${progressPercentage-3}%`;
+    const stepOrder = ['DonHangDaDat', 'DaXacNhan', 'DaLayHang', 'HoanThanh'];
+
+    function updateProgressBar(status) {
+        const stepKey = statusToStepMap[status] || stepOrder[0];
+        const steps = document.querySelectorAll('.progress-step');
+        const targetIndex = stepOrder.indexOf(stepKey);
+
+        steps.forEach((step, index) => {
+            const circle = step.querySelector('.step-circle');
+            circle.classList.remove('completed', 'active', 'pending');
+
+            if (index < targetIndex) {
+                circle.classList.add('completed');
+            } else if (index === targetIndex) {
+                circle.classList.add('active');
+            } else {
+                circle.classList.add('pending');
+            }
+        });
+
+        // Tính toán chiều rộng progress line
+        const progressLine = document.getElementById('progress-line-active');
+        const stepWidth = 100 / (stepOrder.length - 1); // % width mỗi bước
+        const progressWidth = targetIndex * stepWidth;
+
+        progressLine.style.width = `${progressWidth}%`;
     }
-
     // Thêm hiệu ứng khi trang được tải
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         updateProgressBar();
-
-        // Hiệu ứng cho các bước đã hoàn thành
         const completedSteps = document.querySelectorAll('.step-circle.completed');
         completedSteps.forEach((step, index) => {
             setTimeout(() => {
                 step.style.transform = 'scale(1.2)';
-                setTimeout(() => {
-                    step.style.transform = 'scale(1)';
-                }, 300);
+                setTimeout(() => step.style.transform = 'scale(1)', 300);
             }, index * 300);
         });
 
-        // Hiệu ứng cho bước hiện tại
         const activeStep = document.querySelector('.step-circle.active');
-        setTimeout(() => {
-            activeStep.style.transform = 'scale(1.2)';
+        if (activeStep) {
             setTimeout(() => {
-                activeStep.style.transform = 'scale(1)';
-            }, 300);
-        }, completedSteps.length * 300);
+                activeStep.style.transform = 'scale(1.2)';
+                setTimeout(() => activeStep.style.transform = 'scale(1)', 300);
+            }, completedSteps.length * 300);
+        }
     });
 </script>
-
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const expandBtn = document.getElementById('od-expand-btn');
         const detailsSection = document.getElementById('od-details-expanded');
 
-        expandBtn.addEventListener('click', function() {
+        expandBtn.addEventListener('click', function () {
             if (detailsSection.classList.contains('expanded')) {
                 detailsSection.classList.remove('expanded');
                 expandBtn.textContent = 'Xem chi tiết';
@@ -929,7 +931,7 @@
         // Copy mã đơn hàng
         const copyButtons = document.querySelectorAll('.od-copy-btn');
         copyButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const orderNumber = this.parentNode.textContent.trim().split(' ')[0];
                 navigator.clipboard.writeText(orderNumber).then(() => {
                     const originalText = this.textContent;
@@ -942,7 +944,6 @@
         });
     });
 </script>
-
 <script src="/js/orderDetail.js"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@ package com.main.serviceImpl;
 
 import com.main.dto.*;
 
+import com.main.entity.Order;
 import com.main.entity.OrderDetail;
 import com.main.repository.OrderDetailRepository;
 
@@ -9,17 +10,16 @@ import com.main.repository.OrderRepository;
 import com.main.repository.ReviewRepository;
 import com.main.service.OrderService;
 import com.main.service.ReviewService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -27,30 +27,42 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
-
+    private final RestTemplate restTemplate = new RestTemplate();
     public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, ReviewService reviewService, ReviewRepository reviewRepository) {
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.reviewService = reviewService;
         this.reviewRepository = reviewRepository;
     }
+    @Value("${ghn.token}")
+    private String ghnToken;
+
+    @Value("${ghn.shop-id}")
+    private String shopId;
 
     @Override
     public List<OrderDTO> getOrdersByCustomerIdAndStatus(String customerId, String status, Integer year) {
         List<OrderDTO> orders = new ArrayList<>();
+        List<OrderPriceDTO> orderPrices;
 
         if ("ChoLayHang".equals(status)) {
+            orderPrices = new ArrayList<>();
             List<String> statusList = List.of("ChuanBiDon", "SanSangGiao", "DaYeuCauHuy");
             for (String s : statusList) {
                 orders.addAll(orderRepository.getOrdersByCustomerIdAndStatus(customerId, s, year));
+                orderPrices.addAll(getOrderPricesByCustomer(customerId, s, year));
             }
         } else {
             orders = orderRepository.getOrdersByCustomerIdAndStatus(customerId, status, year);
+
+            orderPrices= getOrderPricesByCustomer(customerId, status, year);
         }
 
-        List<OrderPriceDTO> orderPrices = getOrderPricesByCustomer(customerId, status, year);
 
+
+        orderPrices.forEach(System.err::println);
         orders.forEach(order -> {
+
             OrderPriceDTO orderPriceDTO = orderPrices.stream()
                     .filter(orderPrice -> orderPrice.getOrderId().equals(order.getOrderID()))
                     .findFirst()
@@ -92,12 +104,12 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal voucherDiscount = convertToBigDecimal(resultArray[3]);
         BigDecimal finalPrice = convertToBigDecimal(resultArray[4]);
 
-//        // Log các giá trị
-//        System.out.println("OrderID: " + orderIdResult);
-//        System.out.println("TotalPrice: " + totalPrice);
-//        System.out.println("ProductDiscount: " + productDiscount);
-//        System.out.println("VoucherDiscount: " + voucherDiscount);
-//        System.out.println("FinalPrice: " + finalPrice);
+        // Log các giá trị
+        System.out.println("OrderID: " + orderIdResult);
+        System.out.println("TotalPrice: " + totalPrice);
+        System.out.println("ProductDiscount: " + productDiscount);
+        System.out.println("VoucherDiscount: " + voucherDiscount);
+        System.out.println("FinalPrice: " + finalPrice);
 
         return new OrderPriceDTO(
                 orderIdResult,
@@ -156,6 +168,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDetailDTO getOrderDetailByOrderID(Integer orderId) {
         OrderDetailDTO orderDetailDTO = orderRepository.getOrderDetailByOrderId(orderId);
+        System.err.println("CCCCCC: "+orderDetailDTO);
         OrderPriceDTO priceDTO= getOrderPrice(orderId);
         orderDetailDTO.setFinalPrice(priceDTO.getFinalPrice().add(orderDetailDTO.getShippingCost()));
         orderDetailDTO.setDiscountVoucherPrice(priceDTO.getVoucherDiscount());
@@ -184,6 +197,17 @@ public class OrderServiceImpl implements OrderService {
         });
 
 
+        return orders;
+    }
+
+    @Override
+    public List<OrderDTO> getOrdersByCustomerIdAndOrderID(String customerId, String orderID) {
+        List<OrderDTO> orders = orderRepository.getOrdersByCustomerIdAndOrderID(customerId, orderID);
+        orders.forEach(order -> {
+            order.setItems(orderRepository.getOrderItemsByOrderId(order.getOrderID()));
+            OrderPriceDTO priceDTO = getOrderPrice(order.getOrderID());
+            order.setTotalPrice(priceDTO.getFinalPrice().add(order.getShippingCosts()));
+        });
         return orders;
     }
 
@@ -288,6 +312,92 @@ public class OrderServiceImpl implements OrderService {
             }
         }
     }
+    public Map<String, Object> getOrderStatus(String orderCode) {
+        String url = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Token", ghnToken);
+        headers.set("ShopId", shopId);
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("order_code", orderCode);
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                request,
+                new ParameterizedTypeReference<>() {}
+        );
+
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            Map<String, Object> responseBody = response.getBody();
+            Object dataObj = responseBody.get("data");
+
+            if (dataObj instanceof Map) {
+                Map<String, Object> data = (Map<String, Object>) dataObj;
+                String status = (String) data.get("status");
+
+                List<Map<String, Object>> logs = (List<Map<String, Object>>) data.get("log");
+
+                // Lịch sử tracking
+                List<Map<String, String>> history = new ArrayList<>();
+                String updatedDate = null;
+
+                if (logs != null) {
+                    for (Map<String, Object> logEntry : logs) {
+                        String s = (String) logEntry.get("status");
+                        String t = (String) logEntry.get("updated_date");
+
+                        if (s != null && t != null) {
+                            Map<String, String> entry = new HashMap<>();
+                            entry.put("status", s);
+                            entry.put("updatedTime", t);
+                            history.add(entry);
+                        }
+
+                        // Lấy updated_date của trạng thái hiện tại
+                        if (status.equals(logEntry.get("status"))) {
+                            updatedDate = (String) logEntry.get("updated_date");
+                        }
+                    }
+                }
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("shippingStatus", status);           // trạng thái hiện tại
+                result.put("updatedTime", updatedDate);         // thời gian cập nhật trạng thái hiện tại
+                result.put("trackingHistory", history);         // lịch sử
+
+                return result;
+            }
+        }
+
+        throw new RuntimeException("GHN API failed: " + response.getStatusCode());
+    }
 
 
+
+    @Override
+    public Order findOrderByID(Integer orderDetailID) {
+        return orderRepository.findByOrderID(orderDetailID);
+    }
+
+    @Override
+    public Boolean saveOrders(List<OrderDTO> orders) {
+        try {
+            List<Order> orderList = new ArrayList<>();
+            orders.forEach(order -> {
+                Order saveOrder = orderRepository.findByOrderID(order.getOrderID());
+                saveOrder.setStatus(order.getStatus());
+                saveOrder.setUpdateStatusAt(LocalDateTime.now());
+                orderList.add(saveOrder);
+            });
+            orderRepository.saveAll(orderList);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

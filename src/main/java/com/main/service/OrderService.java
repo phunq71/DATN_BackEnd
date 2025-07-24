@@ -1,10 +1,12 @@
 package com.main.service;
 
 import com.main.dto.*;
+import com.main.entity.Order;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrderService {
     List<OrderDTO> getOrdersByCustomerIdAndStatus(String customerId, String status, Integer year);
@@ -23,6 +25,7 @@ public interface OrderService {
 
     List<OrderDTO> getOrdersByKeyword(String customerId, String keyword);
 
+    List<OrderDTO> getOrdersByCustomerIdAndOrderID(String customerId, String orderID);
 
     List<OrderPreviewDTO> getOrderPreviewProducts();
 
@@ -30,5 +33,11 @@ public interface OrderService {
 
 
     ResponseEntity<?> handleReviewAccess(Integer orderDetailID, String customerId);
+
+    Map<String, Object> getOrderStatus(String orderCode);
+
+    Order findOrderByID(Integer orderId);
+
+    Boolean saveOrders(List<OrderDTO> orders);
 
 }
