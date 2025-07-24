@@ -5,11 +5,13 @@ import com.main.dto.OrderDetailDTO;
 import com.main.dto.OrderItemDTO;
 import com.main.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
@@ -18,6 +20,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         , o.orderDate
         , o.status
         , o.costShip
+        , o.shippingCode
     FROM Order o
     WHERE o.customer.customerId=:customerId
     AND (:status='ALL' OR o.status=:status)
@@ -39,12 +42,30 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     LEFT JOIN v.product p
     WHERE o.customer.customerId = :customerId
     AND (:keyword IS NULL OR :keyword = ''
-         OR CAST(o.orderID AS string) LIKE %:keyword%
          OR p.productName LIKE %:keyword%)
     ORDER BY o.orderDate DESC
     """
     )
     List<OrderDTO> getOrdersByCustomerIdAndKeywords(@Param("customerId") String customerId, @Param("keyword") String keyword);
+
+    @Query("""
+    SELECT DISTINCT o.orderID
+        , o.orderDate
+        , o.status
+        , o.costShip
+    FROM Order o
+    LEFT JOIN o.orderDetails od
+    LEFT JOIN od.item i
+    LEFT JOIN i.variant v
+    LEFT JOIN v.product p
+    WHERE o.customer.customerId = :customerId
+    AND (:keyword IS NULL OR :keyword = ''
+         OR CAST(o.orderID AS string) LIKE %:keyword%
+         )
+    ORDER BY o.orderDate DESC
+    """
+    )
+    List<OrderDTO> getOrdersByCustomerIdAndOrderID(@Param("customerId") String customerId, @Param("keyword") String keyword);
 
     @Query("""
     SELECT DISTINCT YEAR(o.orderDate)
@@ -65,6 +86,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         , o.transaction.paymentMethod
         , o.transaction.transactionDate
         , o.updateStatusAt
+        , o.shippingCode
     FROM Order o
     WHERE o.orderID=:orderId
     """)
@@ -72,7 +94,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
 
     @Query(value = """
-        SELECT 
+        SELECT  
             o.OrderID,
             SUM(od.unitPrice * od.quantity) AS TotalPrice,
             SUM(
@@ -82,22 +104,22 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                 END
             ) AS ProductDiscount,
             CASE 
-                WHEN v.discountType = 1 THEN
+                WHEN v.discountType = 'Percent' THEN
                     (SUM(od.unitPrice * od.quantity) - 
                      SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                     ) * (v.discountValue / 100.0)
-                WHEN v.discountType = 0 THEN
+                WHEN v.discountType = 'Amount' THEN
                     v.discountValue
                 ELSE 0
             END AS VoucherDiscount,
             SUM(od.unitPrice * od.quantity) 
                 - SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                 - CASE 
-                    WHEN v.discountType = 1 THEN
+                    WHEN v.discountType = 'Percent' THEN
                         (SUM(od.unitPrice * od.quantity) - 
                          SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                         ) * (v.discountValue / 100.0)
-                    WHEN v.discountType = 0 THEN
+                    WHEN v.discountType = 'Amount' THEN
                         v.discountValue
                     ELSE 0
                   END AS FinalPrice
@@ -121,22 +143,22 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             END
         ) AS ProductDiscount,
         CASE 
-            WHEN v.discountType = 1 THEN
+            WHEN v.discountType = 'Percent' THEN
                 (SUM(od.unitPrice * od.quantity) - 
                  SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                 ) * (v.discountValue / 100.0)
-            WHEN v.discountType = 0 THEN
+            WHEN v.discountType = 'Amount' THEN
                 v.discountValue
             ELSE 0
         END AS VoucherDiscount,
         SUM(od.unitPrice * od.quantity) 
             - SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
             - CASE 
-                WHEN v.discountType = 1 THEN
+                WHEN v.discountType = 'Percent' THEN
                     (SUM(od.unitPrice * od.quantity) - 
                      SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                     ) * (v.discountValue / 100.0)
-                WHEN v.discountType = 0 THEN
+                WHEN v.discountType = 'Amount' THEN
                     v.discountValue
                 ELSE 0
               END AS FinalPrice
@@ -157,7 +179,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     (SELECT img.imageUrl AS image FROM Image img WHERE img.variant = od.item.variant AND img.isMainImage = true),
     od.item.variant.color,
     od.item.size.code,
-    od.item.variant.price,
+    od.unitPrice,
     od.promotionProduct.discountPercent,
     od.quantity,
         CASE WHEN EXISTS (
@@ -171,7 +193,10 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     boolean existsByOrderIDAndCustomer_CustomerId(Integer orderID, String customerCustomerId);
 
+    Optional<Order> findByOrderIDAndCustomer_CustomerId(Integer orderID, String customerCustomerId);
+
     boolean existsByCustomer_CustomerIdAndStatusIn(String customerId, List<String> statuses);
+
 
     List<String> getShippingAddressByCustomer_CustomerId(String customerId);
 
@@ -179,6 +204,12 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     @Query("SELECT COUNT(o) FROM Order o WHERE o.status IN ('ChoXacNhan', 'ChuanBiDon', 'SanSangGiao') and o.facility.facilityId = :facilityId")
     long countProcessingOrders(String facilityId);
+
+    Order findByOrderID(Integer orderID);
+    @Modifying
+    @Query("UPDATE Order o SET o.status = :status WHERE o.orderID = :orderID")
+    void updateOrderStatus(@Param("status   ") String status, @Param("orderID") int orderID);
+
 }
 
 

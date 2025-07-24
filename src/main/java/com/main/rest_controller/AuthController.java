@@ -1,6 +1,7 @@
 package com.main.rest_controller;
 
 import com.main.security.*;
+import com.main.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,12 +11,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,6 +27,8 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
@@ -43,6 +48,42 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
         }
     }
+
+    @PostMapping("/login2")
+    public ResponseEntity<?> login2(@RequestBody LoginRequest request, HttpServletResponse response) {
+        try {
+
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+
+            CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(request.getEmail());
+
+            Authentication auth = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+
+
+            Map<String, ResponseCookie> cookies = authService.generateTokenCookies(userDetails, request.isRememberMe());
+
+
+            response.addHeader("Set-Cookie", cookies.get("accessToken").toString());
+            response.addHeader("Set-Cookie", cookies.get("refreshToken").toString());
+            System.err.println("🙂role đã đăng nhập từ FE"+AuthUtil.getRole());
+            String role = AuthUtil.getRole();
+            if(role== null || role.equals("ROLE_USER")){
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+
+            return ResponseEntity.ok(AuthUtil.getFullName());
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
+        }
+    }
+
+
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(

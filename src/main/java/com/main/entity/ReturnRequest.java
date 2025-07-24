@@ -25,7 +25,7 @@ public class ReturnRequest {
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "staffID", nullable = false)
+    @JoinColumn(name = "staffID")
     private Staff staff;
 
     @Column(nullable = false)
@@ -37,7 +37,7 @@ public class ReturnRequest {
     @Column(nullable = false)
     private Boolean isOnline;
 
-    @Column(length = 500, nullable = false)
+    @Column(length = 500)
     private String note;
 
     @OneToMany(mappedBy = "returnRequest")
@@ -46,4 +46,11 @@ public class ReturnRequest {
     @OneToOne(mappedBy = "returnRequest")
     private Transaction transaction;
 
+    public ReturnRequest(Integer returnRequestID, Order order, LocalDateTime requestDate, String status, Boolean isOnline) {
+        this.returnRequestID = returnRequestID;
+        this.order = order;
+        this.requestDate = requestDate;
+        this.status = status;
+        this.isOnline = isOnline;
+    }
 }

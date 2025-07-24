@@ -12,7 +12,7 @@
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         line-height: 1.6;
         color: #1a1a1a;
-        max-width: 900px;
+        max-width: 1400px; /* Increased width */
         padding: 30px 20px;
         margin:70px auto 0 auto;
     }
@@ -48,7 +48,7 @@
         color: #fff;
         text-align: center;
         text-decoration: none;
-        border-radius: 8px;
+        /*border-radius: 8px;*/
         font-weight: 500;
         font-size: 16px;
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -68,9 +68,10 @@
     .r-description-select,
     .r-form-container-choose,
     .r-upload-photo-form,
-    .r-refund-info-form {
+    .r-refund-info-form,
+    .r-product-details-form {
         background-color: #fff;
-        border-radius: 12px;
+        /*border-radius: 12px;*/
         box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
         margin-bottom: 32px;
         padding: 32px;
@@ -120,14 +121,16 @@
     }
 
     .r-description-textarea {
-        width: 800px;
+        width: 100%;
         padding: 14px 16px;
         font-size: 15px;
         border: 1px solid #e0e0e0;
-        border-radius: 8px;
+        /*border-radius: 8px;*/
         transition: all 0.3s ease;
         font-family: 'Inter', sans-serif;
         background-color: #fafafa;
+        box-sizing: border-box;
+        display: block;
     }
 
     .r-description-select-box {
@@ -140,7 +143,7 @@
         padding: 14px 16px;
         font-size: 15px;
         border: 1px solid #e0e0e0;
-        border-radius: 8px;
+        /*border-radius: 8px;*/
         transition: all 0.3s ease;
         font-family: 'Inter', sans-serif;
         color: #333;
@@ -173,7 +176,7 @@
         font-size: 14px;
         padding: 14px 16px;
         background-color: #f8f8f8;
-        border-radius: 8px;
+        /*border-radius: 8px;*/
         border-left: 4px solid #1a1a1a;
         line-height: 1.5;
     }
@@ -220,7 +223,7 @@
         height: 80px;
         object-fit: cover;
         margin-right: 20px;
-        border-radius: 6px;
+        /*border-radius: 6px;*/
         border: 1px solid #f0f0f0;
         background-color: #f8f8f8;
     }
@@ -262,10 +265,44 @@
     }
 
     .r-product-qty {
-        text-align: right;
-        font-size: 15px;
-        color: #666;
-        min-width: 40px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .r-qty-control {
+        display: flex;
+        align-items: center;
+        border: 1px solid #e0e0e0;
+        /*border-radius: 6px;*/
+        overflow: hidden;
+    }
+
+    .r-qty-btn {
+        width: 32px;
+        height: 32px;
+        background-color: #f5f5f5;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+    }
+
+    .r-qty-btn:hover {
+        background-color: #eee;
+    }
+
+    .r-qty-input {
+        width: 40px;
+        height: 32px;
+        text-align: center;
+        border: none;
+        border-left: 1px solid #e0e0e0;
+        border-right: 1px solid #e0e0e0;
+        font-size: 14px;
     }
 
     /* Phần upload ảnh */
@@ -279,7 +316,7 @@
         width: 140px;
         height: 140px;
         border: 2px dashed #e0e0e0;
-        border-radius: 10px;
+        /*border-radius: 10px;*/
         display: flex;
         align-items: center;
         justify-content: center;
@@ -318,6 +355,36 @@
         display: none;
     }
 
+    .r-upload-error {
+        color: #e53935;
+        font-size: 13px;
+        margin-top: 5px;
+        display: none;
+    }
+
+    /* Delete button for uploaded images */
+    .r-upload-delete {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 24px;
+        height: 24px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .r-upload-box:hover .r-upload-delete {
+        opacity: 1;
+    }
+
     /* Phần thông tin hoàn tiền */
     .r-refund-row {
         margin-bottom: 18px;
@@ -344,6 +411,21 @@
         margin-top: 30px;
     }
 
+    /* Phần chi tiết sản phẩm (ẩn ban đầu) */
+    .r-product-details-form {
+        display: none;
+        margin-top: -20px;
+        margin-bottom: 20px;
+        padding-top: 20px;
+    }
+
+    /* Chrome, Safari, Edge */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
     /* Hiệu ứng loading */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
@@ -368,7 +450,8 @@
         .r-description-select,
         .r-form-container-choose,
         .r-upload-photo-form,
-        .r-refund-info-form {
+        .r-refund-info-form,
+        .r-product-details-form {
             padding: 24px 18px;
             margin-bottom: 24px;
         }
@@ -390,7 +473,6 @@
 
         .r-product-qty {
             width: 100%;
-            text-align: left;
             margin-top: 10px;
             padding-left: 106px;
         }
@@ -429,100 +511,17 @@
         <div class="r-note">Vui lòng chọn sản phẩm bạn muốn trả hàng/hoàn tiền. Chúng tôi sẽ xử lý yêu cầu của bạn trong thời gian sớm nhất.</div>
 
         <label class="r-select-all">
-            <input type="checkbox" class="r-checkbox" checked> Chọn tất cả sản phẩm
+            <input type="checkbox" class="r-checkbox" id="select-all"> Chọn tất cả sản phẩm
         </label>
 
         <!-- Sản phẩm 1 -->
-        <div class="r-product">
-            <input type="checkbox" class="r-checkbox" checked>
-            <img class="r-product-img" src="https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/474894/item/vngoods_69_474894_3x4.jpg?width=294" alt="Áo khoác cản gió">
-            <div class="r-product-info">
-                <div class="r-product-name">Áo khoác cản gió</div>
-                <div class="r-product-loai">Size: M | Màu: Đen</div>
-                <div class="r-product-price">
-                    <del>₫165.000</del><span>₫135.300</span>
-                </div>
-            </div>
-            <div class="r-product-qty">Số lượng: 1</div>
-        </div>
+
 
         <!-- Sản phẩm 2 -->
-        <div class="r-product">
-            <input type="checkbox" class="r-checkbox" checked>
-            <img class="r-product-img" src="https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/479585/item/vngoods_69_479585_3x4.jpg?width=369" alt="Áo thun cổ vuông">
-            <div class="r-product-info">
-                <div class="r-product-name">Áo thun cổ vuông</div>
-                <div class="r-product-loai">Size: S | Màu: Xanh bích</div>
-                <div class="r-product-price">
-                    <del>₫9.000</del><span>₫7.380</span>
-                </div>
-            </div>
-            <div class="r-product-qty">Số lượng: 1</div>
-        </div>
+
 
         <!-- Sản phẩm 3 -->
-        <div class="r-product">
-            <input type="checkbox" class="r-checkbox" checked>
-            <img class="r-product-img" src="https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/479208/item/vngoods_09_479208_3x4.jpg?width=300" alt="Áo len dệt 3D">
-            <div class="r-product-info">
-                <div class="r-product-name">Áo len dệt 3D</div>
-                <div class="r-product-loai">Size: S | Màu: Hồng</div>
-                <div class="r-product-price">
-                    <del>₫9.000</del><span>₫7.380</span>
-                </div>
-            </div>
-            <div class="r-product-qty">Số lượng: 1</div>
-        </div>
-    </div>
 
-    <!-- Mô tả lý do -->
-    <div class="r-description-select">
-        <div class="r-description-title">Thông tin trả hàng</div>
-
-        <div class="r-description-group">
-            <label class="r-description-label">
-                <span class="r-required">*</span>Lý do trả hàng:
-            </label>
-            <select class="r-description-select-box">
-                <option value="" disabled selected>-- Chọn lý do --</option>
-                <option value="damaged">Sản phẩm bị hư hỏng</option>
-                <option value="wrong">Giao sai sản phẩm</option>
-                <option value="not_match">Không giống mô tả</option>
-                <option value="size">Sai kích cỡ</option>
-                <option value="other">Lý do khác</option>
-            </select>
-        </div>
-
-        <div class="r-description-group">
-            <label class="r-description-label">
-                <span class="r-required">*</span>Mô tả chi tiết:
-            </label>
-            <textarea class="r-description-textarea" maxlength="2000" oninput="updateCharCount(this)"
-                      placeholder="Vui lòng mô tả chi tiết lý do trả hàng..."></textarea>
-            <div class="r-description-count"><span id="r-description-char-count">0</span>/2000 ký tự</div>
-        </div>
-    </div>
-
-    <!-- Chọn ảnh -->
-    <div class="r-upload-photo-form">
-        <div class="r-upload-title">Hình ảnh minh chứng</div>
-        <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Tải lên hình ảnh sản phẩm hiện trạng để hỗ trợ yêu cầu của bạn (tối đa 2 ảnh)</p>
-
-        <div class="r-upload-grid">
-            <!-- Upload Box 1 -->
-            <div class="r-upload-box" onclick="document.getElementById('r-upload-input-1').click()">
-                <span class="r-upload-plus">+</span>
-                <img id="r-preview-1" alt="preview 1">
-                <input type="file" accept="image/*" id="r-upload-input-1" class="r-upload-hidden" onchange="handleImagePreview(this, 'r-preview-1')">
-            </div>
-
-            <!-- Upload Box 2 -->
-            <div class="r-upload-box" onclick="document.getElementById('r-upload-input-2').click()">
-                <span class="r-upload-plus">+</span>
-                <img id="r-preview-2" alt="preview 2">
-                <input type="file" accept="image/*" id="r-upload-input-2" class="r-upload-hidden" onchange="handleImagePreview(this, 'r-preview-2')">
-            </div>
-        </div>
     </div>
 
     <!-- Thông tin hoàn tiền -->
@@ -531,7 +530,7 @@
 
         <div class="r-refund-row">
             <span class="r-refund-label">Tổng tiền hoàn lại:</span>
-            <span class="r-refund-amount">₫150.060</span>
+            <span class="r-refund-amount" id="total-refund-amount">₫0</span>
         </div>
 
         <div class="r-refund-row">
@@ -540,31 +539,297 @@
         </div>
 
         <div class="r-refund-btn-wrapper">
-            <button class="btn-yeucau">Gửi yêu cầu</button>
+            <button class="btn-yeucau" id="submit-request">Gửi yêu cầu</button>
         </div>
     </div>
 </div>
 
-<script>
-    function updateCharCount(el) {
-        document.getElementById('r-description-char-count').innerText = el.value.length;
-    }
-</script>
+<!--<script>-->
+<!--    // Update character count for textareas-->
+<!--    function updateCharCount(el, countId) {-->
+<!--        document.getElementById(countId).innerText = el.value.length;-->
+<!--    }-->
 
-<script>
-    function handleImagePreview(input, previewId) {
-        const file = input.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = document.getElementById(previewId);
-                img.src = e.target.result;
-                img.style.display = 'block';
-                img.previousElementSibling.style.display = 'none';
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-</script>
+<!--    // Handle image preview and upload-->
+<!--    function handleImagePreview(input, gridId) {-->
+<!--        const files = input.files;-->
+<!--        if (!files || files.length === 0) return;-->
+
+<!--        const uploadGrid = document.getElementById(gridId);-->
+<!--        const productId = gridId.split('-')[2];-->
+
+<!--        // Clear existing upload boxes except the first one-->
+<!--        while (uploadGrid.children.length > 1) {-->
+<!--            uploadGrid.removeChild(uploadGrid.lastChild);-->
+<!--        }-->
+
+<!--        // Process each selected file (up to 5)-->
+<!--        const maxFiles = Math.min(files.length, 5);-->
+<!--        for (let i = 0; i < maxFiles; i++) {-->
+<!--            const file = files[i];-->
+<!--            const reader = new FileReader();-->
+
+<!--            reader.onload = function(e) {-->
+<!--                // For the first file, use the existing upload box-->
+<!--                if (i === 0) {-->
+<!--                    const existingBox = uploadGrid.children[0];-->
+<!--                    const img = existingBox.querySelector('img');-->
+<!--                    img.src = e.target.result;-->
+<!--                    img.style.display = 'block';-->
+<!--                    existingBox.querySelector('.r-upload-plus').style.display = 'none';-->
+
+<!--                    // Add delete button-->
+<!--                    if (!existingBox.querySelector('.r-upload-delete')) {-->
+<!--                        const deleteBtn = document.createElement('div');-->
+<!--                        deleteBtn.className = 'r-upload-delete';-->
+<!--                        deleteBtn.innerHTML = '×';-->
+<!--                        deleteBtn.onclick = function(e) {-->
+<!--                            e.stopPropagation();-->
+<!--                            removeImage(existingBox, gridId);-->
+<!--                        };-->
+<!--                        existingBox.appendChild(deleteBtn);-->
+<!--                    }-->
+<!--                }-->
+<!--                // For additional files, create new upload boxes-->
+<!--                else {-->
+<!--                    const newUploadBox = document.createElement('div');-->
+<!--                    newUploadBox.className = 'r-upload-box';-->
+
+<!--                    newUploadBox.innerHTML = `-->
+<!--                        <img src="${e.target.result}" style="display: block;">-->
+<!--                        <div class="r-upload-delete">×</div>-->
+<!--                    `;-->
+
+<!--                    newUploadBox.onclick = function() {-->
+<!--                        // Allow clicking to replace image-->
+<!--                        input.value = '';-->
+<!--                        input.click();-->
+<!--                    };-->
+
+<!--                    // Add delete button functionality-->
+<!--                    const deleteBtn = newUploadBox.querySelector('.r-upload-delete');-->
+<!--                    deleteBtn.onclick = function(e) {-->
+<!--                        e.stopPropagation();-->
+<!--                        removeImage(newUploadBox, gridId);-->
+<!--                    };-->
+
+<!--                    uploadGrid.appendChild(newUploadBox);-->
+<!--                }-->
+
+<!--                // Hide error message if at least one image is uploaded-->
+<!--                const errorElement = document.getElementById(`upload-error-${productId}`);-->
+<!--                if (errorElement) {-->
+<!--                    errorElement.style.display = 'none';-->
+<!--                }-->
+<!--            };-->
+
+<!--            reader.readAsDataURL(file);-->
+<!--        }-->
+
+<!--        // Reset the input to allow selecting the same files again-->
+<!--        input.value = '';-->
+<!--    }-->
+
+<!--    // Remove an image-->
+<!--    function removeImage(uploadBox, gridId) {-->
+<!--        const uploadGrid = document.getElementById(gridId);-->
+<!--        const productId = gridId.split('-')[2];-->
+
+<!--        // If this is the last image, reset to empty upload box-->
+<!--        if (uploadGrid.children.length === 1) {-->
+<!--            uploadBox.innerHTML = `-->
+<!--                <span class="r-upload-plus">+</span>-->
+<!--                <img>-->
+<!--                <input type="file" accept="image/*" class="r-upload-hidden"-->
+<!--                       onchange="handleImagePreview(this, '${gridId}')" multiple>-->
+<!--            `;-->
+<!--            uploadBox.onclick = function() {-->
+<!--                uploadBox.querySelector('input').click();-->
+<!--            };-->
+<!--        }-->
+<!--        // Otherwise just remove this box-->
+<!--        else {-->
+<!--            uploadGrid.removeChild(uploadBox);-->
+<!--        }-->
+
+<!--        // Show error if no images left-->
+<!--        const images = uploadGrid.querySelectorAll('img[src]');-->
+<!--        const errorElement = document.getElementById(`upload-error-${productId}`);-->
+<!--        if (images.length === 0 && errorElement) {-->
+<!--            errorElement.style.display = 'block';-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Quantity control-->
+<!--   function addEvent() {-->
+<!--        // Quantity buttons-->
+<!--        document.querySelectorAll('.r-qty-btn').forEach(button => {-->
+<!--            button.addEventListener('click', function() {-->
+<!--                const input = this.parentNode.querySelector('.r-qty-input');-->
+<!--                let value = parseInt(input.value);-->
+
+<!--                if (this.classList.contains('minus') && value > 1) {-->
+<!--                    input.value = value - 1;-->
+<!--                } else if (this.classList.contains('plus') && value < 10) {-->
+<!--                    input.value = value + 1;-->
+<!--                }-->
+
+<!--                // Update total refund amount-->
+<!--                updateTotalRefund();-->
+<!--            });-->
+<!--        });-->
+
+<!--        // Quantity input validation-->
+<!--        document.querySelectorAll('.r-qty-input').forEach(input => {-->
+<!--            input.addEventListener('change', function() {-->
+<!--                let value = parseInt(this.value);-->
+<!--                if (isNaN(value)) value = 1;-->
+<!--                if (value < 1) value = 1;-->
+<!--                if (value > 10) value = 10;-->
+<!--                this.value = value;-->
+
+<!--                // Update total refund amount-->
+<!--                updateTotalRefund();-->
+<!--            });-->
+<!--        });-->
+
+<!--        // Product checkbox toggle-->
+<!--        document.querySelectorAll('.product-checkbox').forEach(checkbox => {-->
+<!--            checkbox.addEventListener('change', function() {-->
+<!--                const productId = this.closest('.r-product').getAttribute('data-product-id');-->
+<!--                const detailsForm = document.getElementById(`product-details-${productId}`);-->
+
+<!--                if (this.checked) {-->
+<!--                    detailsForm.style.display = 'block';-->
+<!--                } else {-->
+<!--                    detailsForm.style.display = 'none';-->
+<!--                }-->
+
+<!--                // Update "Select all" checkbox-->
+<!--                updateSelectAllCheckbox();-->
+
+<!--                // Update total refund amount-->
+<!--                updateTotalRefund();-->
+<!--            });-->
+<!--        });-->
+
+<!--        // "Select all" checkbox-->
+<!--        document.getElementById('select-all').addEventListener('change', function() {-->
+<!--            const checkboxes = document.querySelectorAll('.product-checkbox');-->
+<!--            checkboxes.forEach(checkbox => {-->
+<!--                checkbox.checked = this.checked;-->
+<!--                const productId = checkbox.closest('.r-product').getAttribute('data-product-id');-->
+<!--                const detailsForm = document.getElementById(`product-details-${productId}`);-->
+<!--                detailsForm.style.display = this.checked ? 'block' : 'none';-->
+<!--            });-->
+
+<!--            // Update total refund amount-->
+<!--            updateTotalRefund();-->
+<!--        });-->
+
+<!--        // Return reason select change-->
+<!--        document.querySelectorAll('.return-reason').forEach(select => {-->
+<!--            select.addEventListener('change', function() {-->
+<!--                const otherReasonGroup = this.closest('.r-description-group').nextElementSibling;-->
+<!--                if (this.value === 'other') {-->
+<!--                    otherReasonGroup.style.display = 'block';-->
+<!--                } else {-->
+<!--                    otherReasonGroup.style.display = 'none';-->
+<!--                }-->
+<!--            });-->
+<!--        });-->
+
+<!--        // Submit button-->
+<!--        document.getElementById('submit-request').addEventListener('click', function() {-->
+<!--            if (validateForm()) {-->
+<!--                alert('Yêu cầu trả hàng/hoàn tiền của bạn đã được gửi thành công!');-->
+<!--                // Here you would typically submit the form data to the server-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
+
+<!--    // Update "Select all" checkbox-->
+<!--    function updateSelectAllCheckbox() {-->
+<!--        const checkboxes = document.querySelectorAll('.product-checkbox');-->
+<!--        const selectAll = document.getElementById('select-all');-->
+<!--        const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;-->
+
+<!--        if (checkedCount === checkboxes.length) {-->
+<!--            selectAll.checked = true;-->
+<!--            selectAll.indeterminate = false;-->
+<!--        } else if (checkedCount > 0) {-->
+<!--            selectAll.checked = false;-->
+<!--            selectAll.indeterminate = true;-->
+<!--        } else {-->
+<!--            selectAll.checked = false;-->
+<!--            selectAll.indeterminate = false;-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Update total refund amount-->
+<!--    function updateTotalRefund() {-->
+<!--        let total = 0;-->
+
+<!--        document.querySelectorAll('.product-checkbox:checked').forEach(checkbox => {-->
+<!--            const productElement = checkbox.closest('.r-product');-->
+<!--            const priceText = productElement.querySelector('.r-product-price span').textContent;-->
+<!--            const price = parseInt(priceText.replace(/[^\d]/g, ''));-->
+<!--            const quantity = parseInt(productElement.querySelector('.r-qty-input').value);-->
+
+<!--            total += price * quantity;-->
+<!--        });-->
+
+<!--        document.getElementById('total-refund-amount').textContent = `₫${total.toLocaleString('vi-VN')}`;-->
+<!--    }-->
+
+<!--    // Validate form before submission-->
+<!--    function validateForm() {-->
+<!--        let isValid = true;-->
+
+<!--        // Check at least one product is selected-->
+<!--        const selectedProducts = document.querySelectorAll('.product-checkbox:checked');-->
+<!--        if (selectedProducts.length === 0) {-->
+<!--            alert('Vui lòng chọn ít nhất một sản phẩm để trả hàng/hoàn tiền');-->
+<!--            return false;-->
+<!--        }-->
+
+<!--        // Validate each selected product-->
+<!--        selectedProducts.forEach(checkbox => {-->
+<!--            const productId = checkbox.closest('.r-product').getAttribute('data-product-id');-->
+<!--            const detailsForm = document.getElementById(`product-details-${productId}`);-->
+
+<!--            // Check return reason is selected-->
+<!--            const returnReason = detailsForm.querySelector('.return-reason');-->
+<!--            if (!returnReason.value) {-->
+<!--                alert(`Vui lòng chọn lý do trả hàng cho sản phẩm ${productId}`);-->
+<!--                isValid = false;-->
+<!--                return;-->
+<!--            }-->
+
+<!--            // Check other reason is filled if selected-->
+<!--            if (returnReason.value === 'other') {-->
+<!--                const otherReason = detailsForm.querySelector('.other-reason');-->
+<!--                if (!otherReason.value.trim()) {-->
+<!--                    alert(`Vui lòng nhập lý do trả hàng cho sản phẩm ${productId}`);-->
+<!--                    isValid = false;-->
+<!--                    return;-->
+<!--                }-->
+<!--            }-->
+
+<!--            // Check at least one image is uploaded-->
+<!--            const uploadGrid = document.getElementById(`upload-grid-${productId}`);-->
+<!--            const uploadedImages = uploadGrid.querySelectorAll('img[src]');-->
+<!--            if (uploadedImages.length === 0) {-->
+<!--                document.getElementById(`upload-error-${productId}`).style.display = 'block';-->
+<!--                isValid = false;-->
+<!--            } else {-->
+<!--                document.getElementById(`upload-error-${productId}`).style.display = 'none';-->
+<!--            }-->
+<!--        });-->
+
+<!--        return isValid;-->
+<!--    }-->
+<!--</script>-->
+<script src="/js/returnProduct.js"></script>
 </body>
 </html>

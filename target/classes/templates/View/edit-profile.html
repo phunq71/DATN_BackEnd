@@ -482,6 +482,26 @@
 </style>
 <!--Xử lý model OTP-->
 <style>
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #888;
+        cursor: pointer;
+        z-index: 1000;
+    }
+
+    .close-btn:hover {
+        color: #000;
+    }
+
+    .otp-box {
+        position: relative; /* để nút X nằm đúng vị trí */
+        padding-top: 40px;   /* tránh che phần title nếu cần */
+    }
     /* Thêm vào CSS hiện có của bạn */
     .otp-modal {
         position: fixed;
@@ -792,7 +812,7 @@
             <!-- Hiển thị số điện thoại cũ -->
             <div class="cp-form-group">
                 <label for="cp-oldPhone">Số điện thoại hiện tại</label>
-                <input type="text" class="cp-form-control" id="cp-oldPhone">
+                <input type="text" class="cp-form-control" id="cp-oldPhone" disabled>
             </div>
 
             <!-- Nhập số điện thoại mới -->
@@ -912,12 +932,16 @@
 </script>
 
 <!--modal otp-->
+<!--modal otp-->
 <div id="otpModal" class="otp-modal" style="display: none;">
     <div class="otp-container">
         <div class="otp-box">
+            <!-- Nút đóng modal -->
+            <span class="close-btn" onclick="hideOtpModal()">×</span>
+
             <h2 class="otp-title">Nhập mã OTP</h2>
             <p class="note">Mã OTP đã được gửi qua email và có hiệu lực trong 5 phút.</p>
-            <!-- ✅ Đổi từ <form> sang <div> -->
+
             <div id="verifyOtpForm">
                 <div class="otp-inputs">
                     <input type="text" maxlength="1" name="digit1" required>
@@ -927,19 +951,15 @@
                     <input type="text" maxlength="1" name="digit5" required>
                     <input type="text" maxlength="1" name="digit6" required>
                 </div>
-                <input type="hidden" name="otp" id="otpInput">
-                <input type="hidden" name="email" id="otpEmailInput">
                 <p id="otpMessage" style="color:orangered; display:none;"></p>
                 <button id="confirmOtpBtn" type="button" class="btn-submit">Xác thực OTP</button>
-
-
             </div>
-
 
             <button id="resendBtn" class="btn-resend" disabled>Gửi lại mã (60s)</button>
         </div>
     </div>
 </div>
+
 
 <!--js xử lý vô hiệu hóa tk-->
 <script>

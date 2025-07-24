@@ -30,8 +30,10 @@ public class OrderDetailDTO {
     private BigDecimal shippingCost;
     private String paymentMethod;
     private LocalDateTime transactionDate;
-
-
+    private String shippingCode;
+    private String shippingStatus;
+    private String updatedTime;
+    private List<ShippingLogDTO> trackingHistory;
 
 
     public OrderDetailDTO(Integer orderID, LocalDateTime orderDate, String status, String address) {
@@ -44,7 +46,7 @@ public class OrderDetailDTO {
     }
 
 
-    public OrderDetailDTO(Integer orderID, LocalDateTime orderDate, String status, String shippingAddress, String shippingName, String shippingPhone, BigDecimal shippingCost, String paymentMethod, LocalDateTime transactionDate, LocalDateTime updateStatusAt) {
+    public OrderDetailDTO(Integer orderID, LocalDateTime orderDate, String status, String shippingAddress, String shippingName, String shippingPhone, BigDecimal shippingCost, String paymentMethod, LocalDateTime transactionDate, LocalDateTime updateStatusAt, String shippingCode) {
         this.orderID = orderID;
         this.orderDate = orderDate;
         this.status = status;
@@ -57,5 +59,6 @@ public class OrderDetailDTO {
         this.paymentMethod = paymentMethod;
         this.transactionDate = transactionDate;
         this.updateStatusAt = updateStatusAt;
+        this.shippingCode = shippingCode;
     }
 }

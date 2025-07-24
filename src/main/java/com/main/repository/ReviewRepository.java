@@ -124,7 +124,7 @@ Page<Review_ReviewDTO> findFilteredReviews(@Param("productID") String productID,
     , r.orderDetail.orderDetailID
     , (SELECT img.imageUrl AS image FROM Image img WHERE img.variant = r.orderDetail.item.variant AND img.isMainImage = true)
     , r.orderDetail.item.variant.product.productName
-    , r.orderDetail.item.variant.price
+    , r.orderDetail.unitPrice
     , r.orderDetail.item.variant.color
     , r.orderDetail.item.size.code
     , r.rating
