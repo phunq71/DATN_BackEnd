@@ -38,4 +38,20 @@ public interface ProductService {
 
     List<ProductViewDTO> searchProducts(String keyword);
 
+    //3 trong 1
+    Page<ProductViewDTO> searchAndFilterAllProducts(
+            String keyword,
+            String color,
+            String brand,
+            BigDecimal priceFrom,
+            BigDecimal priceTo,
+            Double minRating,
+            String targetCustomer,
+            String categoryId,
+            String parentCategoryId,
+            Pageable pageable,
+            String sortType
+    );
+
+
 }
