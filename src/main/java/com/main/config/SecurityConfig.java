@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "STAFF", "AREA", "STOCK")
                         .requestMatchers("/opulentia/rest/**").permitAll()
                         .requestMatchers("/opulentia/**").permitAll()
                         .requestMatchers("/auth/**", "/index", "/logo/**", "/js/**", "/data/**",

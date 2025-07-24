@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -69,18 +70,20 @@ public class AuthController {
 
             response.addHeader("Set-Cookie", cookies.get("accessToken").toString());
             response.addHeader("Set-Cookie", cookies.get("refreshToken").toString());
-
+            System.err.println("🙂role đã đăng nhập từ FE"+AuthUtil.getRole());
             String role = AuthUtil.getRole();
             if(role== null || role.equals("ROLE_USER")){
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
-            return ResponseEntity.ok("Đăng nhập thành công");
+            return ResponseEntity.ok(AuthUtil.getFullName());
 
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
         }
     }
+
+
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(

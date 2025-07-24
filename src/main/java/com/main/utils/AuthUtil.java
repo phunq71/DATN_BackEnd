@@ -54,4 +54,20 @@ public final class AuthUtil {
         }
         return null;
     }
+
+    /**
+     * Lấy tên của user hiện tại.
+     *
+     * @return tên nếu đã đăng nhập, null nếu chưa đăng nhập.
+     */
+    public static String getFullName() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof CustomUserDetails userDetails) {
+            return userDetails.getFullName();
+        } else if (principal instanceof CustomOAuth2User oAuthUser) {
+            return oAuthUser.getFullName();
+        }
+        return null;
+    }
 }

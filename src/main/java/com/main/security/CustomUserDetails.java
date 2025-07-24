@@ -42,6 +42,12 @@ public class CustomUserDetails implements UserDetails {
         return account.getProviderId();
     }
 
+    public String getFullName(){
+        if(account.getStaff()!=null){
+            return account.getStaff().getFullname();
+        }
+        return account.getCustomer().getFullName();
+    }
 
     public String getRole(){
         return "ROLE_"+account.getRole();
