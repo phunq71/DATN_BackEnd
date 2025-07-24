@@ -38,4 +38,20 @@ public final class AuthUtil {
         return principal instanceof CustomUserDetails || principal instanceof CustomOAuth2User;
     }
 
+
+    /**
+     * Lấy Role của user hiện tại.
+     *
+     * @return Role nếu đã đăng nhập, null nếu chưa đăng nhập.
+     */
+    public static String getRole() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof CustomUserDetails userDetails) {
+            return userDetails.getRole();
+        } else if (principal instanceof CustomOAuth2User oAuthUser) {
+            return "ROLE_USER";
+        }
+        return null;
+    }
 }

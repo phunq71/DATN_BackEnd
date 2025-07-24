@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserRestController {
     @GetMapping("/isLogin")
     public ResponseEntity<Boolean> isLogin() {
+        System.err.println("📞"+AuthUtil.getAccountID());
         return ResponseEntity.ok(AuthUtil.isLogin());
     }
 }

@@ -20,8 +20,7 @@ public class Voucher implements Serializable {
     @Column(length = 25)
     private String voucherID;
 
-    @Column(nullable = false)
-    private Boolean discountType;  // BIT -> Boolean
+    private String discountType;
 
     @Column(nullable = false)
     private Integer discountValue;
@@ -39,6 +38,8 @@ public class Voucher implements Serializable {
 
     @Column(name = "Claim_conditions", precision = 24, scale = 2)
     private BigDecimal claimConditions;
+
+    private Boolean type;
 
     @ManyToOne
     @JoinColumn(name = "promotionID")

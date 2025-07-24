@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,17 +45,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         System.out.println("✅ SecurityFilterChain from SecurityConfigTest is active");
-        http
+        http    .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/opulentia/rest/**").permitAll()
                         .requestMatchers("/opulentia/**").permitAll()
                         .requestMatchers("/auth/**", "/index", "/logo/**", "/js/**", "/data/**",
                                 "/test/**", "/.well-known/**", "/uploads/**","/oauth2/**","/favicon.ico",
                                 "/api/auth/**", "/testqrcode").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/opulentia_user/**", "/edit-profile").hasRole("USER")
                         .anyRequest().authenticated()
                 )

@@ -84,22 +84,22 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                 END
             ) AS ProductDiscount,
             CASE 
-                WHEN v.discountType = 1 THEN
+                WHEN v.discountType = 'Percent' THEN
                     (SUM(od.unitPrice * od.quantity) - 
                      SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                     ) * (v.discountValue / 100.0)
-                WHEN v.discountType = 0 THEN
+                WHEN v.discountType = 'Amount' THEN
                     v.discountValue
                 ELSE 0
             END AS VoucherDiscount,
             SUM(od.unitPrice * od.quantity) 
                 - SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                 - CASE 
-                    WHEN v.discountType = 1 THEN
+                    WHEN v.discountType = 'Percent' THEN
                         (SUM(od.unitPrice * od.quantity) - 
                          SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                         ) * (v.discountValue / 100.0)
-                    WHEN v.discountType = 0 THEN
+                    WHEN v.discountType = 'Amount' THEN
                         v.discountValue
                     ELSE 0
                   END AS FinalPrice
@@ -123,22 +123,22 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             END
         ) AS ProductDiscount,
         CASE 
-            WHEN v.discountType = 1 THEN
+            WHEN v.discountType = 'Percent' THEN
                 (SUM(od.unitPrice * od.quantity) - 
                  SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                 ) * (v.discountValue / 100.0)
-            WHEN v.discountType = 0 THEN
+            WHEN v.discountType = 'Amount' THEN
                 v.discountValue
             ELSE 0
         END AS VoucherDiscount,
         SUM(od.unitPrice * od.quantity) 
             - SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
             - CASE 
-                WHEN v.discountType = 1 THEN
+                WHEN v.discountType = 'Percent' THEN
                     (SUM(od.unitPrice * od.quantity) - 
                      SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                     ) * (v.discountValue / 100.0)
-                WHEN v.discountType = 0 THEN
+                WHEN v.discountType = 'Amount' THEN
                     v.discountValue
                 ELSE 0
               END AS FinalPrice
