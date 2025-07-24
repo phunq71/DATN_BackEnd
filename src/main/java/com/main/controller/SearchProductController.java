@@ -15,20 +15,20 @@ import java.util.List;
 public class SearchProductController {
     private final ProductService productService;
 
-    @GetMapping("/opulentia/search")
-    public String searchProducts(@RequestParam("keyword") String keyword, Model model) {
-        if (keyword == null || keyword.trim().isBlank()) {
-            model.addAttribute("products", List.of()); // Trả về danh sách rỗng
-            model.addAttribute("keyword", "");
-            return "View/searchProduct";
-        }
-
-        keyword = keyword.toLowerCase().trim();
-        List<ProductViewDTO> products = productService.searchProducts(keyword);
-
-        model.addAttribute("products", products);
-        model.addAttribute("keyword", keyword);
-
-        return "View/searchProduct";
-    }
+//    @GetMapping("/opulentia/search")
+//    public String searchProducts(@RequestParam("keyword") String keyword, Model model) {
+//        if (keyword == null || keyword.trim().isBlank()) {
+//            model.addAttribute("products", List.of()); // Trả về danh sách rỗng
+//            model.addAttribute("keyword", "");
+//            return "View/searchProduct";
+//        }
+//
+//        keyword = keyword.toLowerCase().trim();
+//        List<ProductViewDTO> products = productService.searchProducts(keyword);
+//
+//        model.addAttribute("products", products);
+//        model.addAttribute("keyword", keyword);
+//
+//        return "View/searchProduct";
+//    }
 }

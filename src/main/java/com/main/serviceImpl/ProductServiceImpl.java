@@ -355,4 +355,101 @@ public class ProductServiceImpl implements ProductService {
         markFavorites(dtos);
         return dtos;
     }
+
+    //3 trong 1
+    @Override
+    public Page<ProductViewDTO> searchAndFilterAllProducts(
+            String keyword, String color, String brand,
+            BigDecimal priceFrom, BigDecimal priceTo, Double minRating,
+            String targetCustomer, String categoryId, String parentCategoryId,
+            Pageable pageable, String sortType) {
+
+        if (keyword != null) {
+            keyword = keyword.trim();
+        }
+
+        Page<?> rawPage;
+        List<Product> products;
+
+        if ("price_asc".equalsIgnoreCase(sortType)) {
+            rawPage = productRepository.searchAndFilterProductsPriceAsc(
+                    keyword, color, brand, priceFrom, priceTo, minRating,
+                    targetCustomer, categoryId, parentCategoryId, pageable
+            );
+            System.out.println("Sorting by price ASC");
+
+            // Ép kiểu và lấy Product từ Object[]
+            products = rawPage.getContent().stream()
+                    .map(obj -> (Product) ((Object[]) obj)[0])
+                    .toList();
+
+        } else if ("price_desc".equalsIgnoreCase(sortType)) {
+            rawPage = productRepository.searchAndFilterProductsPriceDesc(
+                    keyword, color, brand, priceFrom, priceTo, minRating,
+                    targetCustomer, categoryId, parentCategoryId, pageable
+            );
+            System.out.println("Sorting by price DESC");
+
+            products = rawPage.getContent().stream()
+                    .map(obj -> (Product) ((Object[]) obj)[0])
+                    .toList();
+
+        } else {
+            Page<Product> defaultPage = productRepository.searchAndFilterProductsDefault(
+                    keyword, color, brand, priceFrom, priceTo, minRating,
+                    targetCustomer, categoryId, parentCategoryId, pageable
+            );
+            rawPage = defaultPage;
+            products = defaultPage.getContent();
+            System.out.println("Default sorting");
+        }
+
+        // In giá mainVariant để kiểm tra
+        for (Product product : products) {
+            product.getVariants().stream()
+                    .filter(Variant::getIsMainVariant)
+                    .findFirst()
+                    .ifPresent(v -> System.out.println("Product ID: " + product.getProductID() + ", Price: " + v.getPrice()));
+        }
+
+        // Lấy danh sách bán chạy
+        Pageable topSellingPageable = PageRequest.of(0, 10);
+        List<Product> topSellingProducts = productRepository.findTopSellingProducts(topSellingPageable);
+        List<String> hotProductIDs = topSellingProducts.stream()
+                .map(Product::getProductID)
+                .toList();
+
+        // Map sang DTO
+        List<ProductViewDTO> dtos = new ArrayList<>();
+        for (Product product : products) {
+            ProductViewDTO dto = new ProductViewDTO();
+            dto.setProductID(product.getProductID());
+
+            boolean isNew = productRepository.isNewProduct(product.getProductID()) > 0;
+            enrichProductViewDTO(dto, product, hotProductIDs, isNew);
+
+            if (color != null) {
+                product.getVariants().forEach(var -> {
+                    if (var.getColor().equalsIgnoreCase(color)) {
+                        dto.setVariantID(var.getVariantID());
+                        for (Image img : var.getImages()) {
+                            if (img.getIsMainImage()) {
+                                dto.setImageUrl(img.getImageUrl());
+                            }
+                        }
+                    }
+                });
+            }
+
+            dtos.add(dto);
+        }
+
+        // Gắn yêu thích nếu có login
+        markFavorites(dtos);
+
+        return new PageImpl<>(dtos, pageable, rawPage.getTotalElements());
+    }
+
+
+
 }

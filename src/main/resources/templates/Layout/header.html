@@ -303,14 +303,15 @@
 
 
             <div class="right-menu d-flex align-items-center">
-                <form th:action="@{/opulentia/search}" method="get" class="search-box position-relative ms-3" style="width: 180px;">
-                    <input type="text" name="keyword" class="rounded-pill ps-3 pe-4" placeholder="Tìm kiếm..."
-                           style="background-color: rgba(255, 255, 255, 0.7); color: black; border: none;">
+                <form id="searchForm" method="get" class="search-box position-relative ms-3 search-form" style="width: 180px;">
+                    <input type="text" id="keywordInput" name="keyword" class="rounded-pill ps-3 pe-4 keyword-input"
+                           placeholder="Tìm kiếm..." style="background-color: rgba(255, 255, 255, 0.7); color: black; border: none;">
                     <button type="submit" class="btn position-absolute end-0 rounded-pill"
                             style="background: none; border: none; height: 100%; width: 30px; padding: 0; top: 0;">
                         <i class="fas fa-search text-dark"></i>
                     </button>
                 </form>
+
 
 
                 <div class="icon-wrapper d-flex align-items-center">
@@ -569,6 +570,36 @@
 //        addToCart({ name: "Áo Polo Dệt Kim 4", price: 387000, image: "https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/474894/item/vngoods_69_474894_3x4.jpg?width=294" });
 
     </script>
+
+<!--    xử lý phần keyword-->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.search-form').forEach(function (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const keywordInput = form.querySelector('.keyword-input');
+                    if (!keywordInput) return;
+
+                    const keyword = keywordInput.value;
+                    const urlParams = new URLSearchParams(window.location.search);
+                    urlParams.set('keyword', keyword);
+                    const newUrl = window.location.pathname + '?' + urlParams.toString();
+                    window.location.href = newUrl;
+                });
+            });
+            const urlParams = new URLSearchParams(window.location.search);
+            const keyword = urlParams.get('keyword');
+            if (keyword) {
+                document.querySelectorAll('.keyword-input').forEach(input => {
+                    input.value = keyword;
+                });
+            }
+        });
+    </script>
+
+
+
     <script src="/js/header.js"></script>
 
 </header>

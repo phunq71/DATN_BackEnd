@@ -229,8 +229,8 @@
       color: black;
     }
   </style>
-  <form class="fn-search-bar" action="/opulentia/search" method="get">
-    <input type="text" name="keyword" id="search-input" placeholder="Nhập từ khóa..." required>
+  <form class="fn-search-bar search-form" id="searchForm" method="get">
+    <input type="text" class="keyword-input" id="keywordInput" name="keyword" placeholder="Nhập từ khóa..." required>
     <button type="submit" style="display: none;"></button> <!-- Để enter hoạt động -->
   </form>
 
@@ -451,6 +451,32 @@
 
 </div>
 
+<!--xử lý keyword-->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.search-form').forEach(function (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const keywordInput = form.querySelector('.keyword-input');
+        if (!keywordInput) return;
+
+        const keyword = keywordInput.value;
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('keyword', keyword);
+        const newUrl = window.location.pathname + '?' + urlParams.toString();
+        window.location.href = newUrl;
+      });
+    });
+    const urlParams = new URLSearchParams(window.location.search);
+    const keyword = urlParams.get('keyword');
+    if (keyword) {
+      document.querySelectorAll('.keyword-input').forEach(input => {
+        input.value = keyword;
+      });
+    }
+  });
+</script>
 
 </body>
 </html>
