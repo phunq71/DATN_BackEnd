@@ -74,7 +74,6 @@ public class SecurityConfig {
                         })
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(oAuth2RefererSavingFilter, OAuth2LoginAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/auth")
                         .userInfoEndpoint(userInfo -> userInfo

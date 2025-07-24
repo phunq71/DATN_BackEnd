@@ -172,6 +172,13 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     boolean existsByOrderIDAndCustomer_CustomerId(Integer orderID, String customerCustomerId);
 
     boolean existsByCustomer_CustomerIdAndStatusIn(String customerId, List<String> statuses);
+
+    List<String> getShippingAddressByCustomer_CustomerId(String customerId);
+
+    List<String> getAddressIdGHNByCustomer_CustomerId(String customerId);
+
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.status IN ('ChoXacNhan', 'ChuanBiDon', 'SanSangGiao') and o.facility.facilityId = :facilityId")
+    long countProcessingOrders(String facilityId);
 }
 
 

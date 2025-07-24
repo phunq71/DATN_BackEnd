@@ -12,6 +12,7 @@ async function isLoggedIn() {
 
         log += "✅ Access token hợp lệ. Đã đăng nhập.\n";
         localStorage.setItem("isLoggedInLog", log);
+        localStorage.removeItem("redirectAfterLogin");
         return true;
     } catch (err) {
         const status = err.response?.status;

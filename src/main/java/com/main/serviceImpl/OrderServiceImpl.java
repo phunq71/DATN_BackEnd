@@ -2,13 +2,19 @@ package com.main.serviceImpl;
 
 import com.main.dto.*;
 
+import com.main.entity.Customer;
 import com.main.entity.OrderDetail;
+import com.main.mapper.CustomerMapper;
+import com.main.repository.CustomerRepository;
 import com.main.repository.OrderDetailRepository;
 
 import com.main.repository.OrderRepository;
 import com.main.repository.ReviewRepository;
+import com.main.service.FacilityService;
 import com.main.service.OrderService;
 import com.main.service.ReviewService;
+import com.main.utils.AuthUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,24 +22,20 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
+    private final CustomerMapper customerMapper;
+    private final CustomerRepository customerRepository;
+    private final FacilityService facilityService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, ReviewService reviewService, ReviewRepository reviewRepository) {
-        this.orderRepository = orderRepository;
-        this.orderDetailRepository = orderDetailRepository;
-        this.reviewService = reviewService;
-        this.reviewRepository = reviewRepository;
-    }
 
     @Override
     public List<OrderDTO> getOrdersByCustomerIdAndStatus(String customerId, String status, Integer year) {
@@ -188,8 +190,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderPreviewDTO> getOrderPreviewProducts() {
-        return List.of();
+    public Map<String, Object> getOrderPreviewData( List<OrderPreviewDTO> items ) {
+        Map<String, Object> orderPreviewData = new HashMap<>();
+        Customer customer = customerRepository.findByCustomerId(AuthUtil.getAccountID());
+        InFoCustomerOrderDTO infoCusDTO = customerMapper.toInFoCustomerOrderDTO(customer);
+        List<FacilityOrderDTO>  listFa = facilityService.getAllFacilities(items);
+        orderPreviewData.put("customer", infoCusDTO);
+        orderPreviewData.put("facilities", listFa);
+        return orderPreviewData;
     }
 
     public Boolean checkOrderDetailByCustomerIDAndODID(String customerId, Integer orderDetailID) {

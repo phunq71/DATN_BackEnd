@@ -31,6 +31,9 @@ public class Order {
     @Column(length = 150)
     private String shippingAddress;
 
+    @Column(length = 100)
+    private String addressIdGHN;
+
     @Column(length = 300)
     private String note;
 
@@ -42,6 +45,9 @@ public class Order {
 
     @Column(precision = 8, scale = 2)
     private BigDecimal costShip;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal discountCost;
 
     @ManyToOne
     @JoinColumn(name = "CustomerID",nullable = false)

@@ -13,9 +13,11 @@ public class OrderPreviewDTO {
     private Integer item_id;
     private String item_name;
     private String image_url;
-    private String colorl;
+    private String size;
+    private String color;
     private  BigDecimal price;
     private Byte discountPercent;
     private Integer quantity;
     private BigDecimal total_price;
+    private BigDecimal discountedPrice;
 }

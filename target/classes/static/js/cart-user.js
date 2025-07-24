@@ -15,12 +15,12 @@ let checkedItems=[];
 function getItemCartsFromServer(){
     return axios.get('/opulentia_user/rest/cart')
         .then(response =>{
-        return response.data;
-        }
-    ).catch(error =>{
-        console.log(error);
-        return [];
-    });
+                return response.data;
+            }
+        ).catch(error =>{
+            console.log(error);
+            return [];
+        });
 }
 
 function updateCartsFromServer(carts){
@@ -147,7 +147,11 @@ function createCartItemRow(chosenProduct, productGroup) {
                 <button class="c-quantity-btn plus" ${currentOutOfStock ? 'disabled' : ''}>+</button>
             </div>
         </td>
-        <td class="c-item-total">${formatPrice(currentOutOfStock ? 0 : ((chosenProduct.price - chosenProduct.discountPercent) * (chosenProduct.quantity || 1)))}</td>
+        <td class="c-item-total">
+          ${formatPrice(currentOutOfStock ? 0 :
+                (chosenProduct.price * (1 - chosenProduct.discountPercent / 100)) * (chosenProduct.quantity || 1)
+            )}
+        </td>
         <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>
     `;
 
@@ -436,18 +440,28 @@ function initCart() {
 // Function to update total amount when checkboxes change
 function updateTotalAmount() {
     let total = 0;
-    checkedItems.forEach(index => {
-        const cartItem = carts[index];
-        if (cartItem) {
-            const item = findItemByID(cartItem.itemID);
-            if (item) {
-                total += (item.price- item.discountPercent) * cartItem.quantity;
-            }
-        }
+    const cartRows = document.querySelectorAll('.c-cart-item');
+
+    cartRows.forEach(row => {
+        const checkbox = row.querySelector('.c-cart-checkbox');
+        if (!checkbox.checked) return;
+
+        // Lấy giá ưu tiên từ `.price-after-discount`, nếu không có thì lấy từ `.basis-price`
+        const priceElement = row.querySelector('.price-after-discount') || row.querySelector('.c-price');
+        if (!priceElement) return;
+
+        const price = parseInt(priceElement.textContent.replace(/[^\d]/g, '')) || 0;
+
+        const quantityInput = row.querySelector('.c-quantity-input');
+        const quantity = parseInt(quantityInput.value) || 1;
+
+        total += price * quantity;
     });
 
     document.getElementById('total-amount').innerText = formatPrice(total);
 }
+
+
 
 function findItemByID(itemID) {
     // Duyệt qua từng mảng con trong mảng lớn
@@ -531,15 +545,22 @@ function updateTotalQuantity() {
     document.getElementById('total-quantity').innerText=totalQuantity;
 }
 
-function renderPrice(basisPrice, discountPercent){
-    if(discountPercent>0){
+function renderPrice(basisPrice, discountPercent) {
+    if (discountPercent > 0) {
+        const discountedPrice = Math.round(basisPrice * (1 - discountPercent / 100));
         return `
-                    <span class="basis-price">${formatPrice(basisPrice)}</span><br>
-                    <span class="price-after-discount">${formatPrice(basisPrice-discountPercent)}</span>
+            <span class="basis-price" style="text-decoration: line-through; color: gray;">
+                ${formatPrice(basisPrice)}
+            </span><br>
+            <span class="price-after-discount" style="font-weight: bold; color: #051931;">
+                ${formatPrice(discountedPrice)}
+            </span>
         `;
     }
-    return formatPrice(basisPrice);
+
+    return `<span class="price">${formatPrice(basisPrice)}</span>`;
 }
+
 
 
 function getCheckedItemIDs() {
@@ -558,7 +579,7 @@ function submitCheckout() {
 
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = '/checkout';
+    form.action = '/opulentia_user/checkout';
 
     const input = document.createElement('input');
     input.type = 'hidden';
@@ -569,4 +590,3 @@ function submitCheckout() {
     document.body.appendChild(form);
     form.submit(); // Gửi và chuyển trang
 }
-

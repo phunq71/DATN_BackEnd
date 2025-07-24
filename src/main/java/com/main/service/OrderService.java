@@ -5,6 +5,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrderService {
     List<OrderDTO> getOrdersByCustomerIdAndStatus(String customerId, String status, Integer year);
@@ -24,7 +25,7 @@ public interface OrderService {
     List<OrderDTO> getOrdersByKeyword(String customerId, String keyword);
 
 
-    List<OrderPreviewDTO> getOrderPreviewProducts();
+    Map<String, Object> getOrderPreviewData( List<OrderPreviewDTO> items );
 
     Boolean checkOrderDetailByCustomerIDAndODID(String customerId, Integer orderDetailID);
 

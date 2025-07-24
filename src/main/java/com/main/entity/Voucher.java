@@ -21,7 +21,7 @@ public class Voucher implements Serializable {
     private String voucherID;
 
     @Column(nullable = false)
-    private Boolean discountType;  // BIT -> Boolean
+    private String discountType;  // BIT -> Boolean
 
     @Column(nullable = false)
     private Integer discountValue;
@@ -49,5 +49,7 @@ public class Voucher implements Serializable {
 
     @OneToMany(mappedBy = "voucher")
     private List<Order> orders;
+
+    private Boolean type;
 
 }

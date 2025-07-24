@@ -55,5 +55,6 @@ public interface CartRepository extends JpaRepository<Cart, CartId> {
     @Query("DELETE FROM Cart c WHERE c.id.customer=:customerId")
     public void clearCartsByCustomerId(@Param("customerId") String customerId);
 
+    Cart getCartByItem_itemIdAndCustomer_customerId(Integer itemItemId, String customerId);
 
 }

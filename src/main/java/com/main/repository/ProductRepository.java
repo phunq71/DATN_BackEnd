@@ -81,7 +81,7 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
 
 
     @Query("""
-    SELECT COALESCE(pp.discountPercent, 0.0)
+    SELECT COALESCE(pp.discountPercent, 0)
     FROM PromotionProduct pp
     JOIN pp.product p
     JOIN pp.promotion pr

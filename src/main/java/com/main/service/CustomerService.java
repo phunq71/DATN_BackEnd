@@ -21,4 +21,6 @@ public interface CustomerService {
     public byte[] createQRCode();
 
     public Customer verifyQRCodeToken(String qrToken);
+
+    public Boolean updateAddrBoolean(String Address, String AddressIdGHN);
 }
