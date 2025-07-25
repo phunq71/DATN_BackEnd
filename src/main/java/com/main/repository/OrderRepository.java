@@ -83,6 +83,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         , o.customer.fullName
         , o.customer.phone
         , o.costShip
+        , o.discountCost
         , o.transaction.paymentMethod
         , o.transaction.transactionDate
         , o.updateStatusAt

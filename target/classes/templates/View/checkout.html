@@ -746,17 +746,17 @@
                         <td class="c-price">
                             <div>
                                 <span th:if="${item.discountPercent > 0}" style="text-decoration: line-through; color: gray; font-size: 14px;">
-                                    ₫<span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 1, 'POINT')}">0</span>
+                                    ₫<span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')}">0</span>
                                 </span><br th:if="${item.discountPercent > 0}" />
 
                                                         <span style="color: #051931; font-weight: bold;">
-                                    ₫<span th:text="${#numbers.formatDecimal(item.discountedPrice, 0, 'COMMA', 1, 'POINT')}">0</span>
+                                    ₫<span th:text="${#numbers.formatDecimal(item.discountedPrice, 0, 'COMMA', 0, 'POINT')}">0</span>
                                 </span>
                             </div>
                         </td>
 
                         <td class="c-quantity" th:text="${item.quantity}">0</td>
-                        <td class="c-item-total" th:text="'₫' + ${#numbers.formatDecimal(item.total_price, 0, 'COMMA', 1, 'POINT')}">₫0</td>
+                        <td class="c-item-total" th:text="'₫' + ${#numbers.formatDecimal(item.total_price, 0, 'COMMA', 0, 'POINT')}">₫0</td>
                     </tr>
 
 
@@ -764,7 +764,7 @@
                     <tfoot>
                     <tr class="c-cart-total">
                         <td colspan="3" class="c-total-label" th:text="${'Tổng số tiền ( ' + totalQuantity + ' sản phẩm )'}"></td>
-                        <td class="c-total-amount" th:text="${#numbers.formatDecimal(totalAmount, 0, 'COMMA', 1, 'POINT') + '₫'}">₫5.250.000</td>
+                        <td class="c-total-amount" th:text="${  '₫' + #numbers.formatDecimal(totalAmount, 0, 'COMMA', 0, 'POINT')}">₫5.250.000</td>
                     </tr>
                     </tfoot>
                 </table>
@@ -890,19 +890,19 @@
                 <div class="payment-info-col">
                     <div class="payment-detail">
                         <span>Tổng tiền hàng:</span>
-                        <span>₫5.250.000</span>
+                        <span th:text="${  '₫' + #numbers.formatDecimal(totalAmount, 0, 'COMMA', 0, 'POINT')}">₫5.250.000</span>
                     </div>
                     <div class="payment-detail">
                         <span>Phí vận chuyển:</span>
-                        <span>₫21.000</span>
+                        <span id="ship">₫21.000</span>
                     </div>
                     <div class="payment-detail">
                         <span>Giảm giá:</span>
-                        <span>₫150.000</span>
+                        <span id="giamGia">₫0</span>
                     </div>
                     <div class="payment-total">
                         <span>Tổng thanh toán:</span>
-                        <span>₫5.121.000</span>
+                        <span id="tongTien">₫0</span>
                     </div>
                 </div>
             </div>
@@ -916,7 +916,7 @@
                     <h5 id="hauMai2"></h5>
                 </div>
                 <a href="#" class="terms-link">Điều khoản và điều kiện</a>
-                <a href="/qrPay" class="order-btn">Đặt hàng</a>
+                <a onclick="datHang()" class="order-btn">Đặt hàng</a>
             </div>
         </div>
     </div>
