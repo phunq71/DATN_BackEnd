@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin đơn hàng</title>
+
+</head>
+<body>
+<style>
+
+    .od-container {
+        color: black;
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #fff;
+        /*margin-top: 80px;*/
+        padding: 20px;
+    }
+
+    .od-header {
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+
+    .od-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+    }
+
+    .od-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0; /* Bỏ margin-bottom của h1 */
+        color: #000;
+    }
+
+    .back-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: none;
+        margin: 0; /* Đảm bảo không có margin */
+    }
+
+    .od-delivery-date {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .od-status {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        font-weight: bold;
+        color: black;
+    }
+
+    .od-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+    }
+
+    .od-col {
+        flex: 1;
+        min-width: 300px;
+        padding: 0 15px;
+    }
+
+    .od-section {
+        margin-bottom: 20px;
+    }
+
+    .od-section-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #000;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+    }
+
+    .od-address {
+        line-height: 1.6;
+    }
+
+    .od-recipient {
+        font-weight: bold;
+        color: #000;
+    }
+
+    .od-phone {
+        color: #777;
+    }
+
+    .od-products {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .od-products th {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        color: #777;
+        font-weight: normal;
+    }
+
+    .od-products td {
+        padding: 15px 10px;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+    }
+
+    .od-product-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+    .od-product-name {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .od-product-attr {
+        color: #777;
+        font-size: 14px;
+    }
+
+    .od-original-price {
+        text-decoration: line-through;
+        color: #777;
+        font-size: 14px;
+    }
+
+    .od-discounted-price {
+        color: #000;
+        font-weight: bold;
+    }
+
+    .od-total {
+        text-align: right;
+        margin-top: 20px;
+    }
+
+    .od-summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee;
+    }
+
+    .od-summary-total {
+        font-size: 18px;
+        font-weight: bold;
+        color: #000;
+    }
+
+    .od-expand-btn {
+        background: none;
+        border: none;
+        color: #777;
+        cursor: pointer;
+        text-decoration: underline;
+        font-size: 14px;
+        padding: 0;
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    .od-expand-btn:hover {
+        color: #333;
+    }
+
+    .od-detail {
+        margin-bottom: 10px;
+    }
+
+    .od-detail-label {
+        color: #777;
+        margin-bottom: 5px;
+    }
+
+    .od-detail-value {
+        font-weight: bold;
+    }
+
+    .od-copy-btn {
+        background: none;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 2px 8px;
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 12px;
+    }
+
+    .od-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .od-btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .od-btn-cancel {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        color: #333;
+    }
+
+    .od-btn-review {
+        background-color: #000000;
+        border: 1px solid #ddd;
+        color: #ffffff;
+        transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+
+    /* Hover state */
+    .od-btn-review:hover {
+        background-color: #333333; /* Đen nhạt hơn xíu khi hover */
+        border-color: #bbb; /* Cho border bớt cứng */
+    }
+
+    /* Click (active) state */
+    .od-btn-review:active {
+        background-color: #555555; /* Sáng hơn xíu khi nhấn */
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Hover state */
+    .od-btn-cancel:hover {
+        background-color: #e0e0e0; /* Màu xám hơi đậm hơn khi hover */
+        border-color: #ccc;
+    }
+
+    /* Click (active) state */
+    .od-btn-cancel:active {
+        background-color: #d5d5d5; /* Màu xám đậm hơn nữa khi nhấn */
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .od-btn-track {
+        background-color: #000;
+        border: 1px solid #000;
+        color: #fff;
+    }
+
+    .od-details-expanded {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 1s ease;
+    }
+
+    .od-details-expanded.expanded {
+        max-height: 500px; /* Giá trị này đủ lớn hơn chiều cao thực tế */
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .back-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: none;
+    }
+
+    .back-button i {
+        color: #191b1f;
+        font-size: 24px;
+        transform: scaleX(-1); /* Lật ngang icon */
+    }
+
+    .back-button:hover {
+        background-color: #f0f0f0; /* Màu hover nhẹ nhàng */
+        transform: translateY(-2px) scale(1.05); /* Thêm hiệu ứng phóng to nhẹ */
+    }
+
+    .back-button:active {
+        background-color: #e1f2ff;
+        transform: translateY(0) scale(0.98); /* Hiệu ứng nhấn xuống */
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng bên trong */
+    }
+
+
+    /* Open Modal Button */
+    .rv-open-modal-btn {
+        padding: 10px 20px;
+        background-color: #222;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+
+    .rv-open-modal-btn:hover {
+        background-color: #444;
+    }
+
+    /* Modal Styles */
+    .rv-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none; /* Ẩn modal mặc định */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .rv-modal-container {
+        background-color: white;
+        width: 90%;
+        max-width: 800px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .rv-modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        background-color: #f8f8f8;
+        color: #333;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .rv-modal-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .rv-product-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .rv-product-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background-color: #fafafa;
+        border: 1px solid #e0e0e0;
+    }
+
+    .rv-product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        margin-right: 15px;
+        background-color: #eee;
+    }
+
+    .rv-product-info {
+        flex: 1;
+    }
+
+    .rv-product-name {
+        font-weight: 600;
+        color: #222;
+        margin-bottom: 5px;
+    }
+
+    .rv-product-details {
+        display: flex;
+        gap: 15px;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .rv-review-button {
+        padding: 8px 15px;
+        background-color: #222;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .rv-review-button:hover {
+        background-color: #444;
+    }
+
+    .rv-review-button.reviewed {
+        background-color: #666;
+    }
+
+    .rv-modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: flex-end;
+        background-color: #f8f8f8;
+    }
+
+    .rv-close-button {
+        padding: 8px 20px;
+        background-color: #222;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .rv-close-button:hover {
+        background-color: #444;
+    }
+
+    /* Scrollbar styling */
+    .rv-modal-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .rv-modal-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .rv-modal-content::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    .rv-modal-content::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+
+<style>
+    .order-status {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        padding: 0 100px;
+        margin-top: 80px;
+    }
+
+    .progress-container {
+        width: 100%;
+        position: relative;
+    }
+
+    .progress-bar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 70px;
+        width: 100%;
+    }
+
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 2;
+        flex: 1;
+        position: relative;
+        min-width: 150px;
+        min-height: 100px;
+    }
+
+    .step-circle {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 3; /* Đảm bảo icon nằm trên progress line */
+        background-color: white; /* Nền trắng để che progress line */
+    }
+
+    .progress-line {
+        position: absolute;
+        height: 2px;
+        background-color: #e0e0e0;
+        top: 27px; /* 27px = (55px height của circle / 2) - (2px height của line / 2) */
+        left: calc(27.5px + 5%); /* Bắt đầu từ giữa icon đầu tiên + padding container */
+        right: calc(27.5px + 5%); /* Kết thúc ở giữa icon cuối cùng + padding container */
+        z-index: 1;
+    }
+
+    .progress-line-active {
+        position: absolute;
+        height: 2px;
+        background-color: #28a745;
+        top: 27px;
+        left: calc(27.5px + 5%); /* Cùng vị trí với progress-line */
+        z-index: 2;
+        transition: width 0.5s ease;
+        width: 0;
+    }
+
+    /* Phần còn lại giữ nguyên */
+    .step-circle.pending {
+        border: 2px solid #ccc;
+        background-color: white;
+        color: #ccc;
+    }
+
+    .step-circle.active {
+        border: 2px solid #28a745;
+        background-color: #28a745;
+        color: white;
+    }
+
+    .step-circle.completed {
+        border: 2px solid #28a745;
+        background-color: white;
+        color: #28a745;
+    }
+
+    .step-label {
+        text-align: center;
+        font-size: 14px;
+        position: absolute;
+        top: 57px;
+        width: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: black;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .step-time {
+        font-size: 12px;
+        color: #666;
+        text-align: center;
+        width: 100%;
+        margin-top: 5px;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        right: 0;
+        white-space: nowrap;
+    }
+
+    .step-icon {
+        font-size: 24px;
+    }
+
+</style>
+
+<style>
+    .status-detail {
+        margin: 0 100px;
+        display: flex;
+        justify-content: right;
+        align-items: flex-start;
+    }
+
+    .order-table {
+        color: #222;
+        border-collapse: collapse;
+        border: 1px solid #ccc;
+        font-family: Arial, sans-serif;
+        width: 50%;
+        background-color: #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .order-table th {
+        background-color: #f5f5f5;
+        color: #333;
+        font-weight: bold;
+        padding: 10px;
+        text-align: left;
+        border-bottom: 2px solid #ddd;
+    }
+
+    .order-table td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .order-table tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .order-table .last-row {
+        text-align: right;
+    }
+
+    .toggle-btn {
+        background: none;
+        border: none;
+        color: #0066cc;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+        font-size: 14px;
+    }
+
+    .hidden-row {
+        display: none;
+    }
+
+</style>
+<div class="order-status">
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-line"></div>
+            <div class="progress-line-active" id="progress-line-active"></div>
+            <div class="progress-step" data-step="DonHangDaDat">
+                <div class="step-circle">
+                    <i class="fas fa-folder step-icon"></i>
+                </div>
+                <div class="step-label">Đơn hàng đã đặt</div>
+            </div>
+
+            <div class="progress-step" data-step="DaXacNhan">
+                <div class="step-circle">
+                    <i class="fas fa-money-bill-wave step-icon"></i>
+                </div>
+                <div class="step-label">Đã xác nhận</div>
+            </div>
+
+            <div class="progress-step" data-step="DaLayHang">
+                <div class="step-circle">
+                    <i class="fas fa-truck step-icon"></i>
+                </div>
+                <div class="step-label">Đã lấy hàng</div>
+            </div>
+
+            <div class="progress-step" data-step="HoanThanh">
+                <div class="step-circle">
+                    <i class="fas fa-star step-icon"></i>
+                </div>
+                <div class="step-label">Hoàn thành</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="status-detail">
+    <table class="order-table" id="shipping-status-table" border="1" style=" border-collapse: collapse;">
+        <thead>
+        <tr>
+            <th>Thời gian cập nhật</th>
+            <th>Trạng thái đơn hàng</th>
+        </tr>
+        </thead>
+        <tbody id="shipping-status-body">
+        <!-- Các dòng sẽ được thêm tại đây -->
+        </tbody>
+    </table>
+</div>
+<div class="od-container">
+    <div class="od-title-wrapper">
+        <button class="back-button" title="Quay lại">
+            <i class="fa-solid fa-share"></i>
+        </button>
+        <h1 class="od-title">Thông tin đơn hàng</h1>
+    </div>
+    <div class="od-header">
+
+        <!-- Ngày giao hàng dự kiến 27/06/2025 -->
+        <div class="od-delivery-date">Ngày nhận hàng dự kiến 30/06/2025</div>
+        <span class="od-status" id="orderStatus"></span>
+    </div>
+
+
+    <div class="od-row">
+        <div class="od-col">
+            <div class="od-section">
+                <h2 class="od-section-title">Địa chỉ nhận hàng</h2>
+                <div class="od-address">
+                    <div class="od-recipient" id="shippingName"></div>
+                    <div class="od-phone" id="shippingPhone"></div>
+                    <div id="shippingAddress"></div>
+                </div>
+            </div>
+
+            <div class="od-section">
+                <h2 class="od-section-title">Thông tin thanh toán</h2>
+                <div class="od-detail">
+                    <div class="od-detail-label">Phương thức thanh toán</div>
+                    <div class="od-detail-value" id="paymentMethod"></div>
+                </div>
+                <div class="od-detail">
+                    <div class="od-detail-label">Thời gian đặt hàng</div>
+                    <div class="od-detail-value" id="orderDate"></div>
+                </div>
+                <div class="od-detail">
+                    <div class="od-detail-label">Thời gian thanh toán</div>
+                    <div class="od-detail-value" id="transactionDate"></div>
+                </div>
+            </div>
+
+            <div class="od-section">
+                <div class="od-detail">
+                    <div class="od-detail-label">Mã đơn hàng</div>
+                    <div class="od-detail-value">
+                        <span id="orderId"></span>
+                        <button class="od-copy-btn">Sao chép</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="od-col">
+            <div class="od-section">
+                <h2 class="od-section-title">Sản phẩm đã đặt</h2>
+                <table class="od-products">
+                    <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                    <!-- Sản phẩm sẽ được thêm động bằng JavaScript -->
+                    </tbody>
+                </table>
+
+                <div class="od-total">
+                    <button id="od-expand-btn" class="od-expand-btn">Xem chi tiết</button>
+                    <div id="od-details-expanded" class="od-details-expanded">
+                        <div class="od-summary-item">
+                            <span>Tổng tiền hàng:</span>
+                            <span id="totalItemsPrice"></span>
+                        </div>
+                        <div class="od-summary-item">
+                            <span>Phí vận chuyển:</span>
+                            <span id="shippingCost"></span>
+                        </div>
+                        <div class="od-summary-item">
+                            <span>Giảm giá của sản phẩm:</span>
+                            <span id="discountProductPrice"></span>
+                        </div>
+                        <div class="od-summary-item">
+                            <span>Voucher:</span>
+                            <span id="discountVoucherPrice"></span>
+                        </div>
+                    </div>
+                    <div class="od-summary-item od-summary-total">
+                        <span>Tổng cộng:</span>
+                        <span id="finalPrice"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="od-actions" id="actions">
+        <!--        <button class="od-btn od-btn-cancel" id="action-btn">-</button>-->
+        <!--        <button class="od-btn od-btn-review" id="review-btn">Đánh giá sản phẩm</button>-->
+
+    </div>
+
+</div>
+
+<div class="rv-modal-overlay" id="rvReviewModal">
+    <div class="rv-modal-container">
+        <div class="rv-modal-header">
+            Đánh giá sản phẩm
+        </div>
+        <div class="rv-modal-content">
+            <div class="rv-product-list" id="rv-items-container">
+                <!-- Product 1 -->
+                <div class="rv-product-item">
+                    <img src="CIRCLE_EMBROIDERED_LOGO_T-SHIRT_BROWN_01.png" alt="Product Image"
+                         class="rv-product-image">
+                    <div class="rv-product-info">
+                        <div class="rv-product-name">Circle Embroidered Logo T-Shirt</div>
+                        <div class="rv-product-details">
+                            <span>Màu: Nâu</span>
+                            <span>Size: L</span>
+                        </div>
+                    </div>
+                    <a href="/review/5" class="rv-review-button">Đánh giá</a>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="rv-product-item">
+                    <img src="BEVERLY_HILLS_LOGO-EMBROIDERED_T-SHIRT_BLACK_01.png" alt="Product Image"
+                         class="rv-product-image">
+                    <div class="rv-product-info">
+                        <div class="rv-product-name">Beverly Hills Logo-Embroidered T-Shirt</div>
+                        <div class="rv-product-details">
+                            <span>Màu: Đen</span>
+                            <span>Size: S</span>
+                        </div>
+                    </div>
+                    <a href="/review/40" class="rv-review-button reviewed">Xem đánh giá</a>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="rv-product-item">
+                    <img src="BEVERLY_HILLS_LOGO-EMBROIDERED_T-SHIRT_WHITE_01.png" alt="Product Image"
+                         class="rv-product-image">
+                    <div class="rv-product-info">
+                        <div class="rv-product-name">Beverly Hills Logo-Embroidered T-Shirt</div>
+                        <div class="rv-product-details">
+                            <span>Màu: Trắng</span>
+                            <span>Size: XXXL</span>
+                        </div>
+                    </div>
+                    <a href="/review/59" class="rv-review-button">Đánh giá</a>
+                </div>
+            </div>
+        </div>
+        <div class="rv-modal-footer">
+            <button class="rv-close-button">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const statusToStepMap = {
+        'ChoXacNhan': 'DonHangDaDat',
+        'ChuanBiDon': 'DaXacNhan',
+        'SanSangGiao': 'DaXacNhan',
+        'DaYeuCauHuy': 'DaXacNhan',
+        'ChoGiaoHang': 'DaLayHang',
+        'DaGiao': 'HoanThanh'
+    };
+
+    const stepOrder = ['DonHangDaDat', 'DaXacNhan', 'DaLayHang', 'HoanThanh'];
+
+    function updateProgressBar(status) {
+        const stepKey = statusToStepMap[status] || stepOrder[0];
+        const steps = document.querySelectorAll('.progress-step');
+        const targetIndex = stepOrder.indexOf(stepKey);
+
+        steps.forEach((step, index) => {
+            const circle = step.querySelector('.step-circle');
+            circle.classList.remove('completed', 'active', 'pending');
+
+            if (index < targetIndex) {
+                circle.classList.add('completed');
+            } else if (index === targetIndex) {
+                circle.classList.add('active');
+            } else {
+                circle.classList.add('pending');
+            }
+        });
+
+        // Tính toán chiều rộng progress line
+        const progressLine = document.getElementById('progress-line-active');
+        const stepWidth = 100 / (stepOrder.length - 1); // % width mỗi bước
+        const progressWidth = targetIndex * stepWidth;
+
+        progressLine.style.width = `${progressWidth}%`;
+    }
+    // Thêm hiệu ứng khi trang được tải
+    document.addEventListener('DOMContentLoaded', function () {
+        updateProgressBar();
+        const completedSteps = document.querySelectorAll('.step-circle.completed');
+        completedSteps.forEach((step, index) => {
+            setTimeout(() => {
+                step.style.transform = 'scale(1.2)';
+                setTimeout(() => step.style.transform = 'scale(1)', 300);
+            }, index * 300);
+        });
+
+        const activeStep = document.querySelector('.step-circle.active');
+        if (activeStep) {
+            setTimeout(() => {
+                activeStep.style.transform = 'scale(1.2)';
+                setTimeout(() => activeStep.style.transform = 'scale(1)', 300);
+            }, completedSteps.length * 300);
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const expandBtn = document.getElementById('od-expand-btn');
+        const detailsSection = document.getElementById('od-details-expanded');
+
+        expandBtn.addEventListener('click', function () {
+            if (detailsSection.classList.contains('expanded')) {
+                detailsSection.classList.remove('expanded');
+                expandBtn.textContent = 'Xem chi tiết';
+            } else {
+                detailsSection.classList.add('expanded');
+                expandBtn.textContent = 'Ẩn chi tiết';
+            }
+        });
+
+        // Copy mã đơn hàng
+        const copyButtons = document.querySelectorAll('.od-copy-btn');
+        copyButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const orderNumber = this.parentNode.textContent.trim().split(' ')[0];
+                navigator.clipboard.writeText(orderNumber).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Đã sao chép!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 2000);
+                });
+            });
+        });
+    });
+</script>
+<script src="/js/orderDetail.js"></script>
+</body>
+</html>

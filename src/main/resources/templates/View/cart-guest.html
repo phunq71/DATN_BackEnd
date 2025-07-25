@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" content="${_csrf.token}" />
+    <meta name="_csrf_header" content="${_csrf.headerName}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+</head>
+<body>
+<style>
+
+     /*CSS scoped cho component giỏ hàng */
+    .c-cart-container {
+        width: 100%;
+        padding: 0 1rem;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 80px;
+
+    }
+
+    .c-cart-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .c-cart-wrapper {
+        background-color: white;
+
+        overflow: hidden;
+        margin-bottom: 2rem;
+        /* Thiết lập thanh cuộn */
+        height: calc(100vh - 150px); /* Chiều cao bằng viewport trừ đi khoảng cách trên và dưới */
+        display: flex;
+        flex-direction: column;
+        position: relative; /* Thêm position relative để chứa checkout */
+    }
+
+    .c-cart-table-container {
+        overflow-y: auto;
+        flex: 1;
+        scrollbar-width: none;
+    }
+
+    /*!* Custom scrollbar cho WebKit browsers *!*/
+    /*.c-cart-table-container::-webkit-scrollbar {*/
+    /*    width: 8px;*/
+    /*    height: 8px;*/
+    /*}*/
+
+    /*.c-cart-table-container::-webkit-scrollbar-track {*/
+    /*    background: #f1f1f1;*/
+    /*    border-radius: 4px;*/
+    /*}*/
+
+    /*.c-cart-table-container::-webkit-scrollbar-thumb {*/
+    /*    background-color: #c1c1c1;*/
+    /*    border-radius: 4px;*/
+    /*}*/
+
+    /*.c-cart-table-container::-webkit-scrollbar-thumb:hover {*/
+    /*    background-color: #a8a8a8;*/
+    /*}*/
+
+    .c-cart-table {
+        width: 100%;
+        /*height: 100vh;*/
+        border-collapse: collapse;
+        background: white;
+        table-layout: fixed;
+    }
+
+    .c-cart-table thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        margin-bottom: 10px;
+    }
+
+    .c-cart-table th {
+        background-color: #000000;
+        color: white;
+        font-weight: 500;
+        font-size: 0.9rem;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .c-cart-table th:first-child {
+        width: 50px;
+    }
+
+    .c-cart-table th:nth-child(2) {
+        text-align: left;
+        width: 40%;
+    }
+
+    .c-cart-table th:nth-child(3),
+    .c-cart-table th:nth-child(5) {
+        width: 10%;
+    }
+
+    .c-cart-table th:nth-child(4) {
+        width: 20%;
+    }
+
+    .c-cart-table th:last-child {
+        width: 15%;
+    }
+
+    .c-cart-table td {
+        padding: 1.2rem;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+
+    .c-cart-item:last-child td {
+        border-bottom: none;
+    }
+
+    .c-product-info {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        text-align: left;
+    }
+
+    .c-product-info strong {
+        display: block;
+        font-size: 1rem;
+        color: #2c3e50;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .c-variant {
+        color: #6c757d;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .c-product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #eee;
+        background-color: #f8f9fa;
+        flex-shrink: 0;
+    }
+
+    .c-quantity-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        max-width: 120px;
+    }
+
+    .c-quantity-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #dee2e6;
+        background-color: #f8f9fa;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .c-quantity-btn:hover {
+        background-color: #e9ecef;
+    }
+
+    .c-quantity-input {
+        width: 42px;
+        height: 32px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+        border-left: none;
+        border-right: none;
+        font-size: 0.95rem;
+        padding: 0 0.25rem;
+    }
+
+    .c-quantity-input:focus {
+        outline: none;
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+    }
+
+    .c-price {
+        font-weight: 500;
+        color: #2c3e50;
+        white-space: nowrap;
+    }
+
+    .c-item-total {
+        font-weight: 600;
+        color: #000000;
+        white-space: nowrap;
+    }
+
+    /*.c-delete-single {*/
+    /*    color: #000000;*/
+    /*    font-weight: 500;*/
+    /*    background: transparent;*/
+    /*    border: none;*/
+    /*    cursor: pointer;*/
+    /*    transition: color 0.2s;*/
+    /*    font-size: 0.95rem;*/
+    /*    padding: 1rem 2rem;*/
+    /*    border-radius: 4px;*/
+    /*    white-space: nowrap;*/
+    /*    z-index: 1000;*/
+    /*}*/
+
+    /*.c-delete-single:hover {*/
+    /*    background-color: #fce8e8;*/
+    /*    color: #e74c3c;*/
+    /*}*/
+
+    .c-checkout {
+        padding: 1.5rem;
+        background: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        border-top: 1px solid #eee;
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+    }
+
+    .c-checkout-actions {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .c-select-all-container {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .c-select-all-container label {
+        color: black;
+    }
+
+    .c-delete-all {
+        color: #e74c3c;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+    }
+
+    .c-delete-all:hover {
+        background-color: #fce8e8;
+    }
+
+    .c-checkout-summary {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .c-total-info {
+        text-align: right;
+    }
+
+    .c-total-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+
+    .c-total-amount {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #41120e;
+    }
+
+    .c-checkout-btn {
+        background: linear-gradient(135deg, #000000, #000000);
+        color: white;
+        border: none;
+        padding: 0.8rem 2rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.25);
+    }
+
+    .c-checkout-btn:hover {
+        background: linear-gradient(135deg, #c0392b, #a23526);
+        box-shadow: 0 6px 16px rgba(231, 76, 60, 0.35);
+        transform: translateY(-2px);
+
+    }
+
+    .c-cart-checkbox {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 992px) {
+        .c-checkout {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .c-checkout-actions, .c-checkout-summary {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .c-cart-title {
+            font-size: 1.7rem;
+        }
+
+        .c-cart-wrapper {
+            overflow-x: auto;
+        }
+
+        .c-cart-table {
+            min-width: 700px;
+        }
+
+        .c-checkout-summary {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .c-total-info {
+            text-align: left;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .c-cart-title {
+            font-size: 1.5rem;
+        }
+
+        .c-checkout-btn {
+            width: 100%;
+            padding: 1rem;
+        }
+
+        .c-cart-wrapper {
+            max-height: 60vh;
+        }
+    }
+
+     .c-cart-container input::-webkit-outer-spin-button,
+     input::-webkit-inner-spin-button {
+         -webkit-appearance: none;
+         margin: 0;
+     }
+
+     /* Firefox */
+     input[type="number"] {
+         -moz-appearance: textfield;
+     }
+
+
+     .c-variant-container {
+         display: flex;
+         gap: 10px;
+         margin-top: 8px;
+     }
+
+     .c-variant-select {
+         appearance: none;
+         -webkit-appearance: none;
+         -moz-appearance: none;
+         background-color: #f5f5f5;
+         border: 1px solid #e0e0e0;
+         border-radius: 4px;
+         padding: 6px 12px;
+         font-size: 14px;
+         color: #333;
+         cursor: pointer;
+         position: relative;
+         min-width: 100px;
+         outline: none;
+         transition: all 0.2s ease;
+     }
+
+     .c-variant-select:hover {
+         background-color: #ebebeb;
+     }
+
+     .c-variant-select:focus {
+         border-color: #999;
+     }
+
+     .c-variant-select option {
+         padding: 8px 12px;
+         border-bottom: 1px solid #e0e0e0;
+         background-color: white;
+     }
+
+     .c-variant-select option:last-child {
+         border-bottom: none;
+     }
+
+     /* Style for the select dropdown arrow */
+     .c-variant-select {
+         background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+         background-repeat: no-repeat;
+         background-position: right 8px center;
+         background-size: 16px;
+         padding-right: 30px;
+     }
+
+     .back-button {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border: none;
+         width: 40px;
+         height: 40px;
+         border-radius: 3px;
+         cursor: pointer;
+         transition: all 0.3s ease;
+         background: none;
+     }
+
+     .back-button i {
+         color: #191b1f;
+         font-size: 24px;
+         transform: scaleX(-1); /* Lật ngang icon */
+     }
+
+     .back-button:hover {
+         background-color: #f0f0f0; /* Màu hover nhẹ nhàng */
+         transform: translateY(-2px) scale(1.05); /* Thêm hiệu ứng phóng to nhẹ */
+     }
+
+     .back-button:active {
+         background-color: #e1f2ff;
+         transform: translateY(0) scale(0.98); /* Hiệu ứng nhấn xuống */
+         box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* Hiệu ứng bóng bên trong */
+     }
+
+
+     select option:disabled {
+         color: #ccc;
+         background-color: #f5f5f5;
+     }
+
+     .disabled-row {
+         background-color: rgba(245, 245, 245, 0.6) !important;
+         color: #999 !important;
+     }
+
+     .disabled-row .c-product-info,
+     .disabled-row .c-price,
+     .disabled-row .c-item-total {
+         color: #999 !important;
+     }
+
+     .disabled-row select:disabled,
+     .disabled-row input:disabled,
+     .disabled-row .c-quantity-btn {
+         opacity: 0.6;
+         cursor: not-allowed !important;
+         background-color: #eee !important;
+     }
+
+     /* Style cho nút delete trong row disabled - KHÔNG ghi đè hover */
+     .disabled-row .c-delete-single {
+         /*opacity: 1 !important;*/
+         color: #000000;
+         background-color: transparent;
+         cursor: pointer;
+     }
+
+     /* Thêm hiệu ứng hover riêng cho nút delete trong row disabled */
+     .disabled-row .c-delete-single:hover {
+         background-color: #fce8e8 !important;
+         color: #e74c3c !important;
+     }
+
+     .c-delete-single {
+         color: #000000;
+         font-weight: 500;
+         background: transparent;
+         border: none;
+         cursor: pointer;
+         transition: color 0.2s;
+         font-size: 0.95rem;
+         padding: 1rem 2rem;
+         border-radius: 4px;
+         white-space: nowrap;
+         z-index: 1000;
+     }
+
+     .c-delete-single:hover {
+         background-color: #fce8e8;
+         color: #e74c3c;
+     }
+
+
+     .basis-price{
+         font-size: 12px;
+         text-decoration: line-through;
+     }
+
+     .price-after-discount{
+         font-weight: bold;
+         font-size: 17px;
+     }
+</style>
+
+<div class="c-cart-container">
+
+    <div class="c-cart-title">
+        <button class="back-button" title="Quay lại" onclick="history.back()">
+            <i class="fa-solid fa-share"></i>
+        </button>
+        Giỏ hàng của bạn</div>
+    <div class="c-cart-wrapper">
+        <div class="c-cart-table-container">
+            <table class="c-cart-table">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Sản Phẩm</th>
+                    <th>Đơn Giá</th>
+                    <th>Số Lượng</th>
+                    <th>Số Tiền</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="cart-container">
+<!--                &lt;!&ndash; Sản phẩm 1 &ndash;&gt;-->
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/hero-image-sp.jpg" alt="Áo thun Uniqlo" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Áo thun Uniqlo U cổ tròn dáng rộng chất liệu cotton thoáng mát</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu trắng</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                        <option>Màu xanh navy</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size M</option>-->
+<!--                                        <option>Size S</option>-->
+<!--                                        <option>Size L</option>-->
+<!--                                        <option>Size XL</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫250.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫250.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
+
+<!--                &lt;!&ndash; Sản phẩm 2 &ndash;&gt;-->
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/women/kv-dresses-women-01-sp.jpg" alt="Quần jeans Levi's" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Quần jeans Levi's 501 Original Fit màu xanh đậm</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu xanh</option>-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                        <option>Màu trắng</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size 32</option>-->
+<!--                                        <option>Size 30</option>-->
+<!--                                        <option>Size 34</option>-->
+<!--                                        <option>Size 36</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫800.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫800.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
+
+<!--                &lt;!&ndash; Sản phẩm 3 &ndash;&gt;-->
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/us/imagesgoods/475647/item/usgoods_00_475647_3x4.jpg?width=600" alt="Áo khoác" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Áo khoác nam Ultra Light Down màu xám nhạt</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu be</option>-->
+<!--                                        <option>Màu navy</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size L</option>-->
+<!--                                        <option>Size M</option>-->
+<!--                                        <option>Size XL</option>-->
+<!--                                        <option>Size XXL</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫1.200.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫1.200.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
+
+<!--                &lt;!&ndash; Sản phẩm 4 &ndash;&gt;-->
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox"></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwPdFdJSyqGh8rnfp4OFbw0bqabdyVyl0SpfSQnQRXocuLFEe94IGYj9dmEk3fwocLY1E&usqp=CAU" alt="Giày thể thao" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Giày thể thao Nike Air Max 270 React màu trắng đen</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu trắng</option>-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                        <option>Màu xanh</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size 42</option>-->
+<!--                                        <option>Size 40</option>-->
+<!--                                        <option>Size 41</option>-->
+<!--                                        <option>Size 43</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫2.500.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫2.500.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
+
+<!--                &lt;!&ndash; Thêm nhiều sản phẩm để demo scroll &ndash;&gt;-->
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/hero-image-sp.jpg" alt="Áo thun Uniqlo" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Áo thun nam cổ tròn màu xanh navy</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu xanh navy</option>-->
+<!--                                        <option>Màu trắng</option>-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size L</option>-->
+<!--                                        <option>Size M</option>-->
+<!--                                        <option>Size XL</option>-->
+<!--                                        <option>Size XXL</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫350.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="2" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫700.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
+
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/women/kv-dresses-women-01-sp.jpg" alt="Quần jeans" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Quần jeans nữ dáng skinny màu đen</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu xanh</option>-->
+<!--                                        <option>Màu trắng</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size 28</option>-->
+<!--                                        <option>Size 26</option>-->
+<!--                                        <option>Size 30</option>-->
+<!--                                        <option>Size 32</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫650.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫650.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
+
+<!--                <tr class="c-cart-item">-->
+<!--                    <td><input type="checkbox" class="c-cart-checkbox" checked></td>-->
+<!--                    <td>-->
+<!--                        <div class="c-product-info">-->
+<!--                            <img src="https://image.uniqlo.com/UQ/ST3/us/imagesgoods/475647/item/usgoods_00_475647_3x4.jpg?width=600" alt="Áo khoác" class="c-product-image">-->
+<!--                            <div>-->
+<!--                                <strong>Áo khoác nữ dạ dáng dài màu be</strong>-->
+<!--                                <div class="c-variant-container">-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Màu be</option>-->
+<!--                                        <option>Màu đen</option>-->
+<!--                                        <option>Màu xám</option>-->
+<!--                                        <option>Màu camel</option>-->
+<!--                                    </select>-->
+<!--                                    <select class="c-variant-select">-->
+<!--                                        <option>Size M</option>-->
+<!--                                        <option>Size S</option>-->
+<!--                                        <option>Size L</option>-->
+<!--                                        <option>Size XL</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-price">₫1.500.000</td>-->
+<!--                    <td class="c-actions">-->
+<!--                        <div class="c-quantity-container">-->
+<!--                            <button class="c-quantity-btn">-</button>-->
+<!--                            <input type="number" class="c-quantity-input" value="1" min="1">-->
+<!--                            <button class="c-quantity-btn">+</button>-->
+<!--                        </div>-->
+<!--                    </td>-->
+<!--                    <td class="c-item-total">₫1.500.000</td>-->
+<!--                    <td><button class="c-delete-single" title="Xóa"><i class="fa-solid fa-trash"></i></button></td>-->
+<!--                </tr>-->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="c-checkout">
+            <div class="c-checkout-actions">
+                <div class="c-select-all-container">
+                    <input type="checkbox" id="c-select-all-checkout" class="c-cart-checkbox">
+                    <label for="c-select-all-checkout">Tất cả (<span id="total-quantity">7</span> sản phẩm)</label>
+                </div>
+                <button class="c-delete-all" onclick="deleteCheckedItem()">Xóa</button>
+            </div>
+
+            <div class="c-checkout-summary">
+                <div class="c-total-info">
+                    <div class="c-total-label">Tổng cộng:</div>
+                    <div class="c-total-amount" id="total-amount">₫7.600.000</div>
+                </div>
+                <a href="/opulentia_user/checkout" class="c-checkout-btn">Mua Hàng</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script  src="/js/cart-guest.js"></script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sản phẩm demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            padding: 40px;
+            background-color: #f5f5f5;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .product-container {
+            width: 70%;
+            position: relative;
+        }
+
+        .product-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image {
+            width: 100%;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .new-label {
+            position: absolute;
+            top: 15px;
+            left: 10px;
+            background-color: #000;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 2;
+            transform: rotate(-15deg);
+            transition: padding 0.3s ease;
+        }
+
+        .discount-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            
+            z-index: 2;
+        }
+
+        .product-wrapper:hover .discount-label {
+            transform: translateX(0);
+            padding: 10px 20px;
+        }
+
+        .product-wrapper:hover .favorite-btn {
+            transform: translateY(0);
+        }
+
+        .product-wrapper:hover .new-label {
+            padding: 5px 20px;
+        }
+
+
+        /* .product-info {
+            background-color: white;
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            position: relative;
+            transform: translateY(100%);
+        }
+
+         .product-wrapper:hover .product-info{
+            display: flex;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+         } */
+
+        .product-info {
+            background-color: white;
+            padding: 15px;
+            display: flex;
+            /* <-- Luôn hiển thị, nhưng ẩn bằng opacity */
+            flex-direction: column;
+            gap: 5px;
+            position: relative;
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+            /* Tránh tương tác khi ẩn */
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .product-wrapper:hover .product-info {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+
+        .price-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .sale-price {
+            font-size: large;
+            font-weight: bold;
+            color: #000;
+            font-size: 16px;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            bottom: 80px;
+            right: 4%;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: larger;
+            border: none;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 2;
+            transform: translateX(-50%);
+            transform: translateY(300%);
+        }
+
+        .favorite-btn:hover {
+            color: red;
+            transform: scale(1.4);
+        }
+
+        .framed {
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .version-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            grid-column: 1 / -1;
+        }
+
+        /* Phiên bản mới 1 - Minimalist */
+        .minimalist .new-label {
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #000;
+            transform: rotate(-5deg);
+        }
+
+        .minimalist .discount-label {
+            background-color: #f8f8f8;
+            color: #000;
+            border: 1px solid #000;
+        }
+
+        .minimalist .product-info {
+            background-color: transparent;
+            padding: 10px 0;
+        }
+
+        .minimalist .favorite-btn {
+            background-color: #fff;
+            top: -20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="products-grid">
+        <div class="version-title">Phiên bản gốc</div>
+
+
+        <div>
+            <div class="product-container">
+                <div class="product-wrapper">
+                    <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg?imwidth=2160"
+                        alt="Product" class="product-image">
+                    <div class="new-label">NEW</div>
+                    <div class="discount-label">GIẢM 10%</div>
+                    <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    <div class="product-info">
+                        <div>Áo Polo H&M</div>
+                        <div class="price-container">
+                            <span class="sale-price">900.000đ</span>
+                            <span class="original-price">1.000.000đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            // Xử lý nút yêu thích
+            document.querySelectorAll('.favorite-btn').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const icon = this.querySelector('i');
+                    if (icon.classList.contains('far')) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        this.style.color = 'red';
+
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        this.style.color = '';
+
+                    }
+                });
+            });
+        </script>
+</body>
+
+</html>

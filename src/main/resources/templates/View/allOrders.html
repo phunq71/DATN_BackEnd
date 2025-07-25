@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng của tôi</title>
+
+</head>
+<body>
+<style>
+
+    /* Container chính */
+    .od-container {
+
+        margin: 0 100px;
+        margin-top: 80px;
+        padding: 20px;
+    }
+
+    /* Thanh search */
+    .od-search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .od-back-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #333;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+
+    .od-back-btn:hover {
+        background: #e0e0e0;
+    }
+
+    .od-search-input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        font-size: 14px;
+        background: white;
+        outline: none;
+    }
+
+    .od-search-btn {
+        padding: 0 20px;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+    }
+
+    .od-search-btn:hover {
+        background-color: #555;
+    }
+
+    /* Tabs */
+    .od-tabs {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 5px;
+    }
+
+    .od-tab {
+        padding: 8px 16px;
+        cursor: pointer;
+        color: #666;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-bottom: 2px solid transparent; /* Thêm border trong suốt */
+    }
+
+    .od-tab.active {
+        color: #333;
+        border-bottom: 2px solid #333; /* Khi active thì đổi màu border thôi */
+        font-weight: 600;
+    }
+
+    .od-tab:hover {
+        color: #333;
+    }
+
+    /* Card đơn hàng */
+    .od-order-card {
+        border: 1px solid #e0e0e0;
+        padding: 16px;
+        margin-bottom: 16px;
+        background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .od-order-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .od-order-id {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .od-order-date {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .od-order-status {
+        padding: 4px 8px;
+        font-size: 14px;
+        font-weight: 500;
+        background-color: #f0f0f0;
+        color: #666;
+    }
+
+    /*.od-status-choxacnhan {*/
+    /*    background-color: #f0f0f0;*/
+    /*    color: #666;*/
+    /*}*/
+
+    /*.od-status-shipping {*/
+    /*    background-color: #e0e0e0;*/
+    /*    color: #333;*/
+    /*}*/
+
+    /*.od-status-delivered {*/
+    /*    background-color: #333;*/
+    /*    color: white;*/
+    /*}*/
+
+    /*.od-status-dahuy {*/
+    /*    background-color: #f5f5f5;*/
+    /*    color: #999;*/
+    /*    border: 1px solid #e0e0e0;*/
+    /*}*/
+
+    /*.od-status-return {*/
+    /*    background-color: #f0f0f0;*/
+    /*    color: #333;*/
+    /*    border: 1px dashed #999;*/
+    /*}*/
+
+    /* Sản phẩm */
+    .od-product-item {
+        display: flex;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px dashed #f0f0f0;
+    }
+
+    .od-product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border: 1px solid #f0f0f0;
+    }
+
+    .od-product-info {
+        flex: 1;
+    }
+
+    .od-product-name {
+        font-size: 15px;
+        color: #333;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+
+    .od-product-variants {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 4px;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .od-product-prices {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 4px;
+    }
+
+    .od-original-price {
+        font-size: 14px;
+        color: #999;
+        text-decoration: line-through;
+    }
+
+    .od-sale-price {
+        font-size: 16px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .od-quantity {
+        font-size: 14px;
+        color: #666;
+    }
+
+    /* Nút mở rộng */
+    .od-expand-products {
+        text-align: center;
+        margin: 8px 0;
+    }
+
+    .od-expand-btn {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        margin: 0 auto;
+        padding: 6px 12px;
+        transition: background 0.2s;
+    }
+
+    .od-expand-btn:hover {
+        background: #f0f0f0;
+    }
+
+    /* Tổng đơn hàng */
+    .od-order-summary {
+        text-align: right;
+        padding: 12px 0;
+        border-top: 1px solid #f0f0f0;
+        margin-top: 8px;
+    }
+
+    .od-total-label {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .od-total-amount {
+        font-size: 18px;
+        color: #333;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    /* Nút hành động */
+    .od-order-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .od-btn {
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .od-btn-outline {
+        background: white;
+        border: 1px solid #d9d9d9;
+        color: #333;
+    }
+
+    .od-btn-outline:hover {
+        border-color: #333;
+        background: #f5f5f5;
+    }
+
+    .od-btn-primary {
+        background-color: #333;
+        color: white;
+        border: none;
+    }
+
+    .od-btn-primary:hover {
+        background-color: #555;
+    }
+
+    /* Modal hiển thị tất cả sản phẩm */
+    .od-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .od-modal-content {
+        background: white;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .od-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .od-modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .od-modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .od-modal-products {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    /* Empty state */
+    .od-empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+        .od-product-item {
+            flex-direction: column;
+        }
+
+        .od-product-image {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1/1;
+        }
+
+        .od-order-actions {
+            justify-content: center;
+        }
+
+        .od-btn {
+            flex: 1;
+            text-align: center;
+        }
+    }
+
+    .od-title{
+        color: black;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    #year-select {
+        font-size: 20px;         /* Giữ nguyên 20px như ông thích */
+        padding: 3px 8px;        /* Thêm padding ngang để ô rộng vừa đẹp */
+        background-color: #fff;  /* Nền trắng */
+        border: none;            /* Bỏ viền mặc định */
+        border-bottom: 2px solid #000;  /* Chỉ có border bottom đen */
+        border-radius: 0;        /* Không bo góc */
+        outline: none;           /* Bỏ viền xanh khi focus mặc định */
+        transition: all 0.2s ease; /* Mượt mà khi hover/click */
+    }
+
+    #year-select:hover {
+        background-color: #f5f5f5; /* Nền xám nhạt thật nhạt khi hover */
+    }
+
+    #year-select:focus {
+        background-color: #f2f5f7; /* Nền xám đậm hơn chút khi click */
+        border-bottom: 2px solid #222; /* Viền đen đậm hơn 1 xíu */
+    }
+
+    #year-select option {
+        font-size: 18px;         /* Option cỡ 17-18 như yêu cầu */
+        padding: 4px 8px;        /* Padding cho option dễ nhìn */
+    }
+
+</style>
+<div class="od-container">
+    <div class="od-title">
+        Đơn hàng của bạn trong năm
+        <select id="year-select">
+            <option th:each="year : ${orderYears}" th:text="${year}" th:value="${year}"></option>
+        </select>
+    </div>
+
+    <!-- Thanh search -->
+    <div class="od-search-bar">
+        <button class="od-back-btn">←</button>
+        <input type="text" class="od-search-input" id="search-order-input" placeholder="Tìm kiếm đơn hàng theo ID, tên sản phẩm...">
+        <button class="od-search-btn" id="search-order-btn">Tìm</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="od-tabs">
+        <div class="od-tab active" id="ALL">Tất cả</div>
+        <div class="od-tab" id="cho-xac-nhan">Chờ xác nhận</div>
+        <div class="od-tab" id="cho-lay-hang">Chờ lấy hàng</div>
+        <div class="od-tab" id="cho-giao-hang">Chờ giao hàng</div>
+        <div class="od-tab" id="da-giao">Đã giao</div>
+        <div class="od-tab" id="da-huy">Đã hủy</div>
+        <div class="od-tab" id="tra-hang">Trả hàng</div>
+
+    </div>
+
+    <!-- Danh sách đơn hàng -->
+    <div class="od-order-list" id="order-list-container">
+        <!-- Đơn hàng 1 - Chờ xác nhận (có 2 nút) -->
+<!--        <a href="/orderDetail" style="text-decoration: none">-->
+<!--        <div class="od-order-card">-->
+<!--            <div class="od-order-header">-->
+<!--                <span class="od-order-id">#OD123456</span>-->
+<!--                <span class="od-order-date">Ngày đặt: 20/06/2023</span>-->
+<!--                <span class="od-order-status od-status-pending">Chờ xác nhận</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-product-item">-->
+<!--                <img src="https://image.hm.com/assets/hm/51/ba/51ba40d8f0d80713246fad69ab3b99732af9bf36.jpg" alt="Áo thun nam" class="od-product-image">-->
+<!--                <div class="od-product-info">-->
+<!--                    <h3 class="od-product-name">Áo thun nam dáng rộng</h3>-->
+<!--                    <div class="od-product-variants">-->
+<!--                        <span class="od-variant">Màu: Đen</span>-->
+<!--                        <span class="od-variant">Size: L</span>-->
+<!--                    </div>-->
+<!--                    <div class="od-product-prices">-->
+<!--                        <span class="od-original-price">₫500.000</span>-->
+<!--                        <span class="od-sale-price">₫400.000</span>-->
+<!--                        <span class="od-quantity">x1</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-summary">-->
+<!--                <span class="od-total-label">Tổng tiền (1 sản phẩm):</span>-->
+<!--                <span class="od-total-amount">₫400.000</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-actions">-->
+<!--                <button class="od-btn od-btn-outline">Hủy đơn hàng</button>-->
+<!--                <button class="od-btn od-btn-primary">Thanh toán</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        </a>-->
+
+<!--        &lt;!&ndash; Đơn hàng 2 - Chờ xác nhận (chỉ có nút hủy) &ndash;&gt;-->
+<!--        <div class="od-order-card">-->
+<!--            <div class="od-order-header">-->
+<!--                <span class="od-order-id">#OD123457</span>-->
+<!--                <span class="od-order-date">Ngày đặt: 19/06/2023</span>-->
+<!--                <span class="od-order-status od-status-pending">Chờ xác nhận</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-product-item">-->
+<!--                <img src="https://image.hm.com/assets/hm/49/d5/49d532391fbb7ce88640c726644cc24b552aab27.jpg" alt="Quần jeans" class="od-product-image">-->
+<!--                <div class="od-product-info">-->
+<!--                    <h3 class="od-product-name">Quần jeans nam ống thẳng</h3>-->
+<!--                    <div class="od-product-variants">-->
+<!--                        <span class="od-variant">Màu: Xanh đậm</span>-->
+<!--                        <span class="od-variant">Size: 32</span>-->
+<!--                    </div>-->
+<!--                    <div class="od-product-prices">-->
+<!--                        <span class="od-sale-price">₫899.000</span>-->
+<!--                        <span class="od-quantity">x1</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-summary">-->
+<!--                <span class="od-total-label">Tổng tiền (1 sản phẩm):</span>-->
+<!--                <span class="od-total-amount">₫899.000</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-actions">-->
+<!--                <button class="od-btn od-btn-outline">Hủy đơn hàng</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Đơn hàng 3 - Chờ lấy hàng &ndash;&gt;-->
+<!--        <div class="od-order-card">-->
+<!--            <div class="od-order-header">-->
+<!--                <span class="od-order-id">#OD123458</span>-->
+<!--                <span class="od-order-date">Ngày đặt: 15/06/2023</span>-->
+<!--                <span class="od-order-status od-status-shipping">Chờ lấy hàng</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-product-item">-->
+<!--                <img src="https://image.hm.com/assets/hm/bd/ca/bdca880c800fd893362646021b45a2bc8d4ce6a8.jpg" alt="Áo khoác" class="od-product-image">-->
+<!--                <div class="od-product-info">-->
+<!--                    <h3 class="od-product-name">Áo khoác dạ nam</h3>-->
+<!--                    <div class="od-product-variants">-->
+<!--                        <span class="od-variant">Màu: Xám</span>-->
+<!--                        <span class="od-variant">Size: M</span>-->
+<!--                    </div>-->
+<!--                    <div class="od-product-prices">-->
+<!--                        <span class="od-sale-price">₫1.500.000</span>-->
+<!--                        <span class="od-quantity">x1</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-summary">-->
+<!--                <span class="od-total-label">Tổng tiền (1 sản phẩm):</span>-->
+<!--                <span class="od-total-amount">₫1.500.000</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-actions">-->
+<!--                <button class="od-btn od-btn-outline">Gửi yêu cầu hủy đơn</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Đơn hàng 4 - Chờ giao hàng &ndash;&gt;-->
+<!--        <div class="od-order-card">-->
+<!--            <div class="od-order-header">-->
+<!--                <span class="od-order-id">#OD123459</span>-->
+<!--                <span class="od-order-date">Ngày đặt: 12/06/2023</span>-->
+<!--                <span class="od-order-status od-status-shipping">Chờ giao hàng</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-product-item">-->
+<!--                <img src="https://image.hm.com/assets/hm/ab/9e/ab9e23eb0c1d65fefb0c82d969f2152a04bba7d5.jpg" alt="Quần short" class="od-product-image">-->
+<!--                <div class="od-product-info">-->
+<!--                    <h3 class="od-product-name">Quần short thể thao</h3>-->
+<!--                    <div class="od-product-variants">-->
+<!--                        <span class="od-variant">Màu: Xanh navy</span>-->
+<!--                        <span class="od-variant">Size: M</span>-->
+<!--                    </div>-->
+<!--                    <div class="od-product-prices">-->
+<!--                        <span class="od-original-price">₫450.000</span>-->
+<!--                        <span class="od-sale-price">₫350.000</span>-->
+<!--                        <span class="od-quantity">x1</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-expand-products">-->
+<!--                <button class="od-expand-btn" onclick="openModal()" data-order-id="OD123459">▼ Xem thêm 3 sản phẩm khác</button>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-summary">-->
+<!--                <span class="od-total-label">Tổng tiền (2 sản phẩm):</span>-->
+<!--                <span class="od-total-amount">₫700.000</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-actions">-->
+<!--                <button class="od-btn od-btn-primary">Theo dõi đơn</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+
+<!--        <div class="od-order-card">-->
+<!--            <div class="od-order-header">-->
+<!--                <span class="od-order-id">#OD123459</span>-->
+<!--                <span class="od-order-date">Ngày đặt: 12/06/2023</span>-->
+<!--                <span class="od-order-status od-status-shipping">Chờ giao hàng</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-product-item">-->
+<!--                <img src="https://image.hm.com/assets/hm/ab/9e/ab9e23eb0c1d65fefb0c82d969f2152a04bba7d5.jpg" alt="Quần short" class="od-product-image">-->
+<!--                <div class="od-product-info">-->
+<!--                    <h3 class="od-product-name">Quần short thể thao</h3>-->
+<!--                    <div class="od-product-variants">-->
+<!--                        <span class="od-variant">Màu: Xanh navy</span>-->
+<!--                        <span class="od-variant">Size: M</span>-->
+<!--                    </div>-->
+<!--                    <div class="od-product-prices">-->
+<!--                        <span class="od-original-price">₫450.000</span>-->
+<!--                        <span class="od-sale-price">₫350.000</span>-->
+<!--                        <span class="od-quantity">x1</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-expand-products">-->
+<!--                <button class="od-expand-btn" onclick="openModal()" data-order-id="OD123459">▼ Xem thêm 3 sản phẩm khác</button>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-summary">-->
+<!--                <span class="od-total-label">Tổng tiền (2 sản phẩm):</span>-->
+<!--                <span class="od-total-amount">₫700.000</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-actions">-->
+<!--                <button class="od-btn od-btn-primary">Đã nhận được hàng</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+
+<!--        &lt;!&ndash; Đơn hàng 5 - Đã giao (trường hợp có 2 nút) &ndash;&gt;-->
+<!--        <div class="od-order-card">-->
+<!--            <div class="od-order-header">-->
+<!--                <span class="od-order-id">#OD123460</span>-->
+<!--                <span class="od-order-date">Ngày đặt: 10/06/2023</span>-->
+<!--                <span class="od-order-status od-status-delivered">Đã giao</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-product-item">-->
+<!--                <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg" alt="Mũ lưỡi trai" class="od-product-image">-->
+<!--                <div class="od-product-info">-->
+<!--                    <h3 class="od-product-name">Mũ lưỡi trai</h3>-->
+<!--                    <div class="od-product-variants">-->
+<!--                        <span class="od-variant">Màu: Đen</span>-->
+<!--                    </div>-->
+<!--                    <div class="od-product-prices">-->
+<!--                        <span class="od-sale-price">₫250.000</span>-->
+<!--                        <span class="od-quantity">x1</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-summary">-->
+<!--                <span class="od-total-label">Tổng tiền (1 sản phẩm):</span>-->
+<!--                <span class="od-total-amount">₫250.000</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-actions">-->
+<!--                <a href="/return" style="text-decoration: none" class="od-btn od-btn-outline">Trả hàng/Hoàn tiền</a>-->
+<!--                <a href="/review" style="text-decoration: none" class="od-btn od-btn-primary">Đánh giá</a>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Đơn hàng 6 - Đã giao (trường hợp chỉ có nút xác nhận) &ndash;&gt;-->
+<!--        <div class="od-order-card">-->
+<!--            <div class="od-order-header">-->
+<!--                <span class="od-order-id">#OD123461</span>-->
+<!--                <span class="od-order-date">Ngày đặt: 08/06/2023</span>-->
+<!--                <span class="od-order-status od-status-delivered">Đã giao</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-product-item">-->
+<!--                <img src="https://image.hm.com/assets/hm/fc/11/fc11cb1d40fd52a00d3cd74e3bb5faeab85fc0c6.jpg" alt="Tất thể thao" class="od-product-image">-->
+<!--                <div class="od-product-info">-->
+<!--                    <h3 class="od-product-name">Tất thể thao</h3>-->
+<!--                    <div class="od-product-variants">-->
+<!--                        <span class="od-variant">Màu: Trắng</span>-->
+<!--                        <span class="od-variant">Size: 39-42</span>-->
+<!--                    </div>-->
+<!--                    <div class="od-product-prices">-->
+<!--                        <span class="od-sale-price">₫150.000</span>-->
+<!--                        <span class="od-quantity">x2</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-summary">-->
+<!--                <span class="od-total-label">Tổng tiền (1 sản phẩm):</span>-->
+<!--                <span class="od-total-amount">₫300.000</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-actions">-->
+<!--                <button class="od-btn od-btn-primary">Đã nhận được hàng</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Đơn hàng 7 - Trả hàng &ndash;&gt;-->
+<!--        <div class="od-order-card">-->
+<!--            <div class="od-order-header">-->
+<!--                <span class="od-order-id">#OD123462</span>-->
+<!--                <span class="od-order-date">Ngày đặt: 05/06/2023</span>-->
+<!--                <span class="od-order-status od-status-return">Trả hàng</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-product-item">-->
+<!--                <img src="https://image.hm.com/assets/hm/51/ba/51ba40d8f0d80713246fad69ab3b99732af9bf36.jpg" alt="Áo thun nam" class="od-product-image">-->
+<!--                <div class="od-product-info">-->
+<!--                    <h3 class="od-product-name">Áo thun nam dáng rộng</h3>-->
+<!--                    <div class="od-product-variants">-->
+<!--                        <span class="od-variant">Màu: Đen</span>-->
+<!--                        <span class="od-variant">Size: L</span>-->
+<!--                    </div>-->
+<!--                    <div class="od-product-prices">-->
+<!--                        <span class="od-sale-price">₫400.000</span>-->
+<!--                        <span class="od-quantity">x1</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-summary">-->
+<!--                <span class="od-total-label">Tổng tiền (1 sản phẩm):</span>-->
+<!--                <span class="od-total-amount">₫400.000</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-actions">-->
+<!--                <button class="od-btn od-btn-outline">Xem chi tiết</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Đơn hàng 8 - Đã hủy &ndash;&gt;-->
+<!--        <div class="od-order-card">-->
+<!--            <div class="od-order-header">-->
+<!--                <span class="od-order-id">#OD123463</span>-->
+<!--                <span class="od-order-date">Ngày đặt: 01/06/2023</span>-->
+<!--                <span class="od-order-status od-status-cancelled">Đã hủy</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-product-item">-->
+<!--                <img src="https://image.hm.com/assets/hm/49/d5/49d532391fbb7ce88640c726644cc24b552aab27.jpg" alt="Quần jeans" class="od-product-image">-->
+<!--                <div class="od-product-info">-->
+<!--                    <h3 class="od-product-name">Quần jeans nam ống thẳng</h3>-->
+<!--                    <div class="od-product-variants">-->
+<!--                        <span class="od-variant">Màu: Xanh đậm</span>-->
+<!--                        <span class="od-variant">Size: 32</span>-->
+<!--                    </div>-->
+<!--                    <div class="od-product-prices">-->
+<!--                        <span class="od-sale-price">₫899.000</span>-->
+<!--                        <span class="od-quantity">x1</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-summary">-->
+<!--                <span class="od-total-label">Tổng tiền (1 sản phẩm):</span>-->
+<!--                <span class="od-total-amount">₫899.000</span>-->
+<!--            </div>-->
+
+<!--            <div class="od-order-actions">-->
+<!--                <button class="od-btn od-btn-primary">Mua lại</button>-->
+<!--            </div>-->
+<!--        </div>-->
+    </div>
+</div>
+
+<!-- Modal hiển thị tất cả sản phẩm -->
+<!-- Modal hiển thị tất cả sản phẩm -->
+<div class="od-modal" id="odProductsModal" style="display: none;">
+    <div class="od-modal-content">
+        <div class="od-modal-header">
+            <h3 class="od-modal-title">Tất cả sản phẩm trong đơn #OD123456</h3>
+            <button class="od-modal-close">&times;</button>
+        </div>
+        <div class="od-modal-products">
+            <!-- Sản phẩm 1 -->
+            <div class="od-product-item">
+                <img src="https://image.hm.com/assets/hm/51/ba/51ba40d8f0d80713246fad69ab3b99732af9bf36.jpg" alt="Áo thun nam" class="od-product-image">
+                <div class="od-product-info">
+                    <h3 class="od-product-name">Áo thun nam dáng rộng</h3>
+                    <div class="od-product-variants">
+                        <span class="od-variant">Màu: Đen</span>
+                        <span class="od-variant">Size: L</span>
+                    </div>
+                    <div class="od-product-prices">
+                        <span class="od-original-price">₫500.000</span>
+                        <span class="od-sale-price">₫400.000</span>
+                        <span class="od-quantity">x1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sản phẩm 2 -->
+            <div class="od-product-item">
+                <img src="https://image.hm.com/assets/hm/ab/9e/ab9e23eb0c1d65fefb0c82d969f2152a04bba7d5.jpg" alt="Quần short" class="od-product-image">
+                <div class="od-product-info">
+                    <h3 class="od-product-name">Quần short thể thao</h3>
+                    <div class="od-product-variants">
+                        <span class="od-variant">Màu: Xanh navy</span>
+                        <span class="od-variant">Size: M</span>
+                    </div>
+                    <div class="od-product-prices">
+                        <span class="od-original-price">₫450.000</span>
+                        <span class="od-sale-price">₫350.000</span>
+                        <span class="od-quantity">x1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sản phẩm 3 -->
+            <div class="od-product-item">
+                <img src="https://image.hm.com/assets/hm/e6/94/e694bb23bda111d01d8cd654044e6498cb81038e.jpg" alt="Mũ lưỡi trai" class="od-product-image">
+                <div class="od-product-info">
+                    <h3 class="od-product-name">Mũ lưỡi trai</h3>
+                    <div class="od-product-variants">
+                        <span class="od-variant">Màu: Đen</span>
+                    </div>
+                    <div class="od-product-prices">
+                        <span class="od-sale-price">₫250.000</span>
+                        <span class="od-quantity">x1</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Xử lý tab
+    const tabs = document.querySelectorAll('.od-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            // Ở đây sẽ thêm logic filter đơn hàng theo tab
+            console.log(`Đã chọn tab: ${tab.textContent}`);
+        });
+    });
+
+    // // Script đơn giản chỉ để mở/đóng modal
+    // const modal = document.getElementById('odProductsModal');
+    // const modalClose = document.querySelector('.od-modal-close');
+    //
+    // // Mở modal (có thể gọi hàm này khi click nút xem thêm)
+    // function openModal() {
+    //     modal.style.display = 'flex';
+    // }
+    //
+    // // Đóng modal khi click nút đóng
+    // modalClose.addEventListener('click', () => {
+    //     modal.style.display = 'none';
+    // });
+    //
+    // // Đóng modal khi click bên ngoài
+    // window.addEventListener('click', (e) => {
+    //     if (e.target === modal) {
+    //         modal.style.display = 'none';
+    //     }
+    // });
+
+    // Xử lý nút back
+    document.querySelector('.od-back-btn').addEventListener('click', () => {
+        window.history.back();
+    });
+
+    // Xử lý search
+    document.querySelector('.od-search-btn').addEventListener('click', () => {
+        const searchTerm = document.querySelector('.od-search-input').value;
+        // Logic tìm kiếm đơn hàng
+        console.log(`Tìm kiếm: ${searchTerm}`);
+    });
+
+
+    // Hiển thị tất cả sản phẩm trong modal
+    function showAllProducts(orderId) {
+        const products = orderProducts[orderId];
+        const modalProducts = document.getElementById('odModalProducts');
+        const modalOrderId = document.getElementById('odModalOrderId');
+
+        if (!products) {
+            modalProducts.innerHTML = '<p>Không có sản phẩm nào trong đơn hàng này</p>';
+            return;
+        }
+
+        // Hiển thị ID đơn hàng
+        modalOrderId.textContent = orderId;
+
+        // Xóa nội dung cũ
+        modalProducts.innerHTML = '';
+
+        // Thêm từng sản phẩm vào modal
+        products.forEach(product => {
+            const productItem = document.createElement('div');
+            productItem.className = 'od-product-item';
+
+            productItem.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="od-product-image">
+                    <div class="od-product-info">
+                        <h3 class="od-product-name">${product.name}</h3>
+                        <div class="od-product-variants">
+                            ${product.variants.map(v => `<span class="od-variant">${v}</span>`).join('')}
+                        </div>
+                        <div class="od-product-prices">
+                            ${product.originalPrice ? `<span class="od-original-price">${product.originalPrice}</span>` : ''}
+                            <span class="od-sale-price">${product.salePrice}</span>
+                            <span class="od-quantity">${product.quantity}</span>
+                        </div>
+                    </div>
+                `;
+
+            modalProducts.appendChild(productItem);
+        });
+
+        // Hiển thị modal
+        modal.style.display = 'flex';
+    }
+</script>
+<script src="/js/all-orders.js"></script>
+</body>
+</html>

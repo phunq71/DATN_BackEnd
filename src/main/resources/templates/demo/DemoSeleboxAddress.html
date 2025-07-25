@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chọn địa chỉ</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    />
+</head>
+<body>
+<div class="container mt-4 text-start">
+    <h3 class="mb-3">Chọn địa chỉ</h3>
+
+    <div class="mb-3">
+        <label for="province" class="form-label">Tỉnh / Thành phố</label>
+        <select id="province" class="form-select">
+            <option value="">-- Chọn Tỉnh --</option>
+        </select>
+    </div>
+
+    <div class="mb-3" id="district-container" style="display:none;">
+        <label for="district" class="form-label">Quận / Huyện</label>
+        <select id="district" class="form-select">
+            <option value="">-- Chọn Huyện --</option>
+        </select>
+    </div>
+
+    <div class="mb-3" id="ward-container" style="display:none;">
+        <label for="ward" class="form-label">Xã / Phường</label>
+        <select id="ward" class="form-select">
+            <option value="">-- Chọn Phường --</option>
+        </select>
+    </div>
+
+    <div id="result" class="alert alert-info mt-4" style="display:none;">
+        <h5>Kết quả:</h5>
+        <p><strong>ProvinceID:</strong> <span id="resProvince"></span></p>
+        <p><strong>DistrictID:</strong> <span id="resDistrict"></span></p>
+        <p><strong>WardCode:</strong> <span id="resWard"></span></p>
+    </div>
+</div>
+
+<script>
+    let rawData = [];
+    let provincesSelect = document.getElementById('province');
+    let districtsSelect = document.getElementById('district');
+    let wardsSelect = document.getElementById('ward');
+
+    let districtContainer = document.getElementById('district-container');
+    let wardContainer = document.getElementById('ward-container');
+
+    let resultDiv = document.getElementById('result');
+    let resProvince = document.getElementById('resProvince');
+    let resDistrict = document.getElementById('resDistrict');
+    let resWard = document.getElementById('resWard');
+
+    // Load JSON dữ liệu
+    fetch('/data/Address.json')
+            .then(res => res.json())
+        .then(json => {
+            rawData = json;
+            populateProvinces();
+        });
+
+    function populateProvinces() {
+        rawData.forEach(province => {
+            let option = document.createElement('option');
+            option.value = province.ProvinceID;
+            option.textContent = province.ProvinceName;
+            provincesSelect.appendChild(option);
+        });
+    }
+
+    provincesSelect.addEventListener('change', () => {
+        clearSelect(districtsSelect);
+        clearSelect(wardsSelect);
+        wardContainer.style.display = 'none';
+        resultDiv.style.display = 'none';
+
+        let selectedProvinceId = provincesSelect.value;
+
+        if (!selectedProvinceId) {
+            districtContainer.style.display = 'none';
+            return;
+        }
+
+        let province = rawData.find(p => p.ProvinceID == selectedProvinceId);
+        if (province) {
+            districtContainer.style.display = 'block';
+            province.Districts.forEach(district => {
+                let option = document.createElement('option');
+                option.value = district.DistrictID;
+                option.textContent = district.DistrictName;
+                districtsSelect.appendChild(option);
+            });
+        }
+    });
+
+    districtsSelect.addEventListener('change', () => {
+        clearSelect(wardsSelect);
+        resultDiv.style.display = 'none';
+
+        let selectedProvinceId = provincesSelect.value;
+        let selectedDistrictId = districtsSelect.value;
+
+        if (!selectedDistrictId) {
+            wardContainer.style.display = 'none';
+            return;
+        }
+
+        let province = rawData.find(p => p.ProvinceID == selectedProvinceId);
+        if (!province) return;
+
+        let district = province.Districts.find(d => d.DistrictID == selectedDistrictId);
+        if (district) {
+            wardContainer.style.display = 'block';
+            district.Wards.forEach(ward => {
+                let option = document.createElement('option');
+                option.value = ward.WardCode;
+                option.textContent = ward.WardName;
+                wardsSelect.appendChild(option);
+            });
+        }
+    });
+
+    wardsSelect.addEventListener('change', () => {
+        let selectedWardCode = wardsSelect.value;
+        if (!selectedWardCode) {
+            resultDiv.style.display = 'none';
+            return;
+        }
+
+        resProvince.textContent = provincesSelect.value;
+        resDistrict.textContent = districtsSelect.value;
+        resWard.textContent = selectedWardCode;
+        resultDiv.style.display = 'block';
+    });
+
+    function clearSelect(selectElement) {
+        while (selectElement.options.length > 1) {
+            selectElement.remove(1);
+        }
+    }
+</script>
+</body>
+</html>

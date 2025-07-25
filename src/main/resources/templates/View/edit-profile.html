@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: dynamic(~{::body})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<style>
+    /* Sidebar */
+    .e-sidebar {
+        min-height: 100vh;
+        background-color: #fff;
+    }
+
+    .e-sidebar-nav a {
+        color: #000;
+        text-decoration: none;
+        display: block;
+        padding: 10px 20px;
+        transition: background 0.2s ease;
+        font-size: 15px;
+        border-radius: 4px;
+    }
+
+    .e-sidebar-nav a:hover,
+    .e-sidebar-nav a.active {
+        background-color: #f2f2f2;
+        font-weight: 500;
+    }
+
+    .e-sub-link {
+        padding-left: 40px;
+        font-size: 14px;
+        margin-top: 4px;
+        cursor: pointer;
+    }
+
+    .e-toggle {
+        cursor: pointer;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 4px;
+        background-color: transparent;
+    }
+
+    .e-toggle:hover {
+        background-color: #f8f9fa;
+    }
+
+    .e-toggle i.fas.fa-chevron-down {
+        display: none;
+    }
+
+    .e-profile-pic {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border: 2px solid #ddd;
+    }
+
+    .e-form-label {
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: inline-block;
+    }
+
+    .e-btn-black {
+        background-color: #000;
+        color: white;
+        padding: 8px 25px;
+        border: none;
+        border-radius: 4px;
+    }
+
+    .e-btn-black:hover {
+        background-color: #333;
+        color: white;
+    }
+
+    .e-form-section {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
+
+    .e-form-icon {
+        width: 24px;
+        display: inline-block;
+        text-align: center;
+        margin-right: 8px;
+        color: #000;
+    }
+
+    .e-input-group {
+        margin-bottom: 20px;
+    }
+
+    /* New form control styles */
+    .e-form-control {
+        display: block;
+        width: 100%;
+        padding: 8px 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #000;
+        background-color: transparent;
+        background-clip: padding-box;
+        border: none;
+        border-bottom: 1px solid #ced4da;
+        transition: box-shadow 0.15s ease-in-out;
+    }
+
+    .e-form-control:focus {
+        border-bottom: 1px solid #ced4da; /* Giữ nguyên border */
+        box-shadow: 0 2px 0 0 #000; /* Thêm shadow phía dưới */
+        outline: 0;
+    }
+
+    .e-form-control:hover {
+        background-color: #f8f9fa;
+        border-bottom: 1.5px solid #000;
+    }
+
+    /* Select styles */
+    .e-form-select {
+        display: block;
+        width: 100%;
+        padding: 8px 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #000;
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid #ced4da;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0 center;
+        background-size: 16px 12px;
+    }
+
+    .e-form-select:hover {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #000;
+    }
+
+    .e-form-select:focus {
+        outline: 0;
+        border-bottom: 2px solid #000;
+    }
+
+    /* Radio button styles */
+    .form-check-input {
+        margin-top: 0.3em;
+    }
+
+    .form-check-label {
+        margin-left: 5px;
+    }
+
+    /* Date input style */
+    input[type="date"].e-form-control {
+        padding-right: 0;
+    }
+
+    /* Avatar upload */
+    .col-md-4.text-center input[type="file"] {
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    .text-muted.small {
+        font-size: 13px;
+    }
+
+    /* Tiêu đề */
+    h4 {
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    p {
+        margin-bottom: 25px;
+        font-size: 14px;
+        color: #555;
+    }
+
+    /* Fix spacing toàn bộ input nhóm */
+    label.e-form-label,
+    label.form-label {
+        margin-bottom: 6px;
+    }
+
+    /* Đường kẻ dọc ngăn cách bên trái và phải */
+    .e-form-section .col-md-8 {
+        border-right: 1px solid #ddd;
+        padding-right: 30px;
+    }
+
+    .all {
+        color: #000;
+        margin-top: 50px;
+    }
+
+    .main-content {
+        margin-top: 50px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 20px;
+        max-width: 1200px;
+        background-color: #fff;
+        /*border: 1px solid #ddd;*/
+        padding-bottom: 0;
+        margin-bottom: 0;
+        height: 650px;
+    }
+
+    .e-form-section:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+
+    form {
+        margin-bottom: 0;
+    }
+
+    /*.form-control:focus,*/
+    /*.e-address-text:focus,*/
+    /*.form-select:focus {*/
+    /*    outline: none !important;*/
+    /*    box-shadow: none !important;*/
+    /*    background-color: transparent;*/
+    /*}*/
+
+    .e-address-select select:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .form-check-input:checked {
+        background-color: #000000;
+        border-color: #171717;
+    }
+
+    #chooseImageBtn {
+        padding: 8px 16px;
+        background-color: #000000;
+        color: white;
+        border: none;
+        border-radius: 0;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    #chooseImageBtn:hover {
+        background-color: #707070;
+    }
+
+    .btn, .form-control{
+        border-radius: 0 !important;
+    }
+</style>
+<style>
+    /* CSS Reset và Base Styles */
+    .cp-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+        animation: cp-fadeIn 0.3s ease-out;
+        color: black;
+    }
+
+    @keyframes cp-fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .cp-modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 30px;
+        border: none;
+        width: 600px;
+        max-width: 90%;
+        max-height: 90vh;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        overflow-y: auto;
+        animation: cp-slideDown 0.3s ease-out;
+    }
+
+    @keyframes cp-slideDown {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .cp-close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .cp-close:hover {
+        color: #333;
+    }
+
+    .cp-form-group {
+        margin-bottom: 20px;
+        position: relative; /* Cho phép absolute positioning của error messages */
+    }
+
+    .cp-form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .cp-form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 16px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .cp-form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        outline: none;
+    }
+
+    .cp-btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s;
+        min-width: 120px;
+        text-align: center;
+    }
+
+    .cp-btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .cp-btn-primary:hover {
+        background-color: #0069d9;
+    }
+
+    .cp-btn-primary:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+
+    .cp-btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .cp-btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    /* Error/Success Messages - Đã chừa chỗ sẵn */
+    .cp-invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 8px;
+        height: 20px; /* Chừa chỗ cố định */
+        display: block; /* Luôn hiển thị để tránh giật layout */
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .cp-invalid-feedback.show {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .cp-is-invalid {
+        border-color: #dc3545 !important;
+    }
+
+    .cp-is-valid {
+        border-color: #28a745 !important;
+    }
+
+    /* Password Check Container */
+    .cp-password-check {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .cp-password-check-input {
+        flex: 1;
+        min-width: 0; /* Ngăn flex item overflow */
+    }
+
+    /* Password Strength Meter */
+    .cp-password-strength {
+        margin-top: 8px;
+        font-size: 0.875em;
+        height: 20px; /* Chừa chỗ cố định */
+    }
+
+    .cp-password-weak {
+        color: #dc3545;
+    }
+
+    .cp-password-medium {
+        color: #ffc107;
+    }
+
+    .cp-password-strong {
+        color: #28a745;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 600px) {
+        .cp-modal-content {
+            width: 95%;
+            padding: 20px 15px;
+        }
+
+        .cp-password-check {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .cp-btn {
+            width: 100%;
+        }
+    }
+
+    .cp-loading-text {
+           display: inline-block;
+           position: relative;
+           padding-right: 20px;
+       }
+
+    .cp-loading-text::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: cp-spin 1s linear infinite;
+    }
+
+    @keyframes cp-spin {
+        to { transform: translateY(-50%) rotate(360deg); }
+    }
+
+       .cp-password-very-strong {
+           color: #218838;
+           font-weight: bold;
+       }
+</style>
+<!--Xử lý model OTP-->
+<style>
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #888;
+        cursor: pointer;
+        z-index: 1000;
+    }
+
+    .close-btn:hover {
+        color: #000;
+    }
+
+    .otp-box {
+        position: relative; /* để nút X nằm đúng vị trí */
+        padding-top: 40px;   /* tránh che phần title nếu cần */
+    }
+    /* Thêm vào CSS hiện có của bạn */
+    .otp-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1050;
+    }
+    .otp-container {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        background: url('https://example.com/your-background-image.jpg') center/cover no-repeat;
+    }
+
+    .otp-container::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: -1;
+    }
+
+    .otp-box {
+        position: relative; /* ✅ Thêm dòng này để làm cha chứa tuyệt đối */
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 450px;
+        animation: fadeInUp 0.5s ease-out;
+        text-align: center;
+    }
+
+    .otp-title {
+        font-weight: bold;
+        font-size: 1.8rem;
+        color: #081c34;
+        margin-bottom: 1rem;
+    }
+
+    .otp-inputs {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 1rem 0;
+    }
+
+    .otp-inputs input {
+        width: 3rem;
+        height: 3.2rem;
+        font-size: 1.5rem;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .otp-inputs input:focus {
+        border-color: #4a90e2;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    }
+
+    .note {
+        color: #333;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .msg {
+        color: red;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .btn-submit, .btn-resend {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.95rem;
+        border-radius: 6px;
+        border: none;
+        margin-top: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    /* Nút xác thực OTP - đậm */
+    .btn-submit {
+        background-color: #003366; /* xanh đậm */
+        color: #fff;
+    }
+
+    .btn-submit:hover {
+        background-color: #00509e;
+    }
+
+    /* Nút gửi lại - xám nhạt khi disabled */
+    .btn-resend {
+        background-color: #bbb;
+        color: #fff;
+    }
+
+    /* Enabled thì đổi màu xanh nhẹ */
+    .btn-resend.enabled {
+        background-color: #28a745;
+    }
+
+    .btn-resend.enabled:hover {
+        background-color: #218838;
+    }
+    .btn-cancel {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        color: #333;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    .btn-cancel:hover {
+        color: red;
+    }
+
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+
+
+<div class="container-fluid all">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 e-sidebar p-4">
+            <div class="text-center mb-4">
+                <div class="mt-2 fw-bold" id="displayName" style="font-size: 40px;"></div>
+            </div>
+
+            <nav class="e-sidebar-nav">
+                <!-- Menu lớn: Bảo mật -->
+                <a class="e-toggle d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#securityMenu" role="button" aria-expanded="false">
+                    <span><i class="fas fa-shield-alt me-2"></i>Bảo mật</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="collapse ps-3" id="securityMenu">
+                    <a class="e-sub-link" id="changePassword">Đổi mật khẩu</a>
+                    <a class="e-sub-link" id="changePhone">Đổi số điện thoại</a>
+                    <a class="e-sub-link" id="disableAccount">Vô hiệu hóa tài khoản</a>
+                </div>
+
+                <a href="#" class="active"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a>
+
+                <!-- Menu lớn: Thứ hạng -->
+                <a class="e-toggle d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#rankingMenu" role="button" aria-expanded="false">
+                    <span><i class="fas fa-medal me-2"></i>Thứ hạng</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+<!--                <form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;"></form>-->
+                <div class="collapse ps-3" id="rankingMenu">
+                    <a href="#" class="e-sub-link">Thứ hạng</a>
+                    <a href="#" class="e-sub-link">Ưu đãi</a>
+                    <a href="#" class="e-sub-link">Chính sách</a>
+                    <a href="#" class="e-sub-link">Kho voucher</a>
+                </div>
+                <a href="#" onclick="confirmLogout(event)"
+                   class="e-toggle d-flex justify-content-between align-items-center" role="button">
+                    <span><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+
+
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 p-4 main-content">
+            <h4>Thông tin cá nhân</h4>
+                <div class="e-form-section row">
+                    <div class="col-md-8">
+                        <div class="e-input-group">
+                            <label class="e-form-label">Họ và tên</label>
+                            <input type="text" id="fullName" class="e-form-control" value="">
+                        </div>
+
+                        <div class="e-input-group">
+                            <label class="e-form-label">Giới tính</label><br>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="male">
+                                <label class="form-check-label" for="male">Nam</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="female" checked>
+                                <label class="form-check-label" for="female">Nữ</label>
+                            </div>
+
+                        </div>
+
+                        <div class="e-input-group">
+                            <label class="e-form-label">Ngày sinh</label>
+                            <input type="date" id="dob" class="e-form-control">
+                        </div>
+
+                        <!-- Địa chỉ -->
+                        <div class="e-input-group">
+                            <label class="e-form-label">Địa chỉ</label>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Tỉnh/Thành phố</label>
+                                    <select class="e-form-select" id="province">
+                                        <option selected></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Quận/Huyện</label>
+                                    <select class="e-form-select" id="district">
+                                        <option selected></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Phường/Xã</label>
+                                    <select class="e-form-select" id="ward">
+                                        <option selected></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <label class="form-label">Địa chỉ (số nhà, tên đường)</label>
+                            <input type="text" class="e-form-control" placeholder="Nhập địa chỉ cụ thể" id="address">
+                        </div>
+
+                        <button class="btn e-btn-black mt-3" id="saveBtn">Lưu</button>
+                    </div>
+
+                    <!-- Avatar -->
+                    <div class="col-md-4 text-center">
+                        <img src="" id="imageAvt" class="e-profile-pic mb-3" alt="avatar">
+<!--                        <button id="chooseImageBtn" class="">Chọn ảnh mới</button>-->
+                        <input type="file" id="imageInput" accept="image/*" class="form-control">
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal thay đổi mật khẩu -->
+<div id="cp-changePasswordModal" class="cp-modal">
+    <div class="cp-modal-content">
+        <span class="cp-close">&times;</span>
+        <h2>Thay đổi mật khẩu</h2>
+
+        <form id="cp-passwordForm">
+            <!-- Nhập mật khẩu cũ -->
+            <div class="cp-form-group">
+                <label for="cp-oldPassword">Mật khẩu hiện tại</label>
+                <div class="cp-password-check">
+                    <input type="password" class="cp-form-control cp-password-check-input" id="cp-oldPassword" required>
+                    <button type="button" id="cp-checkPasswordBtn" class="cp-btn cp-btn-secondary">Kiểm tra</button>
+                </div>
+                <div id="cp-oldPasswordFeedback" class="cp-invalid-feedback"></div>
+            </div>
+
+            <!-- Nhập mật khẩu mới (ban đầu ẩn) -->
+            <div id="cp-newPasswordSection" style="display: none;">
+                <!-- Nhập mật khẩu mới -->
+                <div class="cp-form-group">
+                    <label for="cp-newPassword">Mật khẩu mới</label>
+                    <input type="password" class="cp-form-control" id="cp-newPassword" required>
+                    <div id="cp-newPasswordFeedback" class="cp-invalid-feedback"></div>
+                    <div id="cp-passwordStrength" class="cp-password-strength"></div>
+                    <small>Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (!@#$%^&*).</small>
+                </div>
+
+                <!-- Xác nhận mật khẩu mới -->
+                <div class="cp-form-group">
+                    <label for="cp-confirmPassword">Xác nhận mật khẩu mới</label>
+                    <input type="password" class="cp-form-control" id="cp-confirmPassword" required>
+                    <div id="cp-confirmPasswordFeedback" class="cp-invalid-feedback"></div>
+                </div>
+
+                <!-- Nút đổi mật khẩu -->
+                <div class="cp-form-group">
+                    <button type="submit" id="cp-changePasswordBtn" class="cp-btn cp-btn-primary" disabled>Đổi mật khẩu</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="cp-changePhoneModal" class="cp-modal">
+    <div class="cp-modal-content">
+        <span class="cp-close">&times;</span>
+        <h2>Thay đổi số điện thoại</h2>
+
+        <form id="cp-phoneForm">
+            <!-- Hiển thị số điện thoại cũ -->
+            <div class="cp-form-group">
+                <label for="cp-oldPhone">Số điện thoại hiện tại</label>
+                <input type="text" class="cp-form-control" id="cp-oldPhone" disabled>
+            </div>
+
+            <!-- Nhập số điện thoại mới -->
+            <div class="cp-form-group">
+                <label for="cp-newPhone">Số điện thoại mới</label>
+                <input type="tel" class="cp-form-control" id="cp-newPhone">
+                <div id="cp-newPhoneFeedback" class="cp-invalid-feedback"></div>
+            </div>
+
+            <!-- Nút xác nhận -->
+            <div class="cp-form-group">
+                <button type="submit" id="cp-changePhoneBtn" class="cp-btn cp-btn-primary">Cập nhật số điện thoại</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const phoneModal = document.getElementById('cp-changePhoneModal');
+        const changePhoneBtn = document.getElementById('changePhone');
+        const closeBtns = document.querySelectorAll('.cp-close');
+
+        const phoneForm = document.getElementById('cp-phoneForm');
+        const newPhoneInput = document.getElementById('cp-newPhone');
+        const feedback = document.getElementById('cp-newPhoneFeedback');
+
+        // Mở modal khi click "Đổi số điện thoại"
+        changePhoneBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            phoneModal.style.display = 'block';
+            axios.get('/opulentia_user/phoneNumber')
+                .then(response => {
+                    const currentPhone = response.data;
+                    document.getElementById('cp-oldPhone').value =
+                        currentPhone ? currentPhone : 'Chưa có số điện thoại';
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy số điện thoại:', error);
+                    document.getElementById('cp-oldPhone').value = 'Không lấy được số điện thoại';
+                });
+        });
+
+        // Đóng modal khi click nút X
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const modal = this.closest('.cp-modal');
+                modal.style.display = 'none';
+                const form = modal.querySelector('form');
+                if (form) form.reset();
+
+                modal.querySelectorAll('.cp-invalid-feedback').forEach(el => el.textContent = '');
+            });
+        });
+
+        // Đóng khi click bên ngoài modal
+        window.addEventListener('click', function (event) {
+            if (event.target === phoneModal) {
+                phoneModal.style.display = 'none';
+                const form = phoneModal.querySelector('form');
+                if (form) form.reset();
+                phoneModal.querySelectorAll('.cp-invalid-feedback').forEach(el => el.textContent = '');
+            }
+        });
+
+        //Gửi số điện thoại bằng Axios khi submit form
+        phoneForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const newPhone = newPhoneInput.value.trim();
+            feedback.textContent = '';
+
+            // Validate client
+            if (!/^0\d{9}$/.test(newPhone)) {
+                feedback.textContent = 'Số điện thoại không hợp lệ. Vui lòng nhập 10 chữ số bắt đầu bằng 0.';
+                return;
+            }
+
+            axios.put("/opulentia_user/changePhone", {
+                newPhoneNumber: newPhone
+            })
+                .then(response => {
+                    if (response.data) {
+                        Swal.fire({
+                            title: 'Cập nhật số điện thoại thành công',
+                            icon: 'success',
+                            timer: 1500,
+                            timerProgressBar: true,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#000000'
+                        });
+
+                        phoneModal.style.display = 'none';
+                        phoneForm.reset();
+                    } else {
+                        Swal.fire({
+                            title: 'Không thể cập nhật số điện thoại',
+                            icon: 'error',
+                            timer: 5000,
+                            timerProgressBar: true,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#000000'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                    Swal.fire({
+                        title: 'Lỗi kết nối đến server',
+                        text: error.response?.data?.message || 'Vui lòng thử lại sau.',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#000000'
+                    });
+                });
+        });
+    });
+</script>
+
+<!--modal otp-->
+<!--modal otp-->
+<div id="otpModal" class="otp-modal" style="display: none;">
+    <div class="otp-container">
+        <div class="otp-box">
+            <!-- Nút đóng modal -->
+            <span class="close-btn" onclick="hideOtpModal()">×</span>
+
+            <h2 class="otp-title">Nhập mã OTP</h2>
+            <p class="note">Mã OTP đã được gửi qua email và có hiệu lực trong 5 phút.</p>
+
+            <div id="verifyOtpForm">
+                <div class="otp-inputs">
+                    <input type="text" maxlength="1" name="digit1" required>
+                    <input type="text" maxlength="1" name="digit2" required>
+                    <input type="text" maxlength="1" name="digit3" required>
+                    <input type="text" maxlength="1" name="digit4" required>
+                    <input type="text" maxlength="1" name="digit5" required>
+                    <input type="text" maxlength="1" name="digit6" required>
+                </div>
+                <p id="otpMessage" style="color:orangered; display:none;"></p>
+                <button id="confirmOtpBtn" type="button" class="btn-submit">Xác thực OTP</button>
+            </div>
+
+            <button id="resendBtn" class="btn-resend" disabled>Gửi lại mã (60s)</button>
+        </div>
+    </div>
+</div>
+
+
+<!--js xử lý vô hiệu hóa tk-->
+<script>
+    let otpTimer = null;
+
+    function showOtpModal() {
+        const modal = document.getElementById('otpModal');
+        modal.style.display = 'block';
+        startOtpCountdown();
+        setupOtpInputs();
+    }
+
+    function hideOtpModal() {
+        document.getElementById('otpModal').style.display = 'none';
+        clearInterval(otpTimer);
+    }
+
+    function startOtpCountdown() {
+        let countdown = 60;
+        const resendBtn = document.getElementById('resendBtn');
+
+        clearInterval(otpTimer);
+        resendBtn.disabled = true;
+        resendBtn.classList.remove('enabled');
+        resendBtn.textContent = `Gửi lại mã (${countdown}s)`;
+
+        otpTimer = setInterval(() => {
+            countdown--;
+            resendBtn.textContent = `Gửi lại mã (${countdown}s)`;
+            if (countdown <= 0) {
+                clearInterval(otpTimer);
+                resendBtn.disabled = false;
+                resendBtn.classList.add('enabled');
+                resendBtn.textContent = 'Gửi lại mã';
+            }
+        }, 1000);
+    }
+
+    function setupOtpInputs() {
+        const inputs = document.querySelectorAll('#otpModal .otp-inputs input');
+        inputs.forEach(input => input.value = '');
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !input.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        if (inputs.length > 0) {
+            inputs[0].focus();
+        }
+    }
+
+    function getOtpValue() {
+        const otpInputs = document.querySelectorAll('#otpModal .otp-inputs input');
+        return Array.from(otpInputs).map(input => input.value).join('');
+    }
+
+    function sendOtpForDeactivation() {
+        axios.post("/opulentia_user/send-otp-deactivate")
+            .then(res => {
+                showOtpModal();
+                document.getElementById("otpMessage").style.display = "none";
+            })
+            .catch(err => {
+                const errorMessage = err.response?.data || "Gửi OTP thất bại";
+
+                // Nếu lỗi là do còn đơn hàng
+                if (errorMessage.includes("đơn hàng")) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Không thể vô hiệu hóa',
+                        text: errorMessage,
+                        confirmButtonColor: '#000000'
+                    });
+                } else {
+                    // Các lỗi khác (ví dụ: chưa đăng nhập, spam gửi OTP)
+                    document.getElementById("otpMessage").textContent = errorMessage;
+                    document.getElementById("otpMessage").style.display = "block";
+                }
+            });
+    }
+
+
+    function confirmOtpForDeactivation() {
+        const otp = getOtpValue();
+        if (otp.length !== 6 || isNaN(otp)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Thiếu mã OTP',
+                text: 'Vui lòng nhập đủ 6 chữ số OTP.',
+                confirmButtonColor: '#000000'
+            });
+            return;
+        }
+
+        axios.post("/opulentia_user/confirm-deactivate", {
+            otpCode: parseInt(otp)
+        })
+            .then(res => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Tài khoản đã bị vô hiệu hóa',
+                    text: res.data,
+                    confirmButtonColor: '#000000'
+                }).then(() => {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Cảm ơn bạn đã đồng hành cùng chúng tôi!',
+                        text: 'Hy vọng sẽ gặp lại bạn trong tương lai.',
+                        confirmButtonColor: '#000000'
+                    }).then(() => {
+                        hideOtpModal();
+
+                        // ⛔ QUAN TRỌNG: Gọi logout để xóa cookie
+                        axios.post('/api/auth/logout', {}, {
+                            withCredentials: true
+                        })
+                            .then(() => {
+                                window.location.href = "/index";
+                                axios.post('/opulentia_user/confirm-return', {}, {
+                                    withCredentials: true
+                                })
+                                    .then(() =>{
+                                        console.error("❌ Lỗi khi logout sau khi vô hiệu hóa:", error);
+                                    })
+                            })
+                            .catch(error => {
+                                console.error("❌ Lỗi khi logout sau khi vô hiệu hóa:", error);
+                                // Vẫn chuyển trang trong trường hợp logout lỗi, nhưng có thể log thêm nếu cần
+                                window.location.href = "/index";
+                            });
+                    });
+                });
+            })
+            .catch(err => {
+                const errorMessage = err.response?.data || "Vô hiệu hóa thất bại";
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Không thể vô hiệu hóa',
+                    text: errorMessage,
+                    confirmButtonColor: '#000000'
+                }).then(() => {
+                    if (errorMessage.includes("đơn hàng")) {
+                        hideOtpModal();
+                    }
+                });
+            });
+    }
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const disableLink = document.getElementById("disableAccount");
+        const confirmOtpBtn = document.getElementById("confirmOtpBtn");
+        const resendBtn = document.getElementById("resendBtn");
+
+        disableLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            Swal.fire({
+                title: "Bạn có chắc muốn vô hiệu hóa tài khoản?",
+                html: "Tài khoản sẽ bị khóa vĩnh viễn và không thể đăng nhập lại bằng email này.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Vô hiệu hóa"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sendOtpForDeactivation();
+                }
+            });
+        });
+
+        confirmOtpBtn.addEventListener("click", function () {
+            confirmOtpForDeactivation();
+        });
+
+        resendBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            if (!this.disabled) {
+                sendOtpForDeactivation();
+            }
+        });
+    });
+</script>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('imageInput');
+
+        // Khi nhấn nút "Chọn ảnh mới", kích hoạt input file
+        // chooseImageBtn.addEventListener('click', function() {
+        //     fileInput.click();
+        // });
+
+        // Xử lý khi chọn file
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    // Cập nhật ảnh đại diện
+                    document.querySelector('.e-profile-pic').src = event.target.result;
+                };
+
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    });
+
+    // // thông báo xác nhận đăng xuất
+    // function confirmLogout(event) {
+    //     event.preventDefault(); // chặn hành động mặc định
+    //
+    //     Swal.fire({
+    //         title: 'Bạn có chắc muốn đăng xuất?',
+    //         icon: 'warning',
+    //         showCancelButton: true,
+    //         confirmButtonText: 'Đăng xuất',
+    //         cancelButtonText: 'Hủy',
+    //         confirmButtonColor: '#222831',   // Nút đăng xuất: đen sang
+    //         cancelButtonColor: '#eeeeee',    // Nút hủy: xám nhạt
+    //         color: '#333',                   // Màu chữ chính
+    //         background: '#f9f9f9',           // Nền popup
+    //         customClass: {
+    //             confirmButton: 'text-white',
+    //             cancelButton: 'text-dark'
+    //         }
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             document.getElementById('logoutForm').submit();
+    //         }
+    //     });
+    //}
+</script>
+<script>
+    let dataAddress = [];
+    let provincesSelect = document.getElementById('province');
+    let districtsSelect = document.getElementById('district');
+    let wardsSelect = document.getElementById('ward');
+
+    // Load JSON dữ liệu
+    fetch('/data/Address.json')
+        .then(res => res.json())
+        .then(json => {
+            dataAddress = json;
+            populateProvinces();
+        });
+
+    function populateProvinces() {
+        dataAddress.forEach(province => {
+            let option = document.createElement('option');
+            option.value = province.ProvinceID;
+            option.textContent = province.ProvinceName;
+            provincesSelect.appendChild(option);
+        });
+    }
+
+    provincesSelect.addEventListener('change', () => {
+        clearSelect(districtsSelect);
+        clearSelect(wardsSelect);
+
+        let selectedProvinceId = provincesSelect.value;
+
+
+        let province = dataAddress.find(p => p.ProvinceID == selectedProvinceId);
+        if (province) {
+            //districtContainer.style.display = 'block';
+            province.Districts.forEach(district => {
+                let option = document.createElement('option');
+                option.value = district.DistrictID;
+                option.textContent = district.DistrictName;
+                districtsSelect.appendChild(option);
+            });
+        }
+    });
+
+    districtsSelect.addEventListener('change', () => {
+        clearSelect(wardsSelect);
+        // resultDiv.style.display = 'none';
+
+        let selectedProvinceId = provincesSelect.value;
+        let selectedDistrictId = districtsSelect.value;
+
+        // if (!selectedDistrictId) {
+        //     wardContainer.style.display = 'none';
+        //     return;
+        // }
+
+        let province = dataAddress.find(p => p.ProvinceID == selectedProvinceId);
+        if (!province) return;
+
+        let district = province.Districts.find(d => d.DistrictID == selectedDistrictId);
+        if (district) {
+           // wardContainer.style.display = 'block';
+            district.Wards.forEach(ward => {
+                let option = document.createElement('option');
+                option.value = ward.WardCode;
+                option.textContent = ward.WardName;
+                wardsSelect.appendChild(option);
+            });
+        }
+    });
+
+    wardsSelect.addEventListener('change', () => {
+        let selectedWardCode = wardsSelect.value;
+        // if (!selectedWardCode) {
+        //     resultDiv.style.display = 'none';
+        //     return;
+        // }
+
+        // resProvince.textContent = provincesSelect.value;
+        // resDistrict.textContent = districtsSelect.value;
+        // resWard.textContent = selectedWardCode;
+        // resultDiv.style.display = 'block';
+    });
+
+    function clearSelect(selectElement) {
+        while (selectElement.options.length > 1) {
+            selectElement.remove(1);
+        }
+    }
+</script>
+<script src="/js/edit-profile.js"></script>
+<script src="/js/edit-profile-security.js"></script>
+</body>
+</html>
