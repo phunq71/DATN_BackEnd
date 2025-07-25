@@ -1,17 +1,14 @@
 package com.main.serviceImpl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.dto.*;
 
 
-import com.main.entity.Customer;
-import com.main.entity.Order;
-import com.main.entity.OrderDetail;
+import com.main.entity.*;
 import com.main.mapper.CustomerMapper;
-import com.main.repository.CustomerRepository;
-import com.main.repository.OrderDetailRepository;
+import com.main.repository.*;
 
-import com.main.repository.OrderRepository;
-import com.main.repository.ReviewRepository;
 import com.main.service.FacilityService;
 import com.main.service.OrderService;
 import com.main.service.ReviewService;
@@ -46,6 +43,15 @@ public class OrderServiceImpl implements OrderService {
 
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final VoucherRepository voucherRepository;
+    private final FacilityRepository facilityRepository;
+    private final ItemRepository itemRepository;
+    private final PromotionRepository promotionRepository;
+    private final PromotionProductRepository promotionProductRepository;
+    private final TransactionRepository transactionRepository;
+    private final UsedVoucherRepository usedVoucherRepository;
+    private final InventoryRepository inventoryRepository;
+    private final CartRepository cartRepository;
 
     @Value("${ghn.token}")
     private String ghnToken;
@@ -83,7 +89,7 @@ public class OrderServiceImpl implements OrderService {
                     .orElse(null);
             order.setItems(orderRepository.getOrderItemsByOrderId(order.getOrderID()));
             if (orderPriceDTO != null) {
-                order.setTotalPrice(orderPriceDTO.getFinalPrice().add(order.getShippingCosts()));
+                order.setTotalPrice(transactionRepository.findByOrder_OrderID(order.getOrderID()).getAmount());
             } else {
                 System.err.println("Không tìm thấy OrderPriceDTO cho OrderID: " + order.getOrderID());
             }
@@ -117,6 +123,7 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal productDiscount = convertToBigDecimal(resultArray[2]);
         BigDecimal voucherDiscount = convertToBigDecimal(resultArray[3]);
         BigDecimal finalPrice = convertToBigDecimal(resultArray[4]);
+        finalPrice = transactionRepository.findByOrder_OrderID(orderIdResult).getAmount();
 
         // Log các giá trị
         System.out.println("OrderID: " + orderIdResult);
@@ -158,10 +165,12 @@ public class OrderServiceImpl implements OrderService {
         List<Object[]> orderPrices = orderRepository.getOrderPricesByCustomer(customerId, status ,year);
         orderPrices.forEach(orderPrice -> {
             Integer orderId = (Integer) orderPrice[0];
-            BigDecimal totalPrice = new BigDecimal(orderPrice[1].toString());
+            System.out.println("OrderID: 😎😎😎😎😎😎😎😎😎😎" + orderId);
+            BigDecimal totalPrice = new BigDecimal(transactionRepository.findByOrder_OrderID(orderId).getAmount().toString());
             BigDecimal productDiscount = new BigDecimal(orderPrice[2].toString());
             BigDecimal voucherDiscount = new BigDecimal(orderPrice[3].toString());
             BigDecimal finalPrice = new BigDecimal(orderPrice[4].toString());
+
             orderPriceDTOs.add(new OrderPriceDTO(orderId, totalPrice, productDiscount, voucherDiscount, finalPrice));
         });
 
@@ -184,7 +193,7 @@ public class OrderServiceImpl implements OrderService {
         OrderDetailDTO orderDetailDTO = orderRepository.getOrderDetailByOrderId(orderId);
         System.err.println("CCCCCC: "+orderDetailDTO);
         OrderPriceDTO priceDTO= getOrderPrice(orderId);
-        orderDetailDTO.setFinalPrice(priceDTO.getFinalPrice().add(orderDetailDTO.getShippingCost()));
+        orderDetailDTO.setFinalPrice(priceDTO.getFinalPrice());
         orderDetailDTO.setDiscountVoucherPrice(priceDTO.getVoucherDiscount());
         orderDetailDTO.setDiscountProductPrice(priceDTO.getProductDiscount());
 
@@ -421,4 +430,146 @@ public class OrderServiceImpl implements OrderService {
             return false;
         }
     }
+
+
+    @Override
+    public Boolean addOrderCustomer(Map<String, Object> checkoutInfo) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            // 1. Customer
+            InFoCustomerOrderDTO customer = mapper.convertValue(checkoutInfo.get("customer"), InFoCustomerOrderDTO.class);
+
+            // 2. List sản phẩm
+            List<OrderPreviewDTO> listItems = mapper.convertValue(
+                    checkoutInfo.get("listItems"),
+                    new TypeReference<List<OrderPreviewDTO>>() {}
+            );
+
+            // 3. Các trường còn lại
+            List<String> facilities = (List<String>) checkoutInfo.get("facilities");
+            String facilityId = (String) checkoutInfo.get("facilityId");
+            String lastTime = (String) checkoutInfo.get("lastTime");
+            String paymentMethod = (String) checkoutInfo.get("paymentMethod");
+            String voucherId = (String) checkoutInfo.get("voucherId");
+            Boolean type = checkoutInfo.get("type") != null ? (Boolean) checkoutInfo.get("type") : null;
+            String hauMai1 = (String) checkoutInfo.get("hauMai1");
+            String hauMai2 = (String) checkoutInfo.get("hauMai2");
+
+            BigDecimal discountTotal = new BigDecimal(checkoutInfo.get("discountTotal").toString());
+            BigDecimal totalAmount = new BigDecimal(checkoutInfo.get("totalAmount").toString());
+
+            // Thêm vào Order và OrderDetails
+            Order order = new Order();
+            order.setOrderDate(LocalDateTime.now());
+            order.setStatus("ChoXacNhan");
+            order.setShippingAddress(customer.getCustomerAddress());
+            order.setNote(customer.getNote());
+            order.setIsOnline(true);
+            order.setShipMethod("GHN");
+            order.setCostShip(customer.getCostShip());
+            order.setCustomer(customerRepository.findByCustomerId(customer.getCustomerId()));
+            order.setStaff(null);
+            System.out.println("✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅ : " + voucherId);
+            if (voucherId != null && !voucherId.equals(""))
+                order.setVoucher(voucherRepository.findById(voucherId).get());
+
+            order.setFacility(facilityRepository.findById(facilityId).get());
+            order.setUpdateStatusAt(LocalDateTime.now());
+            order.setAddressIdGHN(customer.getCustomerAddress());
+            order.setDiscountCost(customer.getDiscountCost());
+            order.setShippingCode(null);
+
+            order = orderRepository.save(order);
+
+            Order finalOrder = order;
+            List<OrderDetail> orderDetails = new ArrayList<>();
+            listItems.forEach(item -> {
+                OrderDetail orderDetail = new OrderDetail();
+                orderDetail.setOrder(finalOrder);
+                orderDetail.setItem(itemRepository.findById(item.getItem_id()).get());
+                orderDetail.setQuantity(item.getQuantity());
+                orderDetail.setUnitPrice(item.getPrice());
+                orderDetail.setTotalPrice(item.getTotal_price());
+                orderDetail.setPromotionProduct(promotionProductRepository.findById(item.getPPID()).get());
+                orderDetails.add(orderDetail);
+            });
+
+            orderDetailRepository.saveAll(orderDetails);
+
+            // Tạo phiếu thu
+            Transaction transaction = new Transaction();
+            transaction.setTransactionType(true);
+            BigDecimal amount =
+                    (totalAmount != null ? totalAmount : BigDecimal.ZERO)
+                            .subtract(discountTotal != null ? discountTotal : BigDecimal.ZERO)
+                            .add(customer != null && customer.getDiscountCost() != null
+                                    ? customer.getDiscountCost()
+                                    : BigDecimal.ZERO);
+
+            transaction.setAmount(amount);
+            transaction.setTransactionDate(LocalDateTime.now());
+            transaction.setPaymentMethod(paymentMethod);
+            transaction.setDescription("Người dùng trã tiền mua hàng");
+            transaction.setStatus("ChuaThanhToan");
+            transaction.setStaff(null); transaction.setApprover(null); transaction.setReturnRequest(null);
+            transaction.setOrder(order);
+            transaction.setFacility(facilityRepository.findById(facilityId).get());
+
+            transactionRepository.save(transaction);
+
+
+
+                // Trừ voucher đã xử dụng
+            if (voucherId != null && !voucherId.equals("")) {
+                if (type != null && type == true) {
+                    Voucher voucher = voucherRepository.findById(voucherId).orElseThrow();
+                    Customer cus = customerRepository.findById(customer.getCustomerId()).orElseThrow();
+
+                    UsedVoucherID usedVoucherID = new UsedVoucherID();
+                    usedVoucherID.setVoucher(voucher.getVoucherID());  // String ID
+                    usedVoucherID.setCustomer(cus.getCustomerId());    // String ID
+
+                    UsedVoucher usedVoucher = new UsedVoucher();
+                    usedVoucher.setVoucher(voucher);        // đã fetch từ DB
+                    usedVoucher.setCustomer(cus);      // đã fetch từ DB
+                    usedVoucher.setType(true);
+                    usedVoucher.setUsedVoucherID(new UsedVoucherID(
+                            voucher.getVoucherID(),
+                            customer.getCustomerId()
+                    ));
+                    usedVoucherRepository.save(usedVoucher);
+
+
+                } else if (type != null) {
+                    UsedVoucher usedVoucher = new UsedVoucher();
+                    Voucher voucher = voucherRepository.findById(voucherId).get();
+                    Customer cus = customerRepository.findById(customer.getCustomerId()).get();
+
+                    usedVoucher = usedVoucherRepository.findByVoucherAndCustomer(voucher, cus);
+                    usedVoucher.setType(true);
+                    usedVoucherRepository.save(usedVoucher);
+                }
+            }
+
+            // Trừ trong kho và xóa cart
+            listItems.forEach(item -> {
+               InventoryId inventoryId = new InventoryId(item.getItem_id(), facilityId);
+               Inventory inventory = inventoryRepository.getInventoryById(inventoryId);
+               inventory.setQuantity(inventory.getQuantity() - item.getQuantity());
+               inventoryRepository.save(inventory);
+
+               Cart cart = cartRepository.getCartByItem_itemIdAndCustomer_customerId(item.getItem_id(), customer.getCustomerId());
+               cartRepository.delete(cart);
+            });
+
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 }

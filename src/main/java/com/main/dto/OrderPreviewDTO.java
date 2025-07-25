@@ -20,4 +20,5 @@ public class OrderPreviewDTO {
     private Integer quantity;
     private BigDecimal total_price;
     private BigDecimal discountedPrice;
+    private Integer PPID;
 }

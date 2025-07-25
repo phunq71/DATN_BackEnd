@@ -54,7 +54,15 @@ document.addEventListener('DOMContentLoaded', async function(){
     }, 0);
 
     document.getElementById("totalItemsPrice").textContent = formatCurrency(calculateTotalPriceWithoutDiscount(order));
-    document.getElementById("discountProductPrice").textContent =order.discountProductPrice>0? "- "+formatCurrency(order.discountProductPrice) : formatCurrency(0);
+    const shippingCost = order.shippingCost;
+    const discountedShipping = order.shippinngCostDiscountPrice;
+    const shippingDiscount = shippingCost - discountedShipping;
+
+    document.getElementById("discountCS").textContent = shippingDiscount > 0
+        ? "- " + formatCurrency(shippingDiscount)
+        : formatCurrency(0);
+
+
     document.getElementById("discountVoucherPrice").textContent=order.discountVoucherPrice>0 ? "- "+ formatCurrency(order.discountVoucherPrice) : formatCurrency(0);
 
     document.getElementById("shippingCost").textContent=formatCurrency(order.shippingCost);
@@ -187,7 +195,7 @@ document.addEventListener('DOMContentLoaded', async function(){
         let total = 0;
 
         order.items.forEach(item => {
-            total += item.price * item.quantity;
+            total += (item.price * (100 - item.discountPercent) / 100 ) * item.quantity;
         });
 
         return total;

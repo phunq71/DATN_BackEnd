@@ -40,6 +40,9 @@ public class CartMapper {
         // ✅ Tổng tiền sau giảm
         BigDecimal total = discountedPrice.multiply(BigDecimal.valueOf(quantity));
 
+        // id KM
+        Integer idPromotion = productRepository.findPromotionProductIdByProductID(cart.getItem().getVariant().getProduct().getProductID());
+
         // ✅ Khởi tạo DTO
         OrderPreviewDTO orderPreviewDTO = new OrderPreviewDTO(
                 cart.getItem().getItemId(),
@@ -51,7 +54,8 @@ public class CartMapper {
                 discountPercent,
                 quantity,
                 total,
-                discountedPrice
+                discountedPrice,
+                idPromotion
         );
 
         return orderPreviewDTO;
