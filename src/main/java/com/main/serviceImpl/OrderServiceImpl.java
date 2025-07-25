@@ -312,6 +312,7 @@ public class OrderServiceImpl implements OrderService {
             }
         }
     }
+    //Gọi API GHN để laays trạng thái đơn hàng
     public Map<String, Object> getOrderStatus(String orderCode) {
         String url = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail";
 
