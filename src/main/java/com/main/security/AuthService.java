@@ -36,7 +36,7 @@ public class AuthService {
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(accessTokenMaxAge)
                 .sameSite("Lax")
@@ -44,7 +44,7 @@ public class AuthService {
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(refreshTokenMaxAge)
                 .sameSite("Lax")
