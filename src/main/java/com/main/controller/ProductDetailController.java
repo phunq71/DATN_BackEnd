@@ -51,6 +51,8 @@ public class ProductDetailController {
         model.addAttribute("listProduct1", productList);
         //Image slider, màu sắc
         List<Variant_DetailDTO> listV = variantService.findByProduct(product.get());
+        System.out.println("✅✅✅✅✅✅✅✅✅✅✅✅✅✅" +listV.size());
+
         Optional<Variant> variant = variantService.findById(variantID);
         //Tìm ds ảnh bằng bằng biến thể
         List<Image_DetailDTO> listImage = imageService.findByVariant(variant.get());

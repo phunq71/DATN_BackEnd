@@ -93,6 +93,20 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
     """)
     Byte findDiscountPercentByProductID(@Param("productID") String productID);
 
+    @Query("""
+    SELECT pp.promotionProductID
+    FROM PromotionProduct pp
+    JOIN pp.product p
+    JOIN pp.promotion pr
+    WHERE p.productID = :productID
+      AND pr.startDate <= CURRENT_TIMESTAMP
+      AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
+      AND pr.type = 'ProductDiscount'
+      AND pp.quantityUsed < pp.quantityRemaining
+    """)
+    Integer findPromotionProductIdByProductID(@Param("productID") String productID);
+
+
 
 
     @Query(value = """

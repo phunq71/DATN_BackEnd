@@ -15,7 +15,6 @@ import java.util.Map;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
 
-
     //Repository for dashboard
     @Query("""
         SELECT YEAR(ts.transactionDate)
@@ -153,4 +152,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
         ORDER BY YEAR(o.orderDate) DESC
     """)
     List<Integer> getAvailableYearCategory();
+
+    Transaction findByOrder_OrderID(Integer orderId);
+
 }

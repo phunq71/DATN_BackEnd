@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsedVoucherID implements Serializable {
-    private Long voucher;
+    private String voucher;
     private String customer;
 }

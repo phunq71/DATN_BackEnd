@@ -106,7 +106,7 @@ function createCartItemRow(chosenProduct, productGroup) {
     const currentOutOfStock = allOutOfStock || !chosenProduct.isInStock;
     // Create row HTML - checkbox checked nếu có trong checkedItems
     row.innerHTML = `
-        <td><input type="checkbox" class="c-cart-checkbox" ${isChecked ? 'checked' : ''} ${currentOutOfStock ? 'disabled' : ''}></td>
+        <td><input type="checkbox" class="c-cart-checkbox"></td>
         <td>
             <div class="c-product-info">
                 <img src="/uploads/${chosenProduct.mainImage}" alt="${chosenProduct.productName}" class="c-product-image">
@@ -348,6 +348,7 @@ function initCart() {
                     checkedItems = checkedItems.filter(index => index !== cartIndex);
                 }
                 updateTotalAmount();
+
             });
 
             // Add event listeners
@@ -407,16 +408,16 @@ function initCart() {
             });
 
 
-            document.getElementById('c-select-all-checkout').addEventListener('change', function() {
+            document.getElementById('c-select-all-checkout')?.addEventListener('change', function () {
                 const isChecked = this.checked;
-                const checkboxes = document.querySelectorAll('.c-cart-checkbox:not(:disabled)');
+                const checkboxes = document.querySelectorAll('.c-cart-checkbox:not(#c-select-all-checkout)');
                 checkedItems = [];
 
                 checkboxes.forEach((checkbox) => {
                     const row = checkbox.closest('.c-cart-item');
-                    if (!row) return; // ⚠️ Bỏ qua nếu không tìm thấy row
+                    if (!row) return;
 
-                    const itemID = parseInt(row.dataset.itemId); // ✅ Đảm bảo row tồn tại
+                    const itemID = parseInt(row.dataset.itemId);
                     const cartIndex = carts.findIndex(cart => cart.itemID === itemID);
 
                     checkbox.checked = isChecked;
@@ -425,9 +426,12 @@ function initCart() {
                     }
                 });
 
-                // console.log('checkedItems', checkedItems);
+                // ✅ lưu cả trạng thái nút select all
+                localStorage.setItem('selectAllChecked', JSON.stringify(isChecked));
+                saveCheckedItemIDs(); // lưu lại item được chọn
                 updateTotalAmount();
             });
+
         });
 
     });
@@ -435,6 +439,11 @@ function initCart() {
     document.dispatchEvent(new Event('cartUpdated'));
     updateTotalAmount();
     updateTotalQuantity();
+
+    // document.querySelectorAll('.c-cart-checkbox').forEach(cb => {
+    //     cb.addEventListener('change', saveCheckedItemIDs);
+    // });
+    restoreCheckedItemIDs();
 }
 
 // Function to update total amount when checkboxes change
@@ -565,15 +574,22 @@ function renderPrice(basisPrice, discountPercent) {
 
 function getCheckedItemIDs() {
     return Array.from(document.querySelectorAll('.c-cart-checkbox:checked'))
+        .filter(cb => cb.id !== 'c-select-all-checkout') // loại bỏ checkbox "select all"
         .map(cb => cb.closest('.c-cart-item')?.getAttribute('data-item-id'))
         .filter(id => id !== null);
 }
+
 
 function submitCheckout() {
     const itemIDs = getCheckedItemIDs();
 
     if (itemIDs.length === 0) {
-        alert('Vui lòng chọn ít nhất 1 sản phẩm để mua.');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Chưa chọn sản phẩm',
+            text: 'Vui lòng chọn ít nhất 1 sản phẩm để tiến hành thanh toán.',
+            confirmButtonText: 'OK'
+        });
         return;
     }
 
@@ -588,5 +604,63 @@ function submitCheckout() {
     form.appendChild(input);
 
     document.body.appendChild(form);
+    saveCheckedItemIDs();
     form.submit(); // Gửi và chuyển trang
+
 }
+
+function saveCheckedItemIDs() {
+    const checkedIDs = Array.from(document.querySelectorAll('.c-cart-checkbox:checked'))
+        .filter(cb => cb.id !== 'c-select-all-checkout')
+        .map(cb => cb.closest('.c-cart-item')?.getAttribute('data-item-id'))
+        .filter(id => !!id);
+
+    const isSelectAllChecked = document.getElementById('c-select-all-checkout')?.checked;
+
+    localStorage.setItem('checkedCartItemIDs', JSON.stringify(checkedIDs));
+    localStorage.setItem('selectAllChecked', JSON.stringify(isSelectAllChecked));
+}
+
+
+
+
+function restoreCheckedItemIDs() {
+    const savedIDs = JSON.parse(localStorage.getItem('checkedCartItemIDs') || '[]');
+    const isSelectAllChecked = JSON.parse(localStorage.getItem('selectAllChecked') || 'false');
+    console.log('Restoring savedIDs', savedIDs);
+
+    // Khôi phục từng item
+    savedIDs.forEach(id => {
+        const checkbox = document.querySelector(`.c-cart-item[data-item-id="${id}"] .c-cart-checkbox`);
+        if (checkbox) checkbox.checked = true;
+    });
+
+    // Khôi phục "chọn tất cả"
+    const selectAllCheckbox = document.getElementById('c-select-all-checkout');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = isSelectAllChecked;
+    }
+
+    // ✅ XÓA dữ liệu sau khi restore
+    localStorage.removeItem('checkedCartItemIDs');
+    localStorage.removeItem('selectAllChecked');
+}
+
+
+
+
+
+
+// window.addEventListener('beforeunload', saveCheckedItemIDs);
+
+
+// Gọi restore sau khi trang tải xong
+// window.addEventListener('DOMContentLoaded', () => {
+//     restoreCheckedItemIDs();
+//
+//     // Gắn sự kiện khi người dùng check/uncheck
+//     document.querySelectorAll('.c-cart-checkbox').forEach(cb => {
+//         cb.addEventListener('change', saveCheckedItemIDs);
+//     });
+// });
+

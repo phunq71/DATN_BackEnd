@@ -18,7 +18,7 @@ async function isLoggedIn() {
         const status = err.response?.status;
         log += `❌ Access token không hợp lệ (status: ${status})\n`;
 
-        if (status === 401) {
+        if (status === 401 || status === 302) {
             const rememberMe = localStorage.getItem("rememberMeChecked") === "true";
             log += `🔁 Cố gắng refresh token (rememberMe = ${rememberMe})...\n`;
 

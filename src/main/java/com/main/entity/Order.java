@@ -70,7 +70,7 @@ public class Order {
     @JoinColumn(name = "FacilityID", nullable = false)
     private Facility facility;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
     private List<OrderDetail> orderDetails;
 
 

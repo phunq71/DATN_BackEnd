@@ -40,4 +40,6 @@ public interface OrderService {
 
     Boolean saveOrders(List<OrderDTO> orders);
 
+    Boolean addOrderCustomer(Map<String, Object> checkoutInfo);
+
 }
