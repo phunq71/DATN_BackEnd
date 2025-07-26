@@ -43,7 +43,7 @@ public class OrderDetail {
     @OneToOne(mappedBy = "orderDetail")
     private ReturnItem returnItem;
 
-    @OneToMany(mappedBy = "orderDetail")
+    @OneToMany(mappedBy = "orderDetail", fetch = FetchType.LAZY)
     private List<Review> reviews;
 
     public OrderDetail(Integer orderDetailID) {

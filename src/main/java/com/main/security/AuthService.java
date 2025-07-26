@@ -39,7 +39,7 @@ public class AuthService {
                 .secure(false)
                 .path("/")
                 .maxAge(accessTokenMaxAge)
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
@@ -47,7 +47,7 @@ public class AuthService {
                 .secure(false)
                 .path("/")
                 .maxAge(refreshTokenMaxAge)
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
         Map<String, ResponseCookie> cookies = new HashMap<>();
