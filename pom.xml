@@ -141,6 +141,7 @@
 							<artifactId>lombok</artifactId>
 						</path>
 					</annotationProcessorPaths>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 			<plugin>
