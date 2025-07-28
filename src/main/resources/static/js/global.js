@@ -224,16 +224,30 @@ function clearCartLocalStorage(){
 
 
 
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("Image fix script is running...");
+const replaceUploadImages = () => {
     document.querySelectorAll('img').forEach(img => {
         const originalSrc = img.getAttribute('src');
-        console.log("Original src:", originalSrc);
         if (originalSrc && originalSrc.startsWith('/uploads/')) {
             const filename = originalSrc.split('/uploads/')[1];
             img.src = `https://phudatn.blob.core.windows.net/uploads/${filename}`;
-            console.log("Replaced src:", img.src);
         }
+    });
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Image fix script is running...");
+    replaceUploadImages();
+
+    // Theo dõi thay đổi DOM
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(() => {
+            replaceUploadImages(); // Kiểm tra và thay lại mỗi khi có element mới
+        });
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
     });
 });
 

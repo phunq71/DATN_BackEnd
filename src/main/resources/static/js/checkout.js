@@ -87,7 +87,7 @@ async function fetchDataCheckout() {
         const info = data?.customer;
         console.log(data);
 
-        if (!info?.customerPhone || info.customerPhone.trim() === '' || info.customerPhone === 'N/A') {
+        if (!info?.customerPhone || info.customerPhone.trim() === '' || info.customerPhone.trim() === 'N/A') {
             Swal.fire({
                 icon: 'warning',
                 title: 'Thiếu thông tin',
@@ -711,7 +711,7 @@ function datHang() {
                 confirmButtonText: 'Đến trang đơn hàng'
             }).then(() => {
                 // Chuyển hướng sau khi người dùng bấm OK
-                window.location.href = 'http://localhost:8989/opulentia_user/allOrder';
+                window.location.href = '/opulentia_user/allOrder';
             });
 
             console.log('Đặt hàng thành công:', response.data);
