@@ -221,3 +221,15 @@ function checkMergeCart(carts){
 function clearCartLocalStorage(){
     localStorage.removeItem('carts');
 }
+
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('img').forEach(img => {
+        if (img.src.includes('/uploads/') && !img.src.startsWith('https://')) {
+            const filename = img.src.split('/uploads/')[1];
+            img.src = `https://phudatn.blob.core.windows.net/uploads/${filename}`;
+        }
+    });
+});
+
