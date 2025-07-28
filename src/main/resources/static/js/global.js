@@ -224,12 +224,17 @@ function clearCartLocalStorage(){
 
 
 
-    document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Image fix script is running...");
     document.querySelectorAll('img').forEach(img => {
-        if (img.src.includes('/uploads/') && !img.src.startsWith('https://')) {
-            const filename = img.src.split('/uploads/')[1];
+        const originalSrc = img.getAttribute('src');
+        console.log("Original src:", originalSrc);
+        if (originalSrc && originalSrc.startsWith('/uploads/')) {
+            const filename = originalSrc.split('/uploads/')[1];
             img.src = `https://phudatn.blob.core.windows.net/uploads/${filename}`;
+            console.log("Replaced src:", img.src);
         }
     });
 });
+
 
