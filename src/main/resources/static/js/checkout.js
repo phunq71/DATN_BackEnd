@@ -93,8 +93,9 @@ async function fetchDataCheckout() {
                 title: 'Thiếu thông tin',
                 text: 'Vui lòng thêm số điện thoại để mua hàng.',
                 confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = '/opulentia_user/edit-profile';
             });
-            window.location.href = '/opulentia_user/edit-profile';
             return;
         }
 
