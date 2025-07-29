@@ -87,7 +87,7 @@ async function fetchDataCheckout() {
         const info = data?.customer;
         console.log(data);
 
-        if (!info?.customerPhone || info.customerPhone.trim() === '' || info.customerPhone === 'N/A') {
+        if (!info?.customerPhone || info.customerPhone.trim() === '' || info.customerPhone.trim() === 'N/A') {
             Swal.fire({
                 icon: 'warning',
                 title: 'Thiếu thông tin',

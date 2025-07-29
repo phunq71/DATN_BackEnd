@@ -154,5 +154,4 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     List<Integer> getAvailableYearCategory();
 
     Transaction findByOrder_OrderID(Integer orderId);
-
 }
