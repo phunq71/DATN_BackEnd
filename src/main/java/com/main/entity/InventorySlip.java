@@ -21,12 +21,12 @@ public class InventorySlip implements Serializable {
     private Boolean type; // true = nhập, false = xuất
 
     // Cơ sở xuất hàng
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FromFID")
     private Facility fromFacility;
 
     // Cơ sở nhập hàng
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ToFID")
     private Facility toFacility;
 
@@ -37,12 +37,12 @@ public class InventorySlip implements Serializable {
     private LocalDateTime createDate;
 
     // Nhân viên lập phiếu
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "StaffID", nullable = false)
     private Staff staff;
 
     // Người duyệt (có thể null)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ApproverID")
     private Staff approver;
 

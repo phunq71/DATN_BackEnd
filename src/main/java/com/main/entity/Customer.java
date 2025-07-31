@@ -41,7 +41,7 @@ public class Customer implements Serializable {
     @Column(name = "ImageAvt", nullable = false, length = 255)
     private String imageAvt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MembershipID", nullable = false)
     private Membership membership;
 

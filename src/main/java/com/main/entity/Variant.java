@@ -23,7 +23,7 @@ public class Variant implements Serializable {
     @Column(length = 13)
     private String variantID;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productID")
     private Product product;
 

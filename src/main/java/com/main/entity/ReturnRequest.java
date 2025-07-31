@@ -24,7 +24,7 @@ public class ReturnRequest {
     @JoinColumn(name = "orderID", nullable = false)
     private Order order;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "staffID")
     private Staff staff;
 
