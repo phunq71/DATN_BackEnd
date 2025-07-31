@@ -1165,7 +1165,7 @@
          });
 
          function populateProvinces() {
-             provincesSelect.innerHTML = '<option value="">Chọn tỉnh/thành phố</option>';
+             provincesSelect.innerHTML = '<option value=""></option>';
              dataAddress.forEach(province => {
                  let option = document.createElement('option');
                  option.value = province.ProvinceID;

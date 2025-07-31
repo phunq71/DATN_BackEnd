@@ -24,11 +24,11 @@
     }
 
     .left-column {
-        flex: 2;
+        flex: 1.8;
     }
 
     .right-column {
-        flex: 1;
+        flex: 1.2;
     }
 
     .bottom-section {
@@ -206,7 +206,7 @@
     .c-cart-total td {
         padding: 12px;
         border-top: 2px solid #ddd;
-        font-size: 24px;
+        font-size: 18px;
     }
 
     .c-total-label {
@@ -542,7 +542,6 @@
     }
 
     .c-voucher-item input[type="radio"]:checked ~ .c-voucher-info {
-        font-weight: bold;
         color: #ff0000;
     }
 
@@ -565,6 +564,10 @@
         .payment-info {
             flex-direction: column;
         }
+    }
+    .c-voucher-item.disabled {
+        opacity: 0.6;
+        pointer-events: none;
     }
 
 
@@ -720,117 +723,126 @@
                     <thead>
                     <tr>
                         <th>Sản Phẩm</th>
-                        <th>Đơn Giá</th>
+                        <th class="text-center align-middle">Đơn Giá</th>
                         <th>Số Lượng</th>
                         <th>Số Tiền</th>
                     </tr>
                     </thead>
                     <tbody>
                     <!-- Sản phẩm 1 -->
-                    <tr class="c-cart-item">
+                    <tr class="c-cart-item" th:each="item : ${listItems}">
                         <td>
                             <div class="c-product-info">
-                                <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/hero-image-sp.jpg" alt="Áo thun Uniqlo" class="c-product-image">
+                                <img th:src="@{${'/uploads/' + item.image_url}}" class="c-product-image" alt="Ảnh sản phẩm">
                                 <div>
-                                    <strong>Áo thun Uniqlo U cổ tròn dáng rộng chất liệu cotton thoáng mát</strong>
+                                    <strong th:text="${item.item_name}">Tên sản phẩm</strong>
                                     <div class="c-variant">
-                                        <span>Màu đen </span>|
-                                        <span>Size M</span>
+                                        <span th:text="'Màu ' + ${item.color}">Màu</span> |
+                                        <span th:text="'Size ' + ${item.size}">Size</span>
                                     </div>
                                 </div>
                             </div>
                         </td>
-                        <td class="c-price">₫250.000</td>
-                        <td class="c-quantity">3</td>
-                        <td class="c-item-total">₫750.000</td>
+                        <td class="c-price">
+                            <div>
+                                <span th:if="${item.discountPercent > 0}" style="text-decoration: line-through; color: gray; font-size: 14px;">
+                                    ₫<span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 1, 'POINT')}">0</span>
+                                </span><br th:if="${item.discountPercent > 0}" />
+
+                                                        <span style="color: #051931; font-weight: bold;">
+                                    ₫<span th:text="${#numbers.formatDecimal(item.discountedPrice, 0, 'COMMA', 1, 'POINT')}">0</span>
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="c-quantity" th:text="${item.quantity}">0</td>
+                        <td class="c-item-total" th:text="'₫' + ${#numbers.formatDecimal(item.total_price, 0, 'COMMA', 1, 'POINT')}">₫0</td>
                     </tr>
 
-                    <!-- Sản phẩm 2 -->
-                    <tr class="c-cart-item">
-                        <td>
-                            <div class="c-product-info">
-                                <img src="https://image.uniqlo.com/UQ/ST3/jp/imagesother/000_PLP/001_collaboration/uniqlo-u/25ss_sesa/women/kv-dresses-women-01-sp.jpg" alt="Quần jeans Levi's" class="c-product-image">
-                                <div>
-                                    <strong>Quần jeans Levi's 501 Original Fit màu xanh đậm</strong>
-                                    <div class="c-variant">
-                                        <span>Màu xanh </span>|
-                                        <span>Size 32</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="c-price">₫800.000</td>
-                        <td class="c-quantity">1</td>
-                        <td class="c-item-total">₫800.000</td>
-                    </tr>
 
-                    <!-- Sản phẩm 3 -->
-                    <tr class="c-cart-item">
-                        <td>
-                            <div class="c-product-info">
-                                <img src="https://image.uniqlo.com/UQ/ST3/us/imagesgoods/475647/item/usgoods_00_475647_3x4.jpg?width=600" alt="Áo khoác" class="c-product-image">
-                                <div>
-                                    <strong>Áo khoác nam Ultra Light Down màu xám nhạt</strong>
-                                    <div class="c-variant">
-                                        <span>Màu xám </span>|
-                                        <span>Size L</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="c-price">₫1.200.000</td>
-                        <td class="c-quantity">1</td>
-                        <td class="c-item-total">₫1.200.000</td>
-                    </tr>
-
-                    <!-- Sản phẩm 4 -->
-                    <tr class="c-cart-item">
-                        <td>
-                            <div class="c-product-info">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwPdFdJSyqGh8rnfp4OFbw0bqabdyVyl0SpfSQnQRXocuLFEe94IGYj9dmEk3fwocLY1E&usqp=CAU" alt="Giày thể thao" class="c-product-image">
-                                <div>
-                                    <strong>Giày thể thao Nike Air Max 270 React màu trắng đen</strong>
-                                    <div class="c-variant">
-                                        <span>Màu trắng </span>|
-                                        <span>Size 42</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="c-price">₫2.500.000</td>
-                        <td class="c-quantity">1</td>
-                        <td class="c-item-total">₫2.500.000</td>
-                    </tr>
                     </tbody>
                     <tfoot>
                     <tr class="c-cart-total">
-                        <td colspan="3" class="c-total-label">Tổng số tiền (6 sản phẩm):</td>
-                        <td class="c-total-amount">₫5.250.000</td>
+                        <td colspan="3" class="c-total-label" th:text="${'Tổng số tiền ( ' + totalQuantity + ' sản phẩm )'}"></td>
+                        <td class="c-total-amount" th:text="${#numbers.formatDecimal(totalAmount, 0, 'COMMA', 1, 'POINT') + '₫'}">₫5.250.000</td>
                     </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
 
+        <script th:inline="javascript">
+            const totalAmount = /*[[${totalAmount}]]*/ 0;
+            console.log("💰 Tổng tiền từ backend:", totalAmount);
+        </script>
+
+        <script th:inline="javascript">
+            const listItems = /*[[${listItemsJson}]]*/ '[]';
+            console.log("📦 Danh sách sản phẩm:", listItems);
+        </script>
+
         <!-- Cột phải - Thông tin giao hàng -->
-        <div class="right-column">
+        <!-- Cột phải - Thông tin giao hàng -->
+        <div class="right-column" >
             <div class="delivery-info-box">
                 <h3>Thông tin giao hàng</h3>
+
                 <div class="info-row">
                     <span class="info-label">Người nhận:</span>
                     <span class="info-value">Chí Tâm</span>
                 </div>
+
                 <div class="info-row">
                     <span class="info-label">Số điện thoại:</span>
                     <span class="info-value">052 2138 980</span>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Địa chỉ:</span>
-                    <span class="info-value">Số 107 Khuông Việt, Phường Phú Trung, Quận Tân Phú, TP.Hồ Chí Minh</span>
+
+                <div class="info-row" style="align-items: flex-start;">
+                    <span class="info-label">Địa chỉ :</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="info-value">
+                    Số 107 Khuông Việt, Phường Phú Trung, Quận Tân Phú, TP.Hồ Chí Minh
+                </span>
+                    </div>
                 </div>
-                <button class="change-address-btn">Thay đổi địa chỉ</button>
+
+                <!-- Nút Thay đổi địa chỉ -->
+                <div style="text-align: right; margin-top: 8px;">
+                    <button class="change-address-btn" onclick="openModal('address-modal')">Thay đổi địa chỉ</button>
+                </div>
+
+                <!-- Label + nội dung ghi chú -->
+                <div class="info-row" style="margin-top: 16px; max-width: 100px">
+                    <span class="info-label">Lời nhắn cho shop:</span>
+                    <span class="info-value" id="noteContent" style="
+                     white-space: nowrap;;
+                    "></span>
+                </div>
+
+                <!-- Nút Thêm ghi chú -->
+                <div style="text-align: right; margin-top: 8px;">
+                    <button class="note-to-shop-btn"
+                            onclick="openModal('note-modal')"
+                            style="
+            background-color: transparent;
+            border: none;
+            color: #007bff;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 8px;
+            transition: color 0.2s;
+        "
+                            onmouseover="this.style.color='#0056b3'"
+                            onmouseout="this.style.color='#007bff'"
+                    >
+                        Thêm ghi chú &gt;
+                    </button>
+                </div>
+
             </div>
         </div>
+
+
     </div>
 
     <!-- Phần dưới cùng - Vận chuyển, voucher và thanh toán -->
@@ -839,7 +851,7 @@
             <div class="c-ship-row">
                 <div class="c-ship-left">
                     <span class="c-ship-icon"><i class="fa-solid fa-truck-fast"></i></span>
-                    <span class="c-ship-text">Phí vận chuyển:</span>
+                    <span class="c-ship-text">Phí vận chuyển: <span style="color: red">Giảm 50% phí ship cho đơn từ 500k - 699k, Free ship cho đơn từ 700k</span></span>
                 </div>
                 <div class="c-ship-price">₫21.000</div>
             </div>
@@ -849,21 +861,24 @@
         </div>
 
         <div class="c-voucher-card">
-            <span class="c-voucher-label">Voucher</span>
-            <button class="c-add-voucher-btn" onclick="openVoucherModal()">+ Thêm voucher</button>
+            <span class="c-voucher-label">Voucher : </span>
+            <span class="c-voucher-value" style="color: red; width: 85%; font-weight: bolder"></span>
+            <button class="c-add-voucher-btn" onclick="openModal('voucherModal')">+ Thêm voucher</button>
         </div>
+
 
         <div class="payment-card">
             <!-- Row 1: Phương thức thanh toán -->
-            <div class="payment-row">
-                <span style="font-weight: bold;">Phương thức thanh toán</span>
-                <div style="display: flex; gap: 10px;">
-                    <button id="cod-btn" class="payment-method-btn selected">
-                        Khi nhận hàng
-                    </button>
-                    <button id="sepay-btn" class="payment-method-btn">
-                        <img src="https://sepay.vn//assets/img/logo/sepay-blue-154x50.png" alt="SePay" class="sepay-logo">
-                    </button>
+            <div class="payment-row" style="margin-top: 20px;">
+                <label for="payment-method" style="font-weight: bold; display: block; margin-bottom: 5px;">
+                    Phương thức thanh toán
+                </label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img id="sepay-logo" src="https://sepay.vn/assets/img/logo/sepay-blue-154x50.png" alt="SePay" style="height: 30px;">
+                    <select id="payment-method" name="paymentMethod" onchange="handlePaymentChange()" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px;">
+                        <option value="sepay">Thanh toán trực tuyến</option>
+                        <option value="cod">💵 Khi nhận hàng</option>
+                    </select>
                 </div>
             </div>
 
@@ -896,6 +911,10 @@
 
             <!-- Row 3: Nút đặt hàng và điều khoản -->
             <div class="payment-row">
+                <div>
+                    <h5 id="hauMai"></h5>
+                    <h5 id="hauMai2"></h5>
+                </div>
                 <a href="#" class="terms-link">Điều khoản và điều kiện</a>
                 <a href="/qrPay" class="order-btn">Đặt hàng</a>
             </div>
@@ -903,97 +922,63 @@
     </div>
 
     <!-- Modal voucher -->
-    <div id="voucherModal" class="c-voucher-modal">
+    <script th:inline="javascript">
+        const listIVouchers = JSON.parse(/*[[${listVoucherJson}]]*/ '[]');
+        console.log("📦 Danh sách VC:", listIVouchers);
+    </script>
+    <div id="voucherModal" class="modal-overlay">
         <div class="c-voucher-modal-content">
-            <h2>Chọn voucher của bạn</h2>
-            <div class="c-voucher-input">
-                <input type="text" placeholder="Nhập mã voucher">
-                <button class="c-apply-btn">Áp dụng</button>
-            </div>
+            <h2>Chọn voucher của bạn <button class="close-btn">&times;</button></h2>
             <p class="c-voucher-note">* Chỉ chọn 1 voucher</p>
 
             <div class="c-voucher-list-container">
                 <div class="c-voucher-list">
                     <!-- Voucher item -->
-                    <label class="c-voucher-item">
-                        <input type="radio" name="voucher" class="c-voucher-radio">
-                        <div class="c-voucher-info">
-                            <strong>Giảm 50.000đ</strong> cho đơn từ 500.000đ<br>
-                            HSD: 20/07/2025
-                        </div>
-                    </label>
-                    <label class="c-voucher-item">
-                        <input type="radio" name="voucher" class="c-voucher-radio">
-                        <div class="c-voucher-info">
-                            <strong>Giảm 100.000đ</strong> cho đơn từ 1.000.000đ<br>
-                            HSD: 31/07/2025
-                        </div>
-                    </label>
-                    <label class="c-voucher-item">
-                        <input type="radio" name="voucher" class="c-voucher-radio">
-                        <div class="c-voucher-info">
-                            <strong>Giảm 30.000đ</strong> cho đơn từ 300.000đ<br>
-                            HSD: 15/08/2025
-                        </div>
-                    </label>
-                    <label class="c-voucher-item">
-                        <input type="radio" name="voucher" class="c-voucher-radio">
-                        <div class="c-voucher-info">
-                            <strong>Giảm 70.000đ</strong> cho đơn từ 700.000đ<br>
-                            HSD: 10/09/2025
-                        </div>
-                    </label>
-                    <label class="c-voucher-item">
-                        <input type="radio" name="voucher" class="c-voucher-radio">
-                        <div class="c-voucher-info">
-                            <strong>Giảm 150.000đ</strong> cho đơn từ 1.500.000đ<br>
-                            HSD: 30/09/2025
-                        </div>
-                    </label>
+                    <div th:if="${listVoucher != null and !listVoucher.isEmpty()}">
+                        <label class="c-voucher-item"
+                               th:each="voucher : ${listVoucher}"
+                               th:classappend="${!voucher.isUse} ? ' disabled'">
+
+                            <input type="radio" name="voucher" class="c-voucher-radio"
+                                   th:value="${voucher.voucherID}"
+                                   th:disabled="${!voucher.isUse}" />
+
+                            <div class="c-voucher-info"
+                                 th:style="${!voucher.isUse} ? 'color: #aaa;' : ''">
+
+                                <!-- Nếu là phần trăm -->
+                                <strong th:if="${voucher.discountType == 'Percent'}"
+                                        th:text="'Giảm ' + ${voucher.discountValue} + '%'"></strong>
+
+                                <!-- Nếu là số tiền -->
+                                <strong th:if="${voucher.discountType == 'Amount'}"
+                                        th:text="'Giảm ' + ${#numbers.formatDecimal(voucher.discountValue, 0, 0)} + 'đ'"></strong>
+
+                                <span th:if="${voucher.minOrderValue != null}"
+                                      th:text="'cho đơn từ ' + ${#numbers.formatDecimal(voucher.minOrderValue, 0, 0)} + 'đ'">
+                                </span>
+                                <br/>
+                                HSD :
+                                <span th:text="${voucher.endDate != null} ? ${#temporals.format(voucher.endDate, 'dd/MM/yyyy')} : 'Vĩnh viễn'"></span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Nếu không có voucher -->
+                    <div th:if="${listVoucher == null or listVoucher.isEmpty()}">
+                        <p>Không có voucher khả dụng.</p>
+                    </div>
+
                 </div>
             </div>
 
             <div class="c-voucher-modal-actions">
-                <button class="c-back-btn" onclick="closeVoucherModal()">Trở lại</button>
-                <button class="c-confirm-btn">OK</button>
+                <button class="c-confirm-btn" onclick="applySelectedVoucher()">OK</button>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    // Xử lý chọn phương thức thanh toán
-    document.getElementById('cod-btn').addEventListener('click', function() {
-        this.classList.add('selected');
-        document.getElementById('sepay-btn').classList.remove('selected');
-    });
-
-    document.getElementById('sepay-btn').addEventListener('click', function() {
-        this.classList.add('selected');
-        document.getElementById('cod-btn').classList.remove('selected');
-    });
-
-    // Xử lý modal voucher
-    function openVoucherModal() {
-        const modal = document.getElementById('voucherModal');
-        modal.style.display = 'block';
-        setTimeout(() => {
-            modal.classList.add('c-modal-show');
-        }, 10);
-    }
-
-    function closeVoucherModal() {
-        const modal = document.getElementById('voucherModal');
-        modal.classList.remove('c-modal-show');
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300);
-    }
-</script>
-
-
-<!-- Modal -->
-<div class="modal-overlay">
+<div class="modal-overlay" id="address-modal">
     <div class="modal-container">
         <div class="modal-header">
             <h3 class="modal-title">Thay đổi địa chỉ</h3>
@@ -1004,45 +989,31 @@
                 <!-- Cột 1 -->
                 <div class="form-column">
                     <div class="form-group">
-                        <label for="receiver-name">Tên người nhận</label>
-                        <input type="text" id="receiver-name" class="form-control" required>
+                        <label for="city">Tỉnh/Thành phố</label>
+                        <select id="city" class="form-control" required>
+                            <option value="">Chọn tỉnh/thành phố</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ward">Xã/Phường</label>
+                        <select id="ward" class="form-control" required>
+                            <option value="">Chọn xã/phường</option>
+                        </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="phone">Số điện thoại</label>
-                        <input type="tel" id="phone" class="form-control" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="address">Địa chỉ (số nhà, tên đường,...)</label>
-                        <input type="text" id="address" class="form-control" required>
-                    </div>
                 </div>
 
                 <!-- Cột 2 -->
                 <div class="form-column">
-                    <div class="form-group">
-                        <label for="city">Tỉnh/Thành phố</label>
-                        <select id="city" class="form-control" required>
-                            <option value="">Chọn tỉnh/thành phố</option>
-                            <option value="hanoi">Hà Nội</option>
-                            <option value="hcm">TP. Hồ Chí Minh</option>
-                            <option value="danang">Đà Nẵng</option>
-                        </select>
-                    </div>
-
                     <div class="form-group">
                         <label for="district">Quận/Huyện</label>
                         <select id="district" class="form-control" required>
                             <option value="">Chọn quận/huyện</option>
                         </select>
                     </div>
-
                     <div class="form-group">
-                        <label for="ward">Xã/Phường</label>
-                        <select id="ward" class="form-control" required>
-                            <option value="">Chọn xã/phường</option>
-                        </select>
+                        <label for="address">Địa chỉ (số nhà, tên đường,...)</label>
+                        <input type="text" id="address" class="form-control" required>
                     </div>
                 </div>
             </div>
@@ -1051,36 +1022,31 @@
                 <input type="checkbox" id="default-address">
                 <label for="default-address">Đặt làm địa chỉ mặc định</label>
             </div>
-
+            <span id="address-error-msg" class="error-msg" style="color: red; font-size: 16px; margin-bottom: 7px;"></span>
             <button type="button" class="submit-btn">Đổi địa chỉ</button>
         </form>
     </div>
 </div>
+<!-- Modal Thêm ghi chú -->
+<div class="modal-overlay" id="note-modal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Thêm ghi chú cho shop</h3>
+            <button class="close-btn">&times;</button>
+        </div>
+        <form onsubmit="submitNote(event)">
+            <div class="form-group">
+                <label for="note-input">Nội dung ghi chú</label>
+                <textarea id="note-input" class="form-control" rows="4" required></textarea>
+            </div>
+            <div style="text-align: right;">
+                <button type="submit" class="submit-btn">Lưu ghi chú</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Lấy các phần tử DOM
-        const changeAddressBtn = document.querySelector('.change-address-btn');
-        const modalOverlay = document.querySelector('.modal-overlay');
-        const closeBtn = document.querySelector('.close-btn');
 
-        // Mở modal khi click vào nút thay đổi địa chỉ
-        changeAddressBtn.addEventListener('click', function() {
-            modalOverlay.classList.add('active');
-        });
-
-        // Đóng modal khi click vào nút đóng
-        closeBtn.addEventListener('click', function() {
-            modalOverlay.classList.remove('active');
-        });
-
-        // Đóng modal khi click ra ngoài
-        modalOverlay.addEventListener('click', function(e) {
-            if (e.target === modalOverlay) {
-                modalOverlay.classList.remove('active');
-            }
-        });
-    });
-</script>
+<script  src="/js/checkout.js" type="module"></script>
 </body>
 </html>

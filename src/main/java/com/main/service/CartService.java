@@ -3,6 +3,7 @@ package com.main.service;
 import com.main.dto.CartDTO;
 import com.main.dto.ItemCartDTO;
 import com.main.dto.MiniCartDTO;
+import com.main.dto.OrderPreviewDTO;
 import com.main.entity.CartId;
 import org.springframework.data.repository.query.Param;
 
@@ -28,5 +29,7 @@ public interface CartService {
     List<CartDTO> mergeCartLists(List<CartDTO> list1, List<CartDTO> list2);
 
     public List<CartDTO> newCarts(List<CartDTO> carts, String accountId);
+
+    public List<OrderPreviewDTO> getOrdersByItemIdsAndCustomerId(List<Integer> itemIds, String customerId);
 
 }

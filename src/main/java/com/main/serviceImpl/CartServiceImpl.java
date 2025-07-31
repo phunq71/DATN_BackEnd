@@ -3,13 +3,17 @@ package com.main.serviceImpl;
 import com.main.dto.CartDTO;
 import com.main.dto.ItemCartDTO;
 import com.main.dto.MiniCartDTO;
+import com.main.dto.OrderPreviewDTO;
 import com.main.entity.Cart;
 import com.main.entity.CartId;
 import com.main.entity.Customer;
 import com.main.entity.Item;
+import com.main.mapper.CartMapper;
 import com.main.repository.*;
 import com.main.service.CartService;
 import com.nimbusds.jose.util.Pair;
+import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
@@ -24,14 +29,7 @@ public class CartServiceImpl implements CartService {
     private final ItemRepository itemRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
-
-    public CartServiceImpl(CartRepository cartRepository, InventoryRepository inventoryRepository, ItemRepository itemRepository, CustomerRepository customerRepository, ProductRepository productRepository) {
-        this.cartRepository = cartRepository;
-        this.inventoryRepository = inventoryRepository;
-        this.itemRepository = itemRepository;
-        this.customerRepository = customerRepository;
-        this.productRepository = productRepository;
-    }
+    private final CartMapper cartMapper;
 
     @Override
     public List<List<ItemCartDTO>> getItemCarts(List<CartDTO> carts) {
@@ -242,6 +240,18 @@ public class CartServiceImpl implements CartService {
 
         return cartDTOs;
     }
+
+    @Override
+    public List<OrderPreviewDTO> getOrdersByItemIdsAndCustomerId(List<Integer> itemIds, String customerId) {
+        List<OrderPreviewDTO> result = new ArrayList<>();
+        for (Integer itemId : itemIds) {
+            Cart cart = cartRepository.getCartByItem_itemIdAndCustomer_customerId(itemId, customerId);
+            OrderPreviewDTO orderPreviewDTO = cartMapper.toOrderPreviewDTO(cart);
+            result.add(orderPreviewDTO);
+        }
+        return result;
+    }
+
     private void processCartList(Map<Integer, CartDTO> mergedMap, List<CartDTO> cartList, boolean isList2) {
         if (cartList == null) return;
 

@@ -2,14 +2,25 @@ package com.main.serviceImpl;
 
 import com.main.dto.*;
 
+
+import com.main.entity.Customer;
 import com.main.entity.Order;
 import com.main.entity.OrderDetail;
-import com.main.repository.OrderDetailRepository;
+import com.main.mapper.CustomerMapper;
+import com.main.repository.*;
 
-import com.main.repository.OrderRepository;
-import com.main.repository.ReviewRepository;
+import com.main.service.FacilityService;
 import com.main.service.OrderService;
+import com.main.service.ProductService;
 import com.main.service.ReviewService;
+
+import com.main.utils.AuthUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -21,24 +32,27 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+
+
 @Service
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
+    private final CustomerMapper customerMapper;
+    private final CustomerRepository customerRepository;
+    private final FacilityService facilityService;
+
     private final RestTemplate restTemplate = new RestTemplate();
-    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, ReviewService reviewService, ReviewRepository reviewRepository) {
-        this.orderRepository = orderRepository;
-        this.orderDetailRepository = orderDetailRepository;
-        this.reviewService = reviewService;
-        this.reviewRepository = reviewRepository;
-    }
+
     @Value("${ghn.token}")
     private String ghnToken;
 
     @Value("${ghn.shop-id}")
     private String shopId;
+
 
     @Override
     public List<OrderDTO> getOrdersByCustomerIdAndStatus(String customerId, String status, Integer year) {
@@ -201,6 +215,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Map<String, Object> getOrderPreviewData( List<OrderPreviewDTO> items ) {
+        Map<String, Object> orderPreviewData = new HashMap<>();
+        Customer customer = customerRepository.findByCustomerId(AuthUtil.getAccountID());
+        InFoCustomerOrderDTO infoCusDTO = customerMapper.toInFoCustomerOrderDTO(customer);
+        List<FacilityOrderDTO> listFa = facilityService.getAllFacilities(items);
+        orderPreviewData.put("customer", infoCusDTO);
+        orderPreviewData.put("facilities", listFa);
+        return orderPreviewData;
+    }
+
+    @Override
     public List<OrderDTO> getOrdersByCustomerIdAndOrderID(String customerId, String orderID) {
         List<OrderDTO> orders = orderRepository.getOrdersByCustomerIdAndOrderID(customerId, orderID);
         orders.forEach(order -> {
@@ -211,10 +236,6 @@ public class OrderServiceImpl implements OrderService {
         return orders;
     }
 
-    @Override
-    public List<OrderPreviewDTO> getOrderPreviewProducts() {
-        return List.of();
-    }
 
     public Boolean checkOrderDetailByCustomerIDAndODID(String customerId, Integer orderDetailID) {
         Optional<OrderDetail> orderDetailOptional= orderDetailRepository.findById(orderDetailID);
@@ -400,5 +421,30 @@ public class OrderServiceImpl implements OrderService {
             e.printStackTrace();
             return false;
         }
+    }
+    @Override
+    public Page<OrdManagement_OrderDTO> getOrders(
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            String status,
+            String facilityId,
+            String parentId,
+            Pageable pageable){
+        return orderRepository.getOrders(startDate, endDate, status, facilityId, parentId, pageable);
+    }
+
+    @Override
+    public Page<OrdManagement_OrderDTO> getOrdersWithOrderDate(Pageable pageable, LocalDateTime orderDate, String status) {
+        return orderRepository.getOrdersWithOrderDate(pageable, orderDate, status);
+    }
+
+    @Override
+    public List<OrdManagement_ProductDTO> getProductsByOrderID(Integer orderID) {
+        return orderRepository.getProductsByOrderID(orderID);
+    }
+
+    @Override
+    public Order save(Order order) {
+        return orderRepository.save(order);
     }
 }

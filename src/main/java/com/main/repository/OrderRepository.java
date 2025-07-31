@@ -1,15 +1,17 @@
 package com.main.repository;
 
-import com.main.dto.OrderDTO;
-import com.main.dto.OrderDetailDTO;
-import com.main.dto.OrderItemDTO;
+import com.main.dto.*;
 import com.main.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,22 +106,22 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                 END
             ) AS ProductDiscount,
             CASE 
-                WHEN v.discountType = 1 THEN
+                WHEN v.discountType = 'Percent' THEN
                     (SUM(od.unitPrice * od.quantity) - 
                      SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                     ) * (v.discountValue / 100.0)
-                WHEN v.discountType = 0 THEN
+                WHEN v.discountType = 'Amount' THEN
                     v.discountValue
                 ELSE 0
             END AS VoucherDiscount,
             SUM(od.unitPrice * od.quantity) 
                 - SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                 - CASE 
-                    WHEN v.discountType = 1 THEN
+                    WHEN v.discountType = 'Percent' THEN
                         (SUM(od.unitPrice * od.quantity) - 
                          SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                         ) * (v.discountValue / 100.0)
-                    WHEN v.discountType = 0 THEN
+                    WHEN v.discountType = 'Amount' THEN
                         v.discountValue
                     ELSE 0
                   END AS FinalPrice
@@ -143,22 +145,22 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             END
         ) AS ProductDiscount,
         CASE 
-            WHEN v.discountType = 1 THEN
+            WHEN v.discountType = 'Percent' THEN
                 (SUM(od.unitPrice * od.quantity) - 
                  SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                 ) * (v.discountValue / 100.0)
-            WHEN v.discountType = 0 THEN
+            WHEN v.discountType = 'Amount' THEN
                 v.discountValue
             ELSE 0
         END AS VoucherDiscount,
         SUM(od.unitPrice * od.quantity) 
             - SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
             - CASE 
-                WHEN v.discountType = 1 THEN
+                WHEN v.discountType = 'Percent' THEN
                     (SUM(od.unitPrice * od.quantity) - 
                      SUM(CASE WHEN pp.PPID IS NOT NULL THEN od.unitPrice * od.quantity * (pp.discountPercent / 100.0) ELSE 0 END)
                     ) * (v.discountValue / 100.0)
-                WHEN v.discountType = 0 THEN
+                WHEN v.discountType = 'Amount' THEN
                     v.discountValue
                 ELSE 0
               END AS FinalPrice
@@ -197,10 +199,88 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     boolean existsByCustomer_CustomerIdAndStatusIn(String customerId, List<String> statuses);
 
+
+    List<String> getShippingAddressByCustomer_CustomerId(String customerId);
+
+    List<String> getAddressIdGHNByCustomer_CustomerId(String customerId);
+
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.status IN ('ChoXacNhan', 'ChuanBiDon', 'SanSangGiao') and o.facility.facilityId = :facilityId")
+    long countProcessingOrders(String facilityId);
+
     Order findByOrderID(Integer orderID);
     @Modifying
     @Query("UPDATE Order o SET o.status = :status WHERE o.orderID = :orderID")
     void updateOrderStatus(@Param("status   ") String status, @Param("orderID") int orderID);
+
+    @Query("""
+    SELECT o.orderID,
+           o.orderDate,
+           o.status,
+           o.updateStatusAt,
+           o.shippingAddress,
+           o.note,
+           o.isOnline,
+           o.shipMethod,
+           c.fullName,
+           s.fullname,
+           f.facilityName,
+           t.transactionDate,
+           t.amount
+         FROM Order o
+            LEFT JOIN o.customer c
+            LEFT JOIN o.staff s
+            LEFT JOIN o.facility f
+            LEFT JOIN o.transaction t
+            WHERE o.orderDate = :orderDate
+            AND o.status = :status
+    """)
+    public Page<OrdManagement_OrderDTO> getOrdersWithOrderDate(Pageable pageable
+            , @Param("orderDate") LocalDateTime orderDate
+            , @Param("status") String status);
+
+    @Query("""
+    SELECT  o.orderID, o.orderDate, o.status, o.updateStatusAt, o.shippingAddress,
+           o.note, o.isOnline, o.shipMethod, o.addressIdGHN, c.fullName, s.fullname, f.facilityName,
+           t.transactionDate, t.amount
+    FROM Order o
+    LEFT JOIN o.customer c
+    LEFT JOIN o.staff s
+    LEFT JOIN o.facility f
+    LEFT JOIN o.transaction t
+    LEFT JOIN f.parent pr
+    LEFT JOIN pr.parent pr2 
+    WHERE (:startDate IS NULL OR o.orderDate >= :startDate)
+      AND (:endDate IS NULL OR o.orderDate < :endDate)
+      AND (:status IS NULL OR o.status = :status)
+      AND (
+           (:facilityId IS NOT NULL AND f.facilityId = :facilityId)
+        OR (:facilityId IS NULL AND :parentId IS NOT NULL AND 
+            (pr.facilityId = :parentId OR pr2.facilityId = :parentId))
+        OR (:facilityId IS NULL AND :parentId IS NULL)
+      )
+    """)
+    Page<OrdManagement_OrderDTO> getOrders(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("status") String status,
+            @Param("facilityId") String facilityId,
+            @Param("parentId") String parentId,
+            Pageable pageable
+    );
+
+
+    @Query("""
+    SELECT p.productName, img.imageUrl, pp.discountPercent, odt.unitPrice, odt.quantity
+        FROM Item i
+          JOIN i.variant v
+          JOIN v.product p
+          JOIN i.orderDetails odt
+          JOIN odt.promotionProduct pp
+          JOIN odt.order o
+          JOIN Image img on img.variant = v AND img.isMainImage = true
+          where o.orderID = :orderID
+    """)
+    public List<OrdManagement_ProductDTO> getProductsByOrderID(@Param("orderID") Integer orderID);
 }
 
 

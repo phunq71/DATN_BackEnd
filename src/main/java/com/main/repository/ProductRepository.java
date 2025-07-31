@@ -81,7 +81,7 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
 
 
     @Query("""
-    SELECT COALESCE(pp.discountPercent, 0.0)
+    SELECT COALESCE(pp.discountPercent, 0)
     FROM PromotionProduct pp
     JOIN pp.product p
     JOIN pp.promotion pr
@@ -152,6 +152,138 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
     //tìm sp theo tên
     @Query("SELECT p FROM Product p WHERE LOWER(p.productName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Product> searchProductsByName(@Param("keyword") String keyword);
+
+
+    //mặc định
+    @Query("""
+    SELECT DISTINCT p FROM Product p
+    JOIN Variant mainVar ON mainVar.product = p AND mainVar.isMainVariant = true
+    LEFT JOIN Item i ON i.variant = mainVar
+    LEFT JOIN OrderDetail od ON od.item = i
+    WHERE 
+        (:keyword IS NULL OR LOWER(p.productName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+        AND (:color IS NULL OR EXISTS (
+            SELECT 1 FROM Variant v2 
+            WHERE v2.product = p AND v2.color = :color AND v2.isUse = true
+        ))
+        AND (:brand IS NULL OR p.brand = :brand)
+        AND (:targetCustomer IS NULL OR p.targetCustomer = :targetCustomer)
+        AND (:priceFrom IS NULL OR mainVar.price >= :priceFrom)
+        AND (:priceTo IS NULL OR mainVar.price <= :priceTo)
+        AND (:minRating IS NULL OR (
+            SELECT COALESCE(AVG(r2.rating), 0)
+            FROM Variant v2
+            JOIN Item i2 ON i2.variant = v2
+            JOIN OrderDetail od2 ON od2.item = i2
+            JOIN Review r2 ON r2.orderDetail = od2
+            WHERE v2.product = p
+        ) >= :minRating)
+        AND (
+            ((:categoryId IS NOT NULL AND :categoryId <> '') AND p.category.categoryId = :categoryId)
+            OR ((:categoryId IS NULL OR :categoryId = '') AND :parentCategoryId IS NOT NULL AND p.category.parent.categoryId = :parentCategoryId)
+        )
+""")
+    Page<Product> searchAndFilterProductsDefault(
+            @Param("keyword") String keyword,
+            @Param("color") String color,
+            @Param("brand") String brand,
+            @Param("priceFrom") BigDecimal priceFrom,
+            @Param("priceTo") BigDecimal priceTo,
+            @Param("minRating") Double minRating,
+            @Param("targetCustomer") String targetCustomer,
+            @Param("categoryId") String categoryId,
+            @Param("parentCategoryId") String parentCategoryId,
+            Pageable pageable
+    );
+
+    //giá tăng dần
+    @Query("""
+SELECT DISTINCT p, mainVar.price FROM Product p
+JOIN Variant mainVar ON mainVar.product = p AND mainVar.isMainVariant = true
+LEFT JOIN Item i ON i.variant = mainVar
+LEFT JOIN OrderDetail od ON od.item = i
+WHERE 
+    (:keyword IS NULL OR LOWER(p.productName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    AND (:color IS NULL OR EXISTS (
+        SELECT 1 FROM Variant v2 
+        WHERE v2.product = p AND v2.color = :color AND v2.isUse = true
+    ))
+    AND (:brand IS NULL OR p.brand = :brand)
+    AND (:targetCustomer IS NULL OR p.targetCustomer = :targetCustomer)
+    AND (:priceFrom IS NULL OR mainVar.price >= :priceFrom)
+    AND (:priceTo IS NULL OR mainVar.price <= :priceTo)
+    AND (:minRating IS NULL OR (
+        SELECT COALESCE(AVG(r2.rating), 0)
+        FROM Variant v2
+        JOIN Item i2 ON i2.variant = v2
+        JOIN OrderDetail od2 ON od2.item = i2
+        JOIN Review r2 ON r2.orderDetail = od2
+        WHERE v2.product = p
+    ) >= :minRating)
+    AND (
+        ((:categoryId IS NOT NULL AND :categoryId <> '') AND p.category.categoryId = :categoryId)
+        OR ((:categoryId IS NULL OR :categoryId = '') AND :parentCategoryId IS NOT NULL AND p.category.parent.categoryId = :parentCategoryId)
+    )
+ORDER BY mainVar.price ASC
+""")
+    Page<Object[]> searchAndFilterProductsPriceAsc(
+            @Param("keyword") String keyword,
+            @Param("color") String color,
+            @Param("brand") String brand,
+            @Param("priceFrom") BigDecimal priceFrom,
+            @Param("priceTo") BigDecimal priceTo,
+            @Param("minRating") Double minRating,
+            @Param("targetCustomer") String targetCustomer,
+            @Param("categoryId") String categoryId,
+            @Param("parentCategoryId") String parentCategoryId,
+            Pageable pageable
+    );
+
+
+    //giá giảm dần
+    @Query("""
+SELECT DISTINCT p, mainVar.price FROM Product p
+JOIN Variant mainVar ON mainVar.product = p AND mainVar.isMainVariant = true
+LEFT JOIN Item i ON i.variant = mainVar
+LEFT JOIN OrderDetail od ON od.item = i
+WHERE 
+    (:keyword IS NULL OR LOWER(p.productName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    AND (:color IS NULL OR EXISTS (
+        SELECT 1 FROM Variant v2 
+        WHERE v2.product = p AND v2.color = :color AND v2.isUse = true
+    ))
+    AND (:brand IS NULL OR p.brand = :brand)
+    AND (:targetCustomer IS NULL OR p.targetCustomer = :targetCustomer)
+    AND (:priceFrom IS NULL OR mainVar.price >= :priceFrom)
+    AND (:priceTo IS NULL OR mainVar.price <= :priceTo)
+    AND (:minRating IS NULL OR (
+        SELECT COALESCE(AVG(r2.rating), 0)
+        FROM Variant v2
+        JOIN Item i2 ON i2.variant = v2
+        JOIN OrderDetail od2 ON od2.item = i2
+        JOIN Review r2 ON r2.orderDetail = od2
+        WHERE v2.product = p
+    ) >= :minRating)
+    AND (
+        ((:categoryId IS NOT NULL AND :categoryId <> '') AND p.category.categoryId = :categoryId)
+        OR ((:categoryId IS NULL OR :categoryId = '') AND :parentCategoryId IS NOT NULL AND p.category.parent.categoryId = :parentCategoryId)
+    )
+ORDER BY mainVar.price DESC
+""")
+    Page<Object[]> searchAndFilterProductsPriceDesc(
+            @Param("keyword") String keyword,
+            @Param("color") String color,
+            @Param("brand") String brand,
+            @Param("priceFrom") BigDecimal priceFrom,
+            @Param("priceTo") BigDecimal priceTo,
+            @Param("minRating") Double minRating,
+            @Param("targetCustomer") String targetCustomer,
+            @Param("categoryId") String categoryId,
+            @Param("parentCategoryId") String parentCategoryId,
+            Pageable pageable
+    );
+
+
 
 }
 

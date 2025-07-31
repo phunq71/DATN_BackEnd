@@ -33,8 +33,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 @Service
@@ -94,7 +96,6 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setDob(customerDTO.getDob());
             customer.setImageAvt(customerDTO.getImageAvt());
             customer.setAddressIdGHN(customerDTO.getAddressIdGHN());
-
             Customer oldCustomer = customerRepository.findById(customer.getCustomerId()).get();
             Customer savedCustomer =mergeCustomer(oldCustomer, customer);
             if(avatar!=null){
@@ -160,6 +161,12 @@ public class CustomerServiceImpl implements CustomerService {
             cus.setGender(customerRegisterDTO.getGender());
             cus.setAddress(customerRegisterDTO.getAddress());
             cus.setAddressIdGHN(customerRegisterDTO.getFullAddressID());
+            String raw = cus.getAddressIdGHN();
+            String formatted = Arrays.stream(raw.split(","))
+                    .map(String::trim) // xóa khoảng trắng hai bên
+                    .collect(Collectors.joining("/"));
+
+            cus.setAddressIdGHN(formatted);
             cus.setDob(customerRegisterDTO.getDob());
             cus.setMembership(mber);
             cus.setImageAvt("avatar.png");
@@ -259,9 +266,19 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-
-
-
+    @Override
+    public Boolean updateAddrBoolean(String Address, String AddressIdGHN) {
+        Customer customer = customerRepository.findByCustomerId(AuthUtil.getAccountID());
+        customer.setAddress(Address);
+        customer.setAddressIdGHN(AddressIdGHN);
+        try {
+            customerRepository.save(customer);
+            return true;
+        }catch (Exception e){
+            e.getMessage();
+            return false;
+        }
+    }
 }
 
 

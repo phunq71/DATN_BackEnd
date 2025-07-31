@@ -32,4 +32,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, InventoryI
                   AND inv.facility.isUse = true
             """)
     public Integer getStockQuantityByItemId(@Param("itemId") int itemId);
+
+    public Inventory getInventoryById(InventoryId inventoryId);
 }
