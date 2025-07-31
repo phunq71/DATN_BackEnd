@@ -42,7 +42,6 @@ public interface OrderService {
     Order findOrderByID(Integer orderId);
 
     Boolean saveOrders(List<OrderDTO> orders);
-
     public Page<OrdManagement_OrderDTO> getOrders(
           LocalDateTime startDate,
           LocalDateTime endDate,
@@ -56,4 +55,7 @@ public interface OrderService {
                 , String status);
     public List<OrdManagement_ProductDTO> getProductsByOrderID(Integer orderID);
     public Order save(Order order);
+    Boolean addOrderCustomer(Map<String, Object> checkoutInfo);
+    public List<OrderDetailDTO> getAllOrderIdShippingCodes();
+    public OrderDetailDTO getOrderIdByShippingCodes(String shippingCode);
 }

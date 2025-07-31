@@ -2,8 +2,12 @@ package com.main.rest_controller;
 
 import com.main.dto.*;
 import com.main.entity.Order;
+import com.main.entity.Transaction;
 import com.main.enums.OrderStatusEnum;
+import com.main.repository.TransactionRepository;
 import com.main.service.OrderService;
+import com.main.service.TransactionService;
+import com.main.service.VoucherService;
 import com.main.utils.AuthUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +21,15 @@ import java.util.stream.Collectors;
 @RestController
 public class OrderRestController {
     public final OrderService orderService;
+    private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
+    private final VoucherService voucherService;
 
-    public OrderRestController(OrderService orderService) {
+    public OrderRestController(OrderService orderService, TransactionRepository transactionRepository, TransactionService transactionService, VoucherService voucherService) {
         this.orderService = orderService;
+        this.transactionRepository = transactionRepository;
+        this.transactionService = transactionService;
+        this.voucherService = voucherService;
     }
 
 //    @GetMapping("/opulentia_user/orders/allOrders/{status}/{year}")
@@ -61,7 +71,7 @@ public class OrderRestController {
 
         List<OrderDTO> orderDTOs = orderService.getOrdersByCustomerIdAndStatus(accountId, status, year);
         for (OrderDTO orderDTO : orderDTOs) {
-            System.out.println(orderDTO.getTotalPrice());
+            System.out.println(orderDTO.getTotalPrice() + "Test");
         }
         System.err.println("OOOOOOOOOO"+orderDTOs.size());
         List<OrderDTO> saveOrderIds = new ArrayList<>();
@@ -88,6 +98,11 @@ public class OrderRestController {
                     if (newStatus != null && !newStatus.equals(currentStatus)) {
                         System.err.println("  ✅ Cập nhật trạng thái đơn hàng từ " + currentStatus + " ➝ " + newStatus);
                         orderDTO.setStatus(newStatus);
+                        if(newStatus.equals("DaGiao")){
+                            transactionService.updateStatusByOrderId(orderDTO.getOrderID());
+                            voucherService.addVoucherCustomerOrderSuccess(orderDTO.getOrderID());
+
+                        }
                         saveOrderIds.add(orderDTO);
                     } else {
                         System.err.println("  ⚠️ Không cần cập nhật hoặc trạng thái không thay đổi.");

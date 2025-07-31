@@ -1,3 +1,9 @@
+
+// ====================== MẶC ĐỊNH =======================
+window.addEventListener('DOMContentLoaded', () => {
+
+});
+
 // ======================= MODAL =======================
 
 function openModal(id) {
@@ -56,8 +62,8 @@ let checkoutInfo = {
     facilities: [],
     facilityId: '',
     lastTime: '',
-    paymentMethod: 'cod',
-    voucherId: '',
+    paymentMethod: 'sepay',
+    voucherId:'',
     type: null,
     discountTotal: 0,
     hauMai1: null,
@@ -81,7 +87,7 @@ async function fetchDataCheckout() {
         const info = data?.customer;
         console.log(data);
 
-        if (!info?.customerPhone || info.customerPhone.trim() === '' || info.customerPhone === 'N/A') {
+        if (!info?.customerPhone || info.customerPhone.trim() === '' || info.customerPhone.trim() === 'N/A') {
             Swal.fire({
                 icon: 'warning',
                 title: 'Thiếu thông tin',
@@ -94,6 +100,23 @@ async function fetchDataCheckout() {
 
         checkoutInfo.customer = info;
         checkoutInfo.facilities = data?.facilities;
+
+        const isValidFacilities = Array.isArray(checkoutInfo.facilities) && checkoutInfo.facilities.length > 0;
+
+        if (!isValidFacilities) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Không tìm thấy cơ sở phù hợp',
+                text: 'Hiện tại không có cơ sở nào có thể đáp ứng tất cả sản phẩm bạn đã chọn. Bạn sẽ được chuyển về giỏ hàng để điều chỉnh.',
+                confirmButtonText: 'Quay về giỏ hàng',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then(() => {
+                window.location.href = '/opulentia/cart';
+            });
+        }
+
+
         await fetchLeadtimes();
         renderCheckoutInfo();
         await calculateShippingFee();
@@ -140,6 +163,8 @@ function renderCheckoutInfo() {
     } else {
         document.querySelector('.c-shipping-estimate').textContent = `Dự kiến giao hàng: N/A`;
     }
+
+
 }
 
 function formatPhone(phone) {
@@ -497,8 +522,8 @@ async function calculateShippingFee() {
         cod_failed_amount: 2000,
         coupon: null,
         items,
-        payment_type_id: isCOD&&flag ? 2 : 1,
-        cod_amount: isCOD ? totalAmount - checkoutInfo.discountTotal : 0
+        payment_type_id: 1,
+        cod_amount: isCOD ? totalAmount - checkoutInfo.discountTotal + checkoutInfo.customer.discountCost : 0
     };
 
     console.log("📦 Dữ liệu gửi tính phí:", JSON.stringify(bodyData, null, 2));
@@ -536,17 +561,22 @@ async function calculateShippingFee() {
 
 // Hiển thị HTML
         const shipPriceEl = document.querySelector('.c-ship-price');
-        const originalShip = `₫${shippingFee.toLocaleString('vi-VN')}`;
-        const finalShip = `₫${finalShippingFee.toLocaleString('vi-VN')}`;
+        const shipPriceEl1 = document.getElementById('ship');
+        const originalShip = `₫${checkoutInfo.customer.costShip.toLocaleString('vi-VN')}`;
+        const finalShip = `₫${checkoutInfo.customer.discountCost.toLocaleString('vi-VN')}`;
 
         if (finalShippingFee < shippingFee) {
             // Có giảm
             shipPriceEl.innerHTML = `<span style="text-decoration: line-through; color: gray; font-size: 0.9em;">${originalShip}</span> <span style="color: red;">${finalShip}</span>`;
+            shipPriceEl1.innerHTML = `<span style="text-decoration: line-through; color: gray; font-size: 0.9em;">${originalShip}</span> <span style="color: black;">${finalShip}</span>`;
         } else {
             // Không giảm
             shipPriceEl.textContent = originalShip;
+            shipPriceEl1.textContent = originalShip;
         }
-
+        const discount = totalAmount -  checkoutInfo.discountTotal + checkoutInfo.customer.discountCost;
+        document.getElementById('tongTien').textContent =
+            '₫' + discount.toLocaleString('vi-VN');
 
     } catch (error) {
         if (error.response) {
@@ -567,7 +597,7 @@ function applySelectedVoucher() {
     const selectedVoucher = listIVouchers.find(v => v.voucherID === selectedVoucherId);
 
     if (selectedVoucher) {
-        checkoutInfo.voucherID = selectedVoucher.voucherID;
+        checkoutInfo.voucherId = selectedVoucher.voucherID;
         checkoutInfo.type = selectedVoucher.type;
 
         // Áp dụng giảm giá
@@ -587,7 +617,12 @@ function applySelectedVoucher() {
                     : `Giảm ${selectedVoucher.discountValue.toLocaleString()}đ`;
         }
         fetchSuggestedVouchers();
+        calculateShippingFee();
         closeModal('voucherModal');
+        const discount = checkoutInfo.discountTotal || 0;
+        document.getElementById('giamGia').textContent =
+            '₫' + discount.toLocaleString('vi-VN');
+
 
     }
 }
@@ -650,5 +685,53 @@ function hienThiHauMai(hauMai1, hauMai2, checkoutInfo) {
     hauMaiEl2.textContent = message1 || "Không có hậu mãi nào phù hợp.";
 }
 
+//=====================================ĐẶT HÀNG =========================================
 
+function datHang() {
+    if (checkoutInfo.paymentMethod === 'sepay') {
+        Swal.fire({
+            icon: 'info',
+            title: 'Thanh toán SePay',
+            text: 'Tính năng đang phát triển. Vui lòng chọn phương thức khác!',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+
+    axios.post('/opulentia_user/order/add', checkoutInfo, {
+        withCredentials: true,
+    })
+        .then(function (response) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Đặt hàng thành công!',
+                text: response.data.message || 'Cảm ơn bạn đã mua hàng tại Opulentia.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Đến trang đơn hàng'
+            }).then(() => {
+                // Chuyển hướng sau khi người dùng bấm OK
+                window.location.href = 'http://localhost:8989/opulentia_user/allOrder';
+            });
+
+            console.log('Đặt hàng thành công:', response.data);
+        })
+
+        .catch(function (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi khi đặt hàng',
+                text: error.response?.data?.message || 'Vui lòng thử lại sau!',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Thử lại'
+            });
+            console.error('Lỗi khi đặt hàng:', error.response?.data || error.message);
+        });
+
+}
+
+
+window.datHang = datHang;
+checkoutInfo.totalAmount = totalAmount;
+checkoutInfo.listItems = JSON.parse(listItems);
 

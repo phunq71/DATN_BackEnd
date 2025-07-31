@@ -14,6 +14,7 @@ import com.main.service.FacilityService;
 import com.main.service.OrderService;
 import com.main.service.VoucherService;
 import com.main.utils.AuthUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class CheckoutRestController {
 
     private final CustomerService customerService;
     private final VoucherService voucherService;
+
 
     @PostMapping("/datacheckout")
     public ResponseEntity<?> getDataCheckout(@RequestBody List<OrderPreviewDTO> itemIds) {
@@ -94,6 +96,22 @@ public class CheckoutRestController {
 
         return ResponseEntity.ok(result);
     }
+
+    @PostMapping("/order/add")
+    public ResponseEntity<Map<String, String>> checkout(@RequestBody Map<String, Object> checkoutInfo) {
+        boolean result = orderService.addOrderCustomer(checkoutInfo);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", result ? "Đã nhận checkoutInfo thành công" : "Xử lý thất bại");
+
+        HttpStatus status = result ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
+        return ResponseEntity.status(status).body(response);
+    }
+
+
+
+
+
 
 
 }

@@ -24,9 +24,23 @@ public interface FacilityRepository  extends JpaRepository<Facility, String>  {
         , p.facilityId, p.facilityName
         from Facility f
         JOIN f.parent p
-          where f.type = 's'
+          where f.type = 'S'
         """)
     List<FacilityOrdManagerDTO> getShop();
 
+    @Query("""
+        Select f.facilityId, f.facilityName
+        , p.facilityId, p.facilityName
+        from Facility f
+        JOIN f.parent p
+          where f.type = 'S'
+        """)
+    List<FacilityOrdManagerDTO> getShopRole_Area();
 
+    @Query("""
+        SELECT f.facilityName
+        FROM Facility f
+        WHERE f.manager.staffID = :managerId
+        """)
+    String getFacilityNameByManagerId(@Param("managerId") String managerId);
 }

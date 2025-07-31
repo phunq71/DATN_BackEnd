@@ -85,6 +85,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         , o.customer.fullName
         , o.customer.phone
         , o.costShip
+        , o.discountCost
         , o.transaction.paymentMethod
         , o.transaction.transactionDate
         , o.updateStatusAt
@@ -281,6 +282,19 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
           where o.orderID = :orderID
     """)
     public List<OrdManagement_ProductDTO> getProductsByOrderID(@Param("orderID") Integer orderID);
+
+    @Query(""" 
+    SELECT o.orderID, o.shippingCode, o.status
+        FROM Order o
+    """)
+    public List<OrderDetailDTO> getAllOrderIdShippingCodes();
+
+    @Query(""" 
+    SELECT o.orderID, o.shippingCode, o.status
+        FROM Order o
+            WHERE o.shippingCode = :shippingCode
+    """)
+    public OrderDetailDTO getOrderByShippingCodes(@Param("shippingCode") String shippingCode);
 }
 
 

@@ -13,15 +13,22 @@ import java.util.List;
 public interface SizeRepository extends JpaRepository<Size, Integer> {
 
     @Query("""
-        SELECT v.variantID
-                ,s.sizeID
-                ,s.code
-                ,i.itemId
-                ,COALESCE(inv.quantity, 0) FROM Variant v
-        JOIN Item i on i.variant.variantID = v.variantID
-        JOIN Size s on s.sizeID= i.size.sizeID
-        LEFT JOIN Inventory inv ON inv.item.itemId = i.itemId
-        WHERE v.variantID = :variantId
-        """)
+SELECT 
+    v.variantID,
+    s.sizeID,
+    s.code,
+    i.itemId,
+    COALESCE(SUM(inv.quantity) , 0)
+FROM Variant v
+JOIN Item i ON i.variant.variantID = v.variantID
+JOIN Size s ON s.sizeID = i.size.sizeID
+LEFT JOIN Inventory inv ON inv.item.itemId = i.itemId
+    AND inv.facility.isUse = true
+WHERE v.variantID = :variantId
+GROUP BY v.variantID, s.sizeID, s.code, i.itemId
+""")
     List<SizeDTO> getSizeDTOByVariantID(@Param("variantId") String variantId);
+
+
+
 }

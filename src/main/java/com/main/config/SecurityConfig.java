@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/opulentia/**").permitAll()
                         .requestMatchers("/auth/**", "/index", "/logo/**", "/js/**", "/data/**",
                                 "/test/**", "/.well-known/**", "/uploads/**","/oauth2/**","/favicon.ico",
-                                "/api/auth/**", "/testqrcode").permitAll()
+                                "/api/auth/**", "/testqrcode", "/admin/isLogin").permitAll()
                         .requestMatchers("/opulentia_user/**", "/edit-profile").hasRole("USER")
                         .anyRequest().authenticated()
                 )

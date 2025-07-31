@@ -25,9 +25,9 @@ public class Category implements Serializable {
     @JoinColumn(name = "ParentID")
     private Category parent;  // danh mục cha
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<Category> childrens;  // danh mục con
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Product> products;
 }

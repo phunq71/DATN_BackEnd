@@ -1,8 +1,6 @@
 package com.main.rest_controller;
 
-import com.main.dto.FacilityOrdManagerDTO;
-import com.main.dto.OrdManagement_OrderDTO;
-import com.main.dto.OrdManagement_ProductDTO;
+import com.main.dto.*;
 import com.main.entity.Facility;
 import com.main.entity.Order;
 import com.main.service.FacilityService;
@@ -22,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 public class OrdManagementRestController {
@@ -45,7 +40,7 @@ public class OrdManagementRestController {
             return ResponseEntity.ok(facility);
         } else if (Objects.equals(role, "ROLE_AREA")) {
 
-        }
+        } else if (Objects.equals(role, "ROLE_STAFF00")) {}
         return ResponseEntity.status(401).build();
     }
 
@@ -59,6 +54,10 @@ public class OrdManagementRestController {
                              @RequestParam(required = false) String orderType,
                              @RequestParam(required = false) String search) {
         System.err.println(areaId+" "+ storeId+" "+day+" "+status+" "+orderType+" "+search+" "+pageNumber);
+        if (status.equals("ChoGiaoHang") || status.equals("DaGiao")) {
+            statusOrderGHN();
+        }
+
         if (areaId == null) {
             System.out.println("❌ areaId là null thực sự");
         } else if (areaId.isEmpty()) {
@@ -78,6 +77,7 @@ public class OrdManagementRestController {
         String role = AuthUtil.getRole();
 //        System.err.println(startDate+" "+endDate);
         if (Objects.equals(role, "ROLE_ADMIN")) {
+
             Pageable pageable = PageRequest.of(pageNumber, 7);
             Page<OrdManagement_OrderDTO> orderDTOS = orderService.getOrders(startDate, endDate
                     , status, storeId, areaId, pageable);
@@ -124,6 +124,57 @@ public class OrdManagementRestController {
         }
     }
 
+    private List<OrderDetailDTO> statusOrderGHN() {
+        List<OrderDetailDTO> orderDetailDTOS = orderService.getAllOrderIdShippingCodes();
+        int updatedCount = 0;
 
+        for (OrderDetailDTO dto : orderDetailDTOS) {
+            String shippingCode = dto.getShippingCode();
+
+            if (shippingCode == null || shippingCode.isBlank()) continue;
+
+            OrderDetailDTO orderDetail = orderService.getOrderIdByShippingCodes(shippingCode);
+            if (orderDetail == null) continue;
+
+
+            try {
+                Map<String, Object> ghnResult = orderService.getOrderStatus(shippingCode);
+                String ghnStatus = (String) ghnResult.get("shippingStatus");
+
+                String systemStatus = mapGHNStatusToSystem(ghnStatus);
+                String currentStatus = orderDetail.getStatus();
+
+                System.err.println("Cập nhật status:");
+                System.err.println("OrderID: " + dto.getOrderID());
+                System.err.println("ShippingCode: " + shippingCode);
+                System.err.println("GHN Status: " + ghnStatus);
+                System.err.println("System DB Status: " + currentStatus);
+
+                if (systemStatus != null && !systemStatus.equals(currentStatus)) {
+//                    Order order = orderService.findOrderByID(orderDetail.getOrderID());
+//                    order.setStatus(systemStatus);
+//                    orderService.save(order);
+                    updatedCount++;
+                }
+
+            } catch (Exception e) {
+                System.err.println("Lỗi cập nhật đơn " + shippingCode + ": " + e.getMessage());
+            }
+        }
+
+        System.err.println("Tổng số đơn đã cập nhật trạng thái: " + updatedCount);
+        return orderDetailDTOS;
+    }
+
+
+
+    private String mapGHNStatusToSystem(String ghnStatus) {
+        return switch (ghnStatus) {
+            case "ready_to_pick", "picking", "money_collect_picking" -> "SanSangGiao";
+            case "picked", "storing", "transporting", "delivering", "money_collect_delivering" -> "ChoGiaoHang";
+            case "delivered" -> "DaGiao";
+            default -> null; // hoặc trạng thái mặc định
+        };
+    }
 }
 

@@ -67,7 +67,6 @@ public class AuthController {
 
             Map<String, ResponseCookie> cookies = authService.generateTokenCookies(userDetails, request.isRememberMe());
 
-
             response.addHeader("Set-Cookie", cookies.get("accessToken").toString());
             response.addHeader("Set-Cookie", cookies.get("refreshToken").toString());
             System.err.println("🙂role đã đăng nhập từ FE"+AuthUtil.getRole());
