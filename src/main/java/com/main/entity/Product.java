@@ -33,7 +33,7 @@ public class Product {
     @Column(length = 45)
     private String brand;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CategoryID", nullable = false)
     private Category category;
 

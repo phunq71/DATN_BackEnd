@@ -16,12 +16,12 @@ public class Cart implements Serializable {
     @EmbeddedId
     private CartId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("customer")
     @JoinColumn(name = "CustomerID")
     private Customer customer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("item")
     @JoinColumn(name = "ItemID")
     private Item item;

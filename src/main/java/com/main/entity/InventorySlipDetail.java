@@ -17,12 +17,12 @@ public class InventorySlipDetail implements Serializable {
     @EmbeddedId
     private InventorySlipDetailId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("itemId")
     @JoinColumn(name = "ItemID", nullable = false)
     private Item item;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("inventorySlipId")
     @JoinColumn(name = "InventorySlipID", nullable = false)
     private InventorySlip inventorySlip;

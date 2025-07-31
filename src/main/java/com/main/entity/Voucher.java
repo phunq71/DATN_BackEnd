@@ -41,7 +41,7 @@ public class Voucher implements Serializable {
 
     private Boolean type;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "promotionID")
     private Promotion promotion;
 
