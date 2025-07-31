@@ -2,6 +2,7 @@ package com.main.rest_controller;
 
 import com.main.dto.RevenueByAreaDTO;
 import com.main.dto.RevenueByCategoryDTO;
+import com.main.dto.RevenueByShopDTO;
 import com.main.dto.RevenueByTimeDTO;
 import com.main.entity.Transaction;
 import com.main.repository.FacilityRepository;
@@ -25,13 +26,16 @@ public class Admin_Dashboard {
     private final TransactionRepository transactionRepository;
     private final FacilityRepository facilityRepository;
 
-    @GetMapping("/opulentia_admin/dashboard/revenueByYear")
+    @GetMapping("/admin/dashboard/revenueByYear")
     public ResponseEntity<?> revenueByYear() {
-        if(AuthUtil.getRole().equals("ROLE_ADMIN")) {
+        System.err.println(AuthUtil.getRole());
+        if(Objects.equals(AuthUtil.getRole(), "ROLE_ADMIN")) {
+            System.err.println("đã đăng nhập admin");
             List<RevenueByTimeDTO> revenueByYear = transactionRepository.getRevenueByYear();
             return ResponseEntity.ok(revenueByYear);
         }
-        else if(AuthUtil.getRole().equals("ROLE_AREA")) {
+        else if(Objects.equals(AuthUtil.getRole(), "ROLE_AREA")) {
+            System.err.println("đã đăng nhập area");
             System.err.println(AuthUtil.getAccountID());
             System.err.println(AuthUtil.getFullName());
 
@@ -43,6 +47,7 @@ public class Admin_Dashboard {
                     "revenueByYear", revenueByYear
             ));
         }
+        System.err.println("Lỗi 401");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
@@ -108,6 +113,17 @@ public class Admin_Dashboard {
         }
 
         return ResponseEntity.ok(transactionRepository.getAvailableYearCategory());
+    }
+
+
+    @GetMapping("/admin/dashboard/revenueByShop")
+    public ResponseEntity<List<RevenueByShopDTO>> revenueByShop(@RequestParam(value = "year", required = true) Integer year,
+                                                                @RequestParam(value = "month", required = false) Integer month) {
+        if(!Objects.equals(AuthUtil.getRole(), "ROLE_ADMIN")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(transactionRepository.getRevenueByShop(year, month));
     }
 
 }
