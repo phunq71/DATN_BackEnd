@@ -41,7 +41,7 @@ public class Promotion {
     @Column(nullable = false, length = 20)
     private String type;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "membershipID")
     private Membership membership;
 

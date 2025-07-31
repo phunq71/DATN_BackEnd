@@ -37,7 +37,7 @@ public class Staff implements Serializable {
     @Column(nullable = false)
     private LocalDate dob;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FacilityId")
     private Facility facility;
 

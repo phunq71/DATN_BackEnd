@@ -21,7 +21,7 @@ public class Category implements Serializable {
     @Column(name = "CategoryName", nullable = false, length = 100)
     private String categoryName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ParentID")
     private Category parent;  // danh mục cha
 
