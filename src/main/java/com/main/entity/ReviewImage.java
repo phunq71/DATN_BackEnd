@@ -19,11 +19,11 @@ public class ReviewImage {
     @Column(nullable = false, length = 55)
     private String imageUrl;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn( name = "reviewID")
     private Review review;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "returnItemID")
     private ReturnItem returnItem;
 

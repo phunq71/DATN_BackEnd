@@ -15,12 +15,12 @@ public class Favorite implements Serializable {
     @EmbeddedId
     private FavoriteId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("customerId")
     @JoinColumn(name = "CustomerID")
     private Customer customer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("productId")
     @JoinColumn(name = "ProductID")
     private Product product;

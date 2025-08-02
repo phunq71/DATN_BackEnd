@@ -32,7 +32,6 @@ public class Account implements Serializable {
     @Column(name = "provider_id")
     private String providerId; // id duy nhất từ OAuth provider
 
-
     @Column(name = "Password", nullable = false)
     private String password;
 

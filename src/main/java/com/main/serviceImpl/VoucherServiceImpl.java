@@ -2,11 +2,12 @@ package com.main.serviceImpl;
 
 import com.main.dto.VoucherOrderDTO;
 import com.main.entity.Customer;
+import com.main.entity.Order;
+import com.main.entity.UsedVoucher;
 import com.main.entity.Voucher;
 import com.main.mapper.CustomerMapper;
 import com.main.mapper.VoucherMapper;
-import com.main.repository.CustomerRepository;
-import com.main.repository.VoucherRepository;
+import com.main.repository.*;
 import com.main.service.VoucherService;
 import com.main.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,9 @@ public class VoucherServiceImpl implements VoucherService {
     private final VoucherRepository voucherRepository;
     private final VoucherMapper voucherMapper;
     private final CustomerRepository customerRepository;
+    private final OrderRepository orderRepository;
+    private final TransactionRepository transactionRepository;
+    private final UsedVoucherRepository usedVoucherRepository;
 
 
     @Override
@@ -74,5 +78,23 @@ public class VoucherServiceImpl implements VoucherService {
         List<Voucher> vouchers = voucherRepository.findBestMatchedVoucher(membershipId, totalAmount,AuthUtil.getAccountID() );
         vouchers.sort(Comparator.comparing(v -> totalAmount.subtract(v.getClaimConditions())));
         return vouchers.isEmpty() ? null : voucherMapper.voucherToVoucherOrderDTONoIsUse(vouchers.get(0));
+    }
+
+    @Override
+    public void addVoucherCustomerOrderSuccess(Integer orderId) {
+        Order order = new Order();
+        order = orderRepository.findByOrderID(orderId);
+        Customer customer = new Customer();
+        customer = customerRepository.findByCustomerId(order.getCustomer().getCustomerId());
+        BigDecimal totalAmount = new BigDecimal(0);
+        totalAmount = transactionRepository.findByOrder_OrderID(orderId).getAmount();
+
+        getNearestVoucherToReach(customer.getMembership().getMembershipId(), totalAmount);
+
+        UsedVoucher usedVoucher = new UsedVoucher();
+        usedVoucher.setCustomer(customer);
+        usedVoucher.setType(false);
+        usedVoucher.setCustomer(order.getCustomer());
+        usedVoucherRepository.save(usedVoucher);
     }
 }

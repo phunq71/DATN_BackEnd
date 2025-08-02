@@ -19,11 +19,11 @@ public class PromotionProduct {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer promotionProductID;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "promotionID", nullable = false)
     private Promotion promotion;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productID", nullable = false)
     private Product product;
 

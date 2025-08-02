@@ -18,11 +18,11 @@ public class Item implements Serializable {
     @Column(name = "ItemID")
     private Integer itemId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "VariantID")
     private Variant variant;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SizeID")
     private Size size;
 

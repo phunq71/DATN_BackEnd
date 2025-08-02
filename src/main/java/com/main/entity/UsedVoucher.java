@@ -20,12 +20,12 @@ public class UsedVoucher implements Serializable {
     @Column(nullable = false)
     private Boolean type;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("voucher")
     @JoinColumn(name = "VoucherID")
     private Voucher voucher;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("customer")
     @JoinColumn(name = "CustomerID")
     private Customer customer;

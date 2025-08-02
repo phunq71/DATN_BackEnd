@@ -20,11 +20,11 @@ public class OrderDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderDetailID;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OrderID", nullable = false)
     private Order order;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itemID", nullable = false)
     private Item item;
 
@@ -36,14 +36,14 @@ public class OrderDetail {
     @Column(precision = 16, scale = 2)
     private BigDecimal totalPrice;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PPID")
     private PromotionProduct promotionProduct;
 
     @OneToOne(mappedBy = "orderDetail")
     private ReturnItem returnItem;
 
-    @OneToMany(mappedBy = "orderDetail")
+    @OneToMany(mappedBy = "orderDetail", fetch = FetchType.LAZY)
     private List<Review> reviews;
 
     public OrderDetail(Integer orderDetailID) {
