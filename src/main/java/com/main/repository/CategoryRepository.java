@@ -19,4 +19,8 @@ public interface CategoryRepository  extends JpaRepository<Category, String> {
         WHERE p.parent IS NULL
     """)
     List<CategoryFlatResult> fetchCategoryWithChildren();
+
+    List<Category> findByCategoryNameContainingIgnoreCase(String keyword);
+    List<Category> findByCategoryIdStartingWith(String prefix);
+
 }
