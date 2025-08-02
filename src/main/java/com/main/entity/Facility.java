@@ -61,5 +61,9 @@ public class Facility implements Serializable {
 
     @OneToMany(mappedBy = "facility")
     private List<Transaction> Transactions;
+
+    public Facility(String facilityId) {
+        this.facilityId = facilityId;
+    }
 }
 
