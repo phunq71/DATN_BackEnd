@@ -5,6 +5,7 @@ import com.main.entity.Category;
 import com.main.entity.Product;
 import com.main.entity.Review;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -297,7 +298,42 @@ ORDER BY mainVar.price DESC
             Pageable pageable
     );
 
+    @Query("""
+        SELECT p 
+        FROM Product p 
+        WHERE p.productName LIKE %:keyword%
+        AND (
+              ((:categoryId IS NOT NULL AND :categoryId <> '') AND p.category.categoryId = :categoryId)
+                OR ((:categoryId IS NULL OR :categoryId = '') AND :parentCategoryId IS NOT NULL AND p.category.parent.categoryId = :parentCategoryId)
+        )
+    """
+    )
+    Page<Product> searchByNameAndCategory(@Param("keyword") String keyword
+            ,@Param("categoryId") String categoryId
+            ,@Param("parentCategoryId") String parentCategoryId
+            ,  Pageable pageable);
 
+    @Query(value = """
+        SELECT p.*
+        FROM Products p
+        WHERE 
+            NOT EXISTS (
+                SELECT 1 
+                FROM Variants v 
+                WHERE v.ProductID = p.ProductID
+            )
+            OR 
+            NOT EXISTS (
+                SELECT 1
+                FROM Variants v
+                JOIN Items i ON i.VariantID = v.VariantID
+                WHERE v.ProductID = p.ProductID
+            )
+        """, nativeQuery = true)
+    List<Product> findProductsWithoutVariantsOrItems();
+
+    @Query("SELECT MAX(p.productID) FROM Product p WHERE p.productID LIKE 'Pro%'")
+    String findMaxProductId();
 
 }
 

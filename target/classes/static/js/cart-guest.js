@@ -354,7 +354,6 @@ function initCart() {
 
             checkbox.addEventListener('change', function() {
                 const cartIndex = carts.findIndex(cart => cart.itemID === parseInt(row.dataset.itemId));
-
                 if (this.checked) {
                     // Thêm index vào danh sách checked nếu chưa có
                     if (!checkedItems.includes(cartIndex)) {
@@ -383,8 +382,10 @@ function initCart() {
 
             // Add checkbox change event
             checkbox.addEventListener('change', () => {
+                saveCheckedItemIDs();
                 updateTotalAmount();
-                document.getElementById('c-select-all-checkout').checked=false;
+                checkSelectAllCondition();
+                // document.getElementById('c-select-all-checkout').checked=false;
             });
 
             plusBtn.addEventListener('click', async () => {
@@ -577,3 +578,44 @@ function renderPrice(basisPrice, discountPercent) {
 
     return `<span class="price">${formatPrice(basisPrice)}</span>`;
 }
+
+
+function saveCheckedItemIDs() {
+    const checkedIDs = Array.from(document.querySelectorAll('.c-cart-checkbox:checked'))
+        .filter(cb => cb.id !== 'c-select-all-checkout')
+        .map(cb => cb.closest('.c-cart-item')?.getAttribute('data-item-id'))
+        .filter(id => !!id);
+
+    const isSelectAllChecked = document.getElementById('c-select-all-checkout')?.checked;
+
+    localStorage.setItem('checkedCartItemIDs', JSON.stringify(checkedIDs));
+    localStorage.setItem('selectAllChecked', JSON.stringify(isSelectAllChecked));
+}
+
+function checkSelectAllCondition() {
+    console.log('😚😚😚😚😚😚😚😚😚😚😚😚')
+    const checkedItemIDs = JSON.parse(localStorage.getItem('checkedCartItemIDs') || '[]');
+    // Đếm số phần tử có class "c-cart-item"
+    const totalItems = document.querySelectorAll('.c-cart-item').length;
+    const selectAllCheckbox = document.getElementById('c-select-all-checkout');
+    if (selectAllCheckbox) {
+        console.log('✅✅✅✅✅✅✅✅✅✅✅');
+        selectAllCheckbox.checked = (checkedItemIDs.length === totalItems);
+    }
+}
+
+function goToCheckout() {
+    saveCheckedItemIDs();
+    Swal.fire({
+        icon: 'warning',
+        title: 'Bạn cần đăng nhập',
+        text: 'Vui lòng đăng nhập để tiếp tục mua hàng.',
+        confirmButtonText: 'Đăng nhập'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.setItem("redirectAfterLogin", "/opulentia_user/checkout");
+            window.location.href = '/auth';
+        }
+    });
+}
+

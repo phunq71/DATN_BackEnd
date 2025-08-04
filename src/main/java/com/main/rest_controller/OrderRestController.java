@@ -70,10 +70,10 @@ public class OrderRestController {
         }
 
         List<OrderDTO> orderDTOs = orderService.getOrdersByCustomerIdAndStatus(accountId, status, year);
-        for (OrderDTO orderDTO : orderDTOs) {
-            System.out.println(orderDTO.getTotalPrice() + "Test");
-        }
-        System.err.println("OOOOOOOOOO"+orderDTOs.size());
+//        for (OrderDTO orderDTO : orderDTOs) {
+//            System.out.println(orderDTO.getTotalPrice() + "Test");
+//        }
+//        System.err.println("OOOOOOOOOO"+orderDTOs.size());
         List<OrderDTO> saveOrderIds = new ArrayList<>();
 
         if (orderDTOs.isEmpty()) {
@@ -82,7 +82,7 @@ public class OrderRestController {
 
         for (OrderDTO orderDTO : orderDTOs) {
             String currentStatus = orderDTO.getStatus();
-
+            System.out.println("😚😚😚😚😚😚😚😚");
             if ("SanSangGiao".equals(currentStatus) || "ChoGiaoHang".equals(currentStatus)) {
                 System.err.println("🔍 Kiểm tra đơn hàng: " + orderDTO.getOrderID() + ", shippingCode: " + orderDTO.getShippingCode());
 

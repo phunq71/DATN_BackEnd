@@ -74,8 +74,9 @@ public class OrderServiceImpl implements OrderService {
             }
         } else {
             orders = orderRepository.getOrdersByCustomerIdAndStatus(customerId, status, year);
-
+            System.out.println("Đã chạy xong 🤬🤬🤬🤬🤬🤬");
             orderPrices= getOrderPricesByCustomer(customerId, status, year);
+            System.out.println("🥕🥕🥕🥕🥕🥕🥕🥕🥕🥕🥕🥕");
         }
 
 
@@ -167,12 +168,18 @@ public class OrderServiceImpl implements OrderService {
             Integer orderId = (Integer) orderPrice[0];
             System.out.println("OrderID: 😎😎😎😎😎😎😎😎😎😎" + orderId);
             BigDecimal totalPrice = new BigDecimal(transactionRepository.findByOrder_OrderID(orderId).getAmount().toString());
+            System.out.println("🙉");
             BigDecimal productDiscount = new BigDecimal(orderPrice[2].toString());
+            System.out.println("🙉 🙉");
             BigDecimal voucherDiscount = new BigDecimal(orderPrice[3].toString());
+            System.out.println("🙉 🙉 🙉");
             BigDecimal finalPrice = new BigDecimal(orderPrice[4].toString());
-
+            System.out.println("🙉 🙉 🙉 🙉");
             orderPriceDTOs.add(new OrderPriceDTO(orderId, totalPrice, productDiscount, voucherDiscount, finalPrice));
+            System.out.println("🙉 🙉 🙉 🙉 🙉");
         });
+
+
 
         return orderPriceDTOs;
     }
@@ -476,7 +483,7 @@ public class OrderServiceImpl implements OrderService {
 
             order.setFacility(facilityRepository.findById(facilityId).get());
             order.setUpdateStatusAt(LocalDateTime.now());
-            order.setAddressIdGHN(customer.getCustomerAddress());
+            order.setAddressIdGHN(customer.getCustomerAddressIdGHN());
             order.setDiscountCost(customer.getDiscountCost());
             order.setShippingCode(null);
 

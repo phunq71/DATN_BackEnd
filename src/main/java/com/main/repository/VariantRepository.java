@@ -34,4 +34,15 @@ public interface VariantRepository extends JpaRepository<Variant, String> {
       AND v.VariantID = :variantID
 """, nativeQuery = true)
     int isNewVariantOf(@Param("variantID") String variantID);
+
+    @Query("""
+    SELECT v
+    FROM Variant v
+    WHERE v.product.productID = :productID
+      AND v.isMainVariant = true
+""")
+    Variant findMainVariantsByProductID(@Param("productID") String productID);
+
+    void deleteByProduct(Product product);
+
 }

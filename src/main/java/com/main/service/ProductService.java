@@ -1,10 +1,8 @@
 package com.main.service;
 
-import com.main.dto.ProductViewDTO;
-import com.main.dto.SupportDetailDTO;
+import com.main.dto.*;
 import com.main.entity.Category;
 import com.main.entity.Product;
-import com.main.dto.ProductByCategoryDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
@@ -53,5 +51,17 @@ public interface ProductService {
             String sortType
     );
 
+    Page<ProductTableAdminDTO> getPagedProducts(String keyword, String categoryId, String parentCategoryId ,int page, int size);
 
+    ProductDetailAdminDTO getProductDetail(String id);
+
+    void updateProductDetail(ProductDetailAdminDTO productDetail);
+
+    void updateVariantSizes(List<VariantSelectionDTO> variantSizes);
+
+    List<ProNewDTO> getProNews();
+
+    String generateProductId();
+
+    public void createProduct(ProductCreateDTO dto);
 }

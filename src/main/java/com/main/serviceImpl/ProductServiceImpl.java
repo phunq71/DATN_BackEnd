@@ -1,8 +1,6 @@
 package com.main.serviceImpl;
 
-import com.main.dto.ColorOption;
-import com.main.dto.ProductViewDTO;
-import com.main.dto.SupportDetailDTO;
+import com.main.dto.*;
 import com.main.entity.*;
 import com.main.mapper.VariantMapper;
 import com.main.repository.*;
@@ -11,24 +9,17 @@ import com.main.utils.AuthUtil;
 import com.main.utils.DataUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import com.main.dto.ProductByCategoryDTO;
 import com.main.mapper.ProductMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 
 @Service
@@ -46,6 +37,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     private final FavoriteRepository favoriteRepository;
+    private final ItemRepository itemRepository;
+    private final SizeRepository sizeRepository;
+    private final CategoryRepository categoryRepository;
 
     //Tim sp cho trang chi tiet sp
     @Override
@@ -450,6 +444,189 @@ public class ProductServiceImpl implements ProductService {
         return new PageImpl<>(dtos, pageable, rawPage.getTotalElements());
     }
 
+    public Page<ProductTableAdminDTO> getPagedProducts(
+            String keyword,
+            String categoryId,
+            String parentCategoryId,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("productName").descending());
+        Page<Product> products = productRepository.searchByNameAndCategory(keyword, categoryId, parentCategoryId, pageable);
 
+        // Lấy danh sách product không có variant hoặc item
+        List<Product> listTemp = productRepository.findProductsWithoutVariantsOrItems();
+        Set<String> invalidProductIds = listTemp.stream()
+                .map(Product::getProductID)
+                .collect(Collectors.toSet());
+
+        // Lọc ra các sản phẩm hợp lệ
+        List<ProductTableAdminDTO> dtoList = products.getContent().stream()
+                .filter(p -> !invalidProductIds.contains(p.getProductID()))
+                .map(productMapper::toProductTableAdminDTO)
+                .collect(Collectors.toList());
+
+        // ⚡ Tổng phần tử đúng là tổng phần tử hợp lệ trong DB, không phải size trang hiện tại
+        long totalValidProducts = products.getTotalElements() - invalidProductIds.size();
+
+        return new PageImpl<>(dtoList, pageable, totalValidProducts);
+    }
+
+
+
+    public ProductDetailAdminDTO getProductDetail(String productID) {
+        ProductDetailAdminDTO dto = new ProductDetailAdminDTO();
+        Product product = productRepository.findById(productID).get();
+        dto.setId(product.getProductID());
+        dto.setName(product.getProductName());
+        dto.setDescription(product.getDescription());
+        dto.setCreatedDate(product.getCreatedDate());
+        dto.setTargetCustomer(product.getTargetCustomer());
+        dto.setBrand(product.getBrand());
+        dto.setCategoryName(product.getCategory().getCategoryName());
+
+        List<Item> selectedItemsFromDB = itemRepository.findByVariant_Product_ProductID(product.getProductID());
+        List<VariantSelectionDTO> variantSizes = new ArrayList<>();
+        Set<String> selectedKeys = selectedItemsFromDB.stream()
+                .map(item -> item.getVariant().getVariantID() + "-" + item.getSize().getCode())
+                .collect(Collectors.toSet());
+
+        for (Variant variant : product.getVariants()) {
+            for (Size size : itemRepository.findSizeByVariant_Product_ProductID(product.getProductID())) {
+                VariantSelectionDTO item = new VariantSelectionDTO();
+                item.setVariantID(variant.getVariantID());   // hoặc getVariantId()
+                item.setSizeCode(size.getCode());         // hoặc getSizeId()
+
+                String key = variant.getVariantID() + "-" + size.getCode();
+                item.setChecked(selectedKeys.contains(key));
+
+                variantSizes.add(item);
+            }
+        }
+
+        dto.setVariantSizes(variantSizes);
+
+        List<VariantProDetailAdminDTO> list = new ArrayList<>();
+        for (Variant variant : product.getVariants()) {
+            VariantProDetailAdminDTO vaDto = new VariantProDetailAdminDTO();
+            vaDto.setId(variant.getVariantID());
+            vaDto.setColor(variant.getColor());
+            vaDto.setDescription(variant.getDescription());
+            vaDto.setCreatedDate(variant.getCreatedDate());
+            vaDto.setPrice(variant.getPrice());
+            Byte discountPercent = productRepository.findDiscountPercentByProductID(
+                    dto.getId());
+            if (discountPercent == null) {
+                discountPercent = 0;
+            }
+
+            BigDecimal discountedPrice = vaDto.getPrice().subtract(
+                    vaDto.getPrice().multiply(BigDecimal.valueOf(discountPercent).divide(BigDecimal.valueOf(100)))
+            );
+
+            vaDto.setDiscount(discountedPrice);
+
+            vaDto.setIsUse(variant.getIsUse());
+            vaDto.setIsMainVariant(variant.getIsMainVariant());
+
+            List<ImageDTO> images = new ArrayList<>();
+            variant.getImages().forEach(image -> {
+                ImageDTO imageDTO = new ImageDTO();
+                imageDTO.setId(image.getImageId());
+                imageDTO.setFileName(image.getImageUrl());
+                imageDTO.setIsMain(image.getIsMainImage());
+                images.add(imageDTO);
+            });
+
+            vaDto.setImages(images);
+            list.add(vaDto);
+        }
+
+        dto.setListVariants(list);
+        return dto;
+    }
+
+    @Override
+    public void updateProductDetail(ProductDetailAdminDTO productDetail){
+        try{
+            Product product = productRepository.getById(productDetail.getId());
+            product.setProductName(productDetail.getName());
+            product.setDescription(productDetail.getDescription());
+            product.setTargetCustomer(productDetail.getTargetCustomer());
+            product.setBrand(productDetail.getBrand());
+
+            System.out.println("💾💾💾💾💾💾💾💾"+product.getTargetCustomer());
+            productRepository.save(product);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void updateVariantSizes(List<VariantSelectionDTO> variantSizes) {
+        for (VariantSelectionDTO dto : variantSizes) {
+            // Tìm item theo variantID và sizeCode
+            Item item = itemRepository
+                    .findByVariant_VariantIDAndSize_Code(dto.getVariantID(), dto.getSizeCode());
+
+            if (dto.isChecked()) {
+                // Nếu người dùng check, mà item chưa có thì tạo mới
+                if (item == null) {
+                    Item newItem = new Item();
+                    newItem.setVariant(variantRepository.findById(dto.getVariantID()).get()); // set variant theo ID
+                    newItem.setSize(sizeRepository.findByCode(dto.getSizeCode()));        // set size theo ID
+                    itemRepository.save(newItem);
+                }
+                // Nếu item đã tồn tại, không cần làm gì
+            } else {
+                // Nếu người dùng bỏ check, mà item đang tồn tại thì xoá
+                if (item != null) {
+                    itemRepository.delete(item);
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<ProNewDTO> getProNews() {
+        return productRepository.findProductsWithoutVariantsOrItems()
+                .stream()
+                .map(product -> new ProNewDTO(
+                        product.getProductID(),
+                        product.getProductName(),
+                        product.getCreatedDate()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String generateProductId() {
+        String maxId = productRepository.findMaxProductId(); // VD: "ACC000000023"
+        long nextId = 1;
+
+        if (maxId != null && maxId.startsWith("Pro")) {
+            try {
+                long current = Long.parseLong(maxId.substring(3));
+                nextId = current + 1;
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("AccountID không hợp lệ: " + maxId);
+            }
+        }
+
+        return String.format("Pro%07d", nextId); // VD: ACC000000024
+    }
+
+    @Override
+    public void createProduct(ProductCreateDTO dto) {
+        Product product = new Product();
+        product.setProductID(dto.getId());
+        product.setProductName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setTargetCustomer(dto.getTargetCustomer());
+        product.setBrand(dto.getBrand());
+        product.setCategory( categoryRepository.findByCategoryName (dto.getCategoryName()));
+        product.setCreatedDate(dto.getCreatedDate()); // Nếu là LocalDate thì ok
+        productRepository.save(product);
+    }
 
 }

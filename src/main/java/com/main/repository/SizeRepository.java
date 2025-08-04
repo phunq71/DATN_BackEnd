@@ -29,6 +29,6 @@ GROUP BY v.variantID, s.sizeID, s.code, i.itemId
 """)
     List<SizeDTO> getSizeDTOByVariantID(@Param("variantId") String variantId);
 
-
+    Size findByCode(String code);
 
 }

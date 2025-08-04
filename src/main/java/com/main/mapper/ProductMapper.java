@@ -1,10 +1,13 @@
 package com.main.mapper;
 
+import com.main.dto.ProductTableAdminDTO;
 import com.main.dto.Product_DetailDTO;
 import com.main.entity.Product;
 import com.main.dto.ProductByCategoryDTO;
 import com.main.entity.Image;
 import com.main.entity.Variant;
+import com.main.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -12,7 +15,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ProductMapper {
+
+    private final ProductRepository productRepository;
+
     //mapper gộp cả variant đc map
     public static Product_DetailDTO toDTOO(Product product) {
         if (product == null) return null;
@@ -71,6 +78,52 @@ public class ProductMapper {
                 colors,
                 variantMainId
         );
+    }
+
+
+    // Ép Pro -> ProductTableAdminDTO
+    public ProductTableAdminDTO toProductTableAdminDTO(Product product) {
+        if (product == null) return null;
+        ProductTableAdminDTO dto = new ProductTableAdminDTO();
+        dto.setId(product.getProductID());
+        dto.setName(product.getProductName());
+        dto.setCreatedDate(product.getCreatedDate());
+        dto.setTargetCustomer(product.getTargetCustomer());
+        dto.setBrand(product.getBrand());
+
+        String mainImageUrl = product.getVariants().stream()
+                .filter(v -> v.getIsMainVariant()) // lọc biến thể chính
+                .flatMap(v -> v.getImages().stream())
+                .filter(Image::getIsMainImage)
+                .map(Image::getImageUrl)
+                .findFirst()
+                .orElse(null);
+
+        dto.setImage(mainImageUrl);
+
+
+        BigDecimal price = product.getVariants().stream()
+                .filter(Variant::getIsMainVariant)
+                .map(Variant::getPrice)
+                .findFirst()
+                .orElse(
+                        product.getVariants().isEmpty() ? BigDecimal.ZERO : product.getVariants().get(0).getPrice()
+                );
+        dto.setPrice(price);
+
+        Byte discountPercent = productRepository.findDiscountPercentByProductID(
+                dto.getId());
+        if (discountPercent == null) {
+            discountPercent = 0;
+        }
+
+        BigDecimal discountedPrice = price.subtract(
+                price.multiply(BigDecimal.valueOf(discountPercent).divide(BigDecimal.valueOf(100)))
+        );
+
+        dto.setDiscount(discountedPrice);
+
+        return dto;
     }
 
 }

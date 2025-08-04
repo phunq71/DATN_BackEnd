@@ -25,7 +25,7 @@ public class Admin_Dashboard {
     private final TransactionRepository transactionRepository;
     private final FacilityRepository facilityRepository;
 
-    @GetMapping("/opulentia_admin/dashboard/revenueByYear")
+    @GetMapping("/admin/dashboard/revenueByYear")
     public ResponseEntity<?> revenueByYear() {
         if(AuthUtil.getRole().equals("ROLE_ADMIN")) {
             List<RevenueByTimeDTO> revenueByYear = transactionRepository.getRevenueByYear();
