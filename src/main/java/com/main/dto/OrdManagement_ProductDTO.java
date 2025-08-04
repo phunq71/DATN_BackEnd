@@ -15,4 +15,8 @@ public class OrdManagement_ProductDTO {
     private Byte discountPercent;
     private BigDecimal originalPrice;
     private Integer quantity;
+    private BigDecimal costShip;
+    private BigDecimal discountCost;
+    private String discountType;
+    private Integer discountValue;
 }

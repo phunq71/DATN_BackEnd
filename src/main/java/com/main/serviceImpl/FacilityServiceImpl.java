@@ -64,4 +64,14 @@ public class FacilityServiceImpl implements FacilityService {
     public List<FacilityOrdManagerDTO> getShop() {
         return facilityRepository.getShop();
     }
+
+    @Override
+    public List<FacilityOrdManagerDTO> getShopByManager_ID(String managerID) {
+        return facilityRepository.getShopByManager_ID(managerID);
+    }
+
+    @Override
+    public List<FacilityOrdManagerDTO> getShopByStaffID(String staffId) {
+        return facilityRepository.getShopByStaffID(staffId);
+    }
 }

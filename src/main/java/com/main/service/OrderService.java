@@ -42,14 +42,9 @@ public interface OrderService {
     Order findOrderByID(Integer orderId);
 
     Boolean saveOrders(List<OrderDTO> orders);
-    public Page<OrdManagement_OrderDTO> getOrders(
-          LocalDateTime startDate,
-          LocalDateTime endDate,
-          String status,
-          String facilityId,
-          String parentId,
-          Pageable pageable
-          );
+
+    public Page<OrdManagement_OrderDTO> getOrders(LocalDateTime startDate,LocalDateTime endDate
+            ,String status, String facilityId,String parentId,Integer orderId, Pageable pageable);
     public Page<OrdManagement_OrderDTO> getOrdersWithOrderDate(Pageable pageable
                 ,LocalDateTime orderDate
                 , String status);
@@ -58,4 +53,5 @@ public interface OrderService {
     Boolean addOrderCustomer(Map<String, Object> checkoutInfo);
     public List<OrderDetailDTO> getAllOrderIdShippingCodes();
     public OrderDetailDTO getOrderIdByShippingCodes(String shippingCode);
+    String createGhnOrder(GhnOrderRequestDTO payload);
 }

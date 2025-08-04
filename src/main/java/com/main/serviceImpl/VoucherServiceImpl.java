@@ -1,13 +1,11 @@
 package com.main.serviceImpl;
 
 import com.main.dto.VoucherOrderDTO;
-import com.main.entity.Customer;
-import com.main.entity.Order;
-import com.main.entity.UsedVoucher;
-import com.main.entity.Voucher;
+import com.main.entity.*;
 import com.main.mapper.CustomerMapper;
 import com.main.mapper.VoucherMapper;
 import com.main.repository.*;
+import com.main.service.MailService;
 import com.main.service.VoucherService;
 import com.main.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +28,7 @@ public class VoucherServiceImpl implements VoucherService {
     private final OrderRepository orderRepository;
     private final TransactionRepository transactionRepository;
     private final UsedVoucherRepository usedVoucherRepository;
+    private final MailService mailService;
 
 
     @Override
@@ -89,12 +88,26 @@ public class VoucherServiceImpl implements VoucherService {
         BigDecimal totalAmount = new BigDecimal(0);
         totalAmount = transactionRepository.findByOrder_OrderID(orderId).getAmount();
 
-        getNearestVoucherToReach(customer.getMembership().getMembershipId(), totalAmount);
+        VoucherOrderDTO voucher = getNearestVoucherToReach(customer.getMembership().getMembershipId(), totalAmount);
 
         UsedVoucher usedVoucher = new UsedVoucher();
         usedVoucher.setCustomer(customer);
         usedVoucher.setType(false);
-        usedVoucher.setCustomer(order.getCustomer());
+        usedVoucher.setVoucher( voucherRepository.findById(voucher.getVoucherID()).get());
+        UsedVoucherID usedVoucherID = new UsedVoucherID();
+        usedVoucherID.setCustomer(order.getCustomer().getCustomerId());
+        usedVoucherID.setVoucher(voucher.getVoucherID());
+        usedVoucher.setUsedVoucherID(usedVoucherID);
+
         usedVoucherRepository.save(usedVoucher);
+
+
+
+        mailService.sendVoucherEmail( order.getCustomer().getAccount().getEmail()
+                    , voucher.getVoucherID()
+                    , voucher.getDiscountValue()
+                    , voucher.getEndDate());
+
+
     }
 }

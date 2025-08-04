@@ -115,4 +115,9 @@ public class AccountServiceImpl implements AccountService {
         return false;
     }
 
+    @Override
+    public Optional<Account> finByAccountId(String accountId) {
+        return accountRepository.findByAccountId(accountId);
+    }
+
 }

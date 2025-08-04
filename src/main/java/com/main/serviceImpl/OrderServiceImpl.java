@@ -1,6 +1,7 @@
 package com.main.serviceImpl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.dto.*;
 
@@ -55,6 +56,7 @@ public class OrderServiceImpl implements OrderService {
     private final UsedVoucherRepository usedVoucherRepository;
     private final InventoryRepository inventoryRepository;
     private final CartRepository cartRepository;
+    private final StaffRepository staffRepository;
 
     @Value("${ghn.token}")
     private String ghnToken;
@@ -441,8 +443,9 @@ public class OrderServiceImpl implements OrderService {
             String status,
             String facilityId,
             String parentId,
+            Integer orderId,
             Pageable pageable){
-        return orderRepository.getOrders(startDate, endDate, status, facilityId, parentId, pageable);
+        return orderRepository.getOrders(startDate, endDate, status, facilityId, parentId, orderId, pageable);
     }
 
     @Override
@@ -504,7 +507,7 @@ public class OrderServiceImpl implements OrderService {
 
             order.setFacility(facilityRepository.findById(facilityId).get());
             order.setUpdateStatusAt(LocalDateTime.now());
-            order.setAddressIdGHN(customer.getCustomerAddress());
+            order.setAddressIdGHN(customer.getCustomerAddressIdGHN());
             order.setDiscountCost(customer.getDiscountCost());
             order.setShippingCode(null);
 
@@ -607,5 +610,43 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDetailDTO getOrderIdByShippingCodes(String shippingCode) {
         return orderRepository.getOrderByShippingCodes(shippingCode);
+    }
+    //Tạo đơn GHN
+    @Override
+    public String createGhnOrder(GhnOrderRequestDTO payload) {
+        String idStaff = AuthUtil.getAccountID();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Token", ghnToken);
+            headers.set("ShopId", shopId);
+
+            HttpEntity<GhnOrderRequestDTO> requestEntity = new HttpEntity<>(payload, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
+                    requestEntity,
+                    String.class
+            );
+//            Sau khi đơn hàng đc tạo lấy order_code
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.getBody());
+            String ghnOrderCode = root.path("data").path("order_code").asText();
+//            ghi staff chuảẩn bị đơn
+            Order order = orderRepository.findByOrderID(payload.getOrderID());
+            if (order == null) {
+                throw new RuntimeException("Không tìm thấy đơn hàng với ID: " + payload.getOrderID());
+            }
+            Staff staff = staffRepository.getByStaffID(idStaff);
+            order.setStaff(staff);
+            order.setStatus("SanSangGiao");
+            order.setShippingCode(ghnOrderCode);
+            order.setOrderDate(LocalDateTime.now());
+            orderRepository.save(order);
+            return response.getBody(); // có thể parse JSON nếu cần
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Gọi GHN thất bại: " + e.getMessage());
+        }
     }
 }

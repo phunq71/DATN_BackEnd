@@ -242,23 +242,26 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     @Query("""
     SELECT  o.orderID, o.orderDate, o.status, o.updateStatusAt, o.shippingAddress,
            o.note, o.isOnline, o.shipMethod, o.addressIdGHN, c.fullName, s.fullname, f.facilityName,
-           t.transactionDate, t.amount
+           t.transactionDate, t.amount, t.paymentMethod, t.paymentCode, c.phone, pr.addressIdGHN, o.shippingCode
     FROM Order o
     LEFT JOIN o.customer c
     LEFT JOIN o.staff s
     LEFT JOIN o.facility f
     LEFT JOIN o.transaction t
     LEFT JOIN f.parent pr
-    LEFT JOIN pr.parent pr2 
+    LEFT JOIN pr.parent pr2
     WHERE (:startDate IS NULL OR o.orderDate >= :startDate)
       AND (:endDate IS NULL OR o.orderDate < :endDate)
       AND (:status IS NULL OR o.status = :status)
+   
       AND (
-           (:facilityId IS NOT NULL AND f.facilityId = :facilityId)
+           (:facilityId IS NOT NULL AND f.facilityId = :facilityId OR f.parent.facilityId = :facilityId) 
         OR (:facilityId IS NULL AND :parentId IS NOT NULL AND 
             (pr.facilityId = :parentId OR pr2.facilityId = :parentId))
         OR (:facilityId IS NULL AND :parentId IS NULL)
       )
+      AND (:orderId IS NULL OR o.orderID = :orderId)
+          ORDER BY o.orderDate DESC
     """)
     Page<OrdManagement_OrderDTO> getOrders(
             @Param("startDate") LocalDateTime startDate,
@@ -266,20 +269,24 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             @Param("status") String status,
             @Param("facilityId") String facilityId,
             @Param("parentId") String parentId,
+            @Param("orderId") Integer orderId,
             Pageable pageable
     );
 
 
     @Query("""
-    SELECT p.productName, img.imageUrl, pp.discountPercent, odt.unitPrice, odt.quantity
-        FROM Item i
-          JOIN i.variant v
-          JOIN v.product p
-          JOIN i.orderDetails odt
-          JOIN odt.promotionProduct pp
-          JOIN odt.order o
-          JOIN Image img on img.variant = v AND img.isMainImage = true
-          where o.orderID = :orderID
+    SELECT p.productName, img.imageUrl, pp.discountPercent,
+           odt.unitPrice, odt.quantity, o.costShip, o.discountCost,
+           vc.discountType, vc.discountValue
+    FROM Item i
+        JOIN i.variant v
+        JOIN v.product p
+        JOIN i.orderDetails odt
+        LEFT JOIN odt.promotionProduct pp
+        JOIN odt.order o
+        LEFT JOIN o.voucher vc
+        JOIN Image img on img.variant = v AND img.isMainImage = true
+    WHERE o.orderID = :orderID
     """)
     public List<OrdManagement_ProductDTO> getProductsByOrderID(@Param("orderID") Integer orderID);
 

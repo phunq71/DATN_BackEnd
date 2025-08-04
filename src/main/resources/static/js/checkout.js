@@ -442,41 +442,39 @@ let service_id = null;
 let service_type_id = null;
 
 // 👉 Hàm tách riêng để lấy danh sách dịch vụ GHN
-async function getGHNService(from_district_id, to_district_id) {
-    try {
-        const res = await axios.post(
-            'https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services',
-            {
-                shop_id: shopId,
-                from_district: from_district_id,
-                to_district: to_district_id
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Token': token
+    async function getGHNService(from_district_id, to_district_id) {
+        try {
+            const res = await axios.post(
+                'https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services',
+                {
+                    shop_id: shopId,
+                    from_district: from_district_id,
+                    to_district: to_district_id
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Token': token
+                    }
                 }
+            );
+
+            const services = res.data?.data;
+            console.log("📋 Danh sách dịch vụ GHN:", services);
+
+            if (!services || services.length === 0) {
+                console.error("❌ Không tìm thấy dịch vụ vận chuyển phù hợp.");
+                return null;
             }
-        );
-
-        const services = res.data?.data;
-        console.log("📋 Danh sách dịch vụ GHN:", services);
-
-        if (!services || services.length === 0) {
-            console.error("❌ Không tìm thấy dịch vụ vận chuyển phù hợp.");
+            // Gán vào biến toàn cục
+            service_id = services[0].service_id;
+            service_type_id = services[0].service_type_id;
+            return services[0]; // hoặc trả về cả danh sách nếu muốn
+        } catch (err) {
+            console.error("❌ Lỗi khi lấy dịch vụ GHN:", err.response?.data || err.message);
             return null;
         }
-
-        // Gán vào biến toàn cục
-        service_id = services[0].service_id;
-        service_type_id = services[0].service_type_id;
-
-        return services[0]; // hoặc trả về cả danh sách nếu muốn
-    } catch (err) {
-        console.error("❌ Lỗi khi lấy dịch vụ GHN:", err.response?.data || err.message);
-        return null;
     }
-}
 
 async function calculateShippingFee() {
     const addressIdGHN = checkoutInfo.customer.customerAddressIdGHN;

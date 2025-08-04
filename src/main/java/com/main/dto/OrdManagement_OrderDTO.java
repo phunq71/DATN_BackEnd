@@ -25,13 +25,21 @@ public class OrdManagement_OrderDTO {
 
     private LocalDateTime transactionDate;
     private BigDecimal totalAmount;
+    private String paymentMethod;
+    private String paymentCode;
+    private String numberPhone;
+    private String addressIDGHN_Shop;
+    private String shippingCode;
+    private String statusGHN;
+    private String updatedTimeGHN;
     private List<OrdManagement_ProductDTO> products;
 
     public OrdManagement_OrderDTO(Integer orderID, LocalDateTime orderDate
             , String status, LocalDateTime updatedStatusAt, String shippingAddress
             , String note, Boolean isOnline, String shipMethod, String addressIdGHN
             , String customerName, String staffName, String facilityName
-            , LocalDateTime transactionDate, BigDecimal totalAmount) {
+            , LocalDateTime transactionDate, BigDecimal totalAmount, String paymentMethod
+            , String paymentCode, String numberPhone, String addressIDGHN_Shop, String shippingCode) {
         this.orderID = orderID;
         this.orderDate = orderDate;
         this.status = status;
@@ -46,5 +54,11 @@ public class OrdManagement_OrderDTO {
         this.facilityName = facilityName;
         this.transactionDate = transactionDate;
         this.totalAmount = totalAmount;
+        this.paymentMethod = paymentMethod;
+        this.paymentCode = paymentCode;
+        this.numberPhone = numberPhone;
+        this.addressIDGHN_Shop = addressIDGHN_Shop;
+        this.shippingCode = shippingCode;
     }
+
 }
