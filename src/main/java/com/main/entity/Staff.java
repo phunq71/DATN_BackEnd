@@ -19,9 +19,9 @@ public class Staff implements Serializable {
     @Column(length = 12)
     private String staffID;
 
-    @OneToOne
-    @MapsId
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "staffId")
+    @MapsId
     private Account account;
 
 

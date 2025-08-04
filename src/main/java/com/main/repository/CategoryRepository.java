@@ -26,4 +26,9 @@ public interface CategoryRepository  extends JpaRepository<Category, String> {
     List<CategoryDTO> findAllRootCategories();
 
     Category findByCategoryName(String categoryName);
+
+    List<Category> findByCategoryNameContainingIgnoreCase(String keyword);
+    List<Category> findByCategoryIdStartingWith(String prefix);
+
+
 }
