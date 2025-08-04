@@ -1,5 +1,6 @@
 package com.main.repository;
 
+import com.main.dto.CategoryDTO;
 import com.main.entity.Category;
 import com.main.entity.Variant;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,15 @@ public interface CategoryRepository  extends JpaRepository<Category, String> {
         WHERE p.parent IS NULL
     """)
     List<CategoryFlatResult> fetchCategoryWithChildren();
+
+    @Query("SELECT new com.main.dto.CategoryDTO(c.categoryId, c.categoryName) " +
+            "FROM Category c WHERE c.parent IS NOT NULL")
+    List<CategoryDTO> findAllRootCategories();
+
+    Category findByCategoryName(String categoryName);
+
+    List<Category> findByCategoryNameContainingIgnoreCase(String keyword);
+    List<Category> findByCategoryIdStartingWith(String prefix);
+
+
 }

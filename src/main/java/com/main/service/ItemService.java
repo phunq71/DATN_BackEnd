@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ItemService {
     List<Item> findByVariant(Variant variant);
+
+    void addItem(Integer selectedSizeId, List<String> selectedVariantIds);
 }

@@ -2,6 +2,7 @@ package com.main.repository;
 
 import com.main.dto.RevenueByAreaDTO;
 import com.main.dto.RevenueByCategoryDTO;
+import com.main.dto.RevenueByShopDTO;
 import com.main.dto.RevenueByTimeDTO;
 import com.main.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,90 +12,107 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
 
     //Repository for dashboard
     @Query("""
-        SELECT YEAR(ts.transactionDate)
+        SELECT YEAR(o.orderDate)
             , COUNT(o.orderID)
             , SUM(ts.amount)
         FROM Transaction ts
         JOIN ts.order o
         WHERE ts.transactionType =true
-        GROUP BY YEAR(ts.transactionDate)
-        ORDER BY YEAR(ts.transactionDate) ASC
+        GROUP BY YEAR(o.orderDate)
+        ORDER BY YEAR(o.orderDate) ASC
         """)
     List<RevenueByTimeDTO> getRevenueByYear();
 
     @Query("""
-    SELECT YEAR(ts.transactionDate),
+    SELECT YEAR(o.orderDate),
            COUNT(o.orderID),
            SUM(ts.amount)
     FROM Transaction ts
     JOIN ts.order o
     JOIN ts.facility f
-    JOIN f.parent p
+    LEFT JOIN f.parent parentOfF
+    LEFT JOIN parentOfF.parent parentOfParent
     WHERE ts.transactionType = true
-      AND p.manager.staffID = :managerId
-      AND p.type = 'Z'
-    GROUP BY YEAR(ts.transactionDate)
-    ORDER BY YEAR(ts.transactionDate) ASC
+      AND (
+          (f.type = 'S' AND parentOfF.type = 'Z' AND parentOfF.manager.staffID = :managerId)
+          OR
+          (f.type = 'K' AND parentOfF.type = 'S' AND parentOfParent.type = 'Z' AND parentOfParent.manager.staffID = :managerId)
+      )
+    GROUP BY YEAR(o.orderDate)
+    ORDER BY YEAR(o.orderDate) ASC
     """)
     List<RevenueByTimeDTO> getRevenueByYear(@Param("managerId") String managerId);
 
     @Query("""
-        SELECT MONTH(ts.transactionDate)
+        SELECT MONTH(o.orderDate)
             , COUNT(o.orderID)
             , SUM(ts.amount)
         FROM Transaction ts
         JOIN ts.order o
-        WHERE YEAR(ts.transactionDate) = :year AND ts.transactionType =true
-        GROUP BY  MONTH(ts.transactionDate)
-        ORDER BY MONTH(ts.transactionDate) ASC
+        WHERE YEAR(o.orderDate) = :year AND ts.transactionType =true
+        GROUP BY  MONTH(o.orderDate)
+        ORDER BY MONTH(o.orderDate) ASC
         """)
     List<RevenueByTimeDTO> getRevenueByMonth(@Param("year") int year);
 
     @Query("""
-        SELECT MONTH(ts.transactionDate)
+        SELECT MONTH(o.orderDate)
             , COUNT(o.orderID)
             , SUM(ts.amount)
         FROM Transaction ts
         JOIN ts.order o
         JOIN ts.facility f
         JOIN f.parent p
-        WHERE YEAR(ts.transactionDate) = :year
-                AND ts.transactionType =true
-                AND p.manager.staffID = :managerID
-                AND p.type = 'Z'
-        GROUP BY  MONTH(ts.transactionDate)
-        ORDER BY MONTH(ts.transactionDate) ASC
+        LEFT JOIN f.parent parentOfF
+        LEFT JOIN parentOfF.parent parentOfParent
+            WHERE ts.transactionType = true
+                AND (
+                        (f.type = 'S' AND parentOfF.type = 'Z' AND parentOfF.manager.staffID = :managerId)
+                        OR
+                        (f.type = 'K' AND parentOfF.type = 'S' AND parentOfParent.type = 'Z' AND parentOfParent.manager.staffID = :managerId)
+                    )
+        GROUP BY  MONTH(o.orderDate)
+        ORDER BY MONTH(o.orderDate) ASC
         """)
-    List<RevenueByTimeDTO> getRevenueByMonth(@Param("year") int year, @Param("managerID") String managerId);
+    List<RevenueByTimeDTO> getRevenueByMonth(@Param("year") int year, @Param("managerId") String managerId);
 
 
 
     @Query(value = """
-    SELECT YEAR(ts.transactionDate)
+    SELECT YEAR(o.orderDate)
     FROM Transaction ts
+    JOIN ts.order o
     WHERE ts.transactionType =true
-    GROUP BY YEAR(ts.transactionDate)
-    ORDER BY YEAR(ts.transactionDate) DESC
+    GROUP BY YEAR(o.orderDate)
+    ORDER BY YEAR(o.orderDate) DESC
     """)
     List<Integer> getAvailableYear();
 
     @Query(value = """
-            SELECT YEAR(ts.transactionDate)
+            SELECT YEAR(o.orderDate)
             FROM Transaction ts
+            JOIN ts.order o
             JOIN ts.facility f
             JOIN f.parent p
-            WHERE ts.transactionType = true AND p.type = 'Z'
-            AND p.manager.staffID = :managerID
-            GROUP BY YEAR(ts.transactionDate)
-            ORDER BY YEAR(ts.transactionDate) DESC
-            """)
-    List<Integer> getAvailableYear(@Param("managerID") String managerID);
+            LEFT JOIN f.parent parentOfF
+            LEFT JOIN parentOfF.parent parentOfParent
+            WHERE ts.transactionType = true
+                AND (
+                    (f.type = 'S' AND parentOfF.type = 'Z' AND parentOfF.manager.staffID = :managerId)
+                    OR
+                    (f.type = 'K' AND parentOfF.type = 'S' AND parentOfParent.type = 'Z' AND parentOfParent.manager.staffID = :managerId)
+                    )
+            GROUP BY YEAR(o.orderDate)
+            ORDER BY YEAR(o.orderDate) DESC
+    """)
+    List<Integer> getAvailableYear(@Param("managerId") String managerId);
 
 
 
@@ -104,30 +122,42 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 
     //----------ByAREA-----------------------------------------
     @Query("""
-        SELECT MONTH(ts.transactionDate)
-            ,fp.facilityName
+        SELECT MONTH(o.orderDate)
+            ,z.facilityName
             ,sum(ts.amount)
         FROM Transaction ts
+        JOIN ts.order o
         JOIN ts.facility f
-        JOIN f.parent fp
-        WHERE ts.transactionType = true AND YEAR(ts.transactionDate) = :year AND fp.type = 'Z'
-        GROUP BY MONTH(ts.transactionDate), fp.facilityName
-        ORDER BY MONTH(ts.transactionDate) ASC
+        JOIN Facility z ON (
+            (f.type = 'S' AND f.parent = z) OR
+            (f.type = 'K' AND f.parent.parent = z)
+        )
+        WHERE ts.transactionType = true 
+        AND YEAR(o.orderDate) = :year 
+        AND z.type = 'Z'
+        GROUP BY MONTH(o.orderDate), z.facilityName
+        ORDER BY MONTH(o.orderDate) ASC
         """)
     List<RevenueByAreaDTO> getRevenueByArea(@Param("year") int year);
 
     @Query("""
-        SELECT YEAR(ts.transactionDate)
-            ,fp.facilityName
-            ,sum(ts.amount)
-        FROM Transaction ts
-        JOIN ts.facility f
-        JOIN f.parent fp
-        WHERE ts.transactionType = true AND fp.type = 'Z'
-        GROUP BY YEAR(ts.transactionDate), fp.facilityName
-        ORDER BY YEAR(ts.transactionDate) ASC
-        """)
+    SELECT YEAR(o.orderDate),
+           z.facilityName,
+           SUM(ts.amount)
+    FROM Transaction ts
+    JOIN ts.order o
+    JOIN ts.facility f
+    JOIN Facility z ON (
+        (f.type = 'S' AND f.parent = z) OR
+        (f.type = 'K' AND f.parent.parent = z)
+    )
+    WHERE ts.transactionType = true
+      AND z.type = 'Z'
+    GROUP BY YEAR(o.orderDate), z.facilityName
+    ORDER BY YEAR(o.orderDate) ASC
+    """)
     List<RevenueByAreaDTO> getRevenueByArea();
+
 
     @Query("""
         SELECT c.categoryName,
@@ -139,7 +169,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
         LEFT JOIN i.orderDetails od
         LEFT JOIN od.order o
         WHERE c.parent IS NOT NULL
-          AND (o.orderDate IS NULL OR FUNCTION('YEAR', o.orderDate) = :year)
+          AND (o.orderDate IS NULL OR YEAR(o.orderDate) = :year)
         GROUP BY c.categoryName
         """)
     List<RevenueByCategoryDTO> getRevenueBySubCategoryAndYear(@Param("year") int year);
@@ -153,6 +183,45 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     """)
     List<Integer> getAvailableYearCategory();
 
+
+    //-----------------------ByShop---------------------------------
+
+
+
+
+
     Transaction findByOrder_OrderID(Integer orderId);
+
+
+
+    @Query("""
+    SELECT
+        z.facilityName,
+        CASE 
+            WHEN f.type = 'K' THEN fp.facilityName
+            ELSE f.facilityName
+        END,
+        SUM(ts.amount)
+    FROM Transaction ts
+    JOIN ts.order o
+    JOIN ts.facility f
+    LEFT JOIN f.parent fp
+    JOIN Facility z ON (
+        (f.type = 'S' AND f.parent = z) OR
+        (f.type = 'K' AND fp.parent = z)
+    )
+    WHERE ts.transactionType = true
+      AND z.type = 'Z'
+      AND YEAR(o.orderDate) = :year
+      AND (:month IS NULL OR MONTH(o.orderDate) = :month)
+    GROUP BY 
+        z.facilityName,
+        CASE 
+            WHEN f.type = 'K' THEN fp.facilityName
+            ELSE f.facilityName
+        END
+""")
+    List<RevenueByShopDTO> getRevenueByShop(@Param("year") int year,
+                                            @Param("month") Integer month);
 
 }

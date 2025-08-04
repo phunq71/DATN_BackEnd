@@ -113,6 +113,7 @@ function getOrders(status){
     return axios.get(`/opulentia_user/orders/allOrders/${status}/${year}`)
         .then(response =>{
             Swal.close();
+            console.log('👈👈👈👈👈👈👈👈');
             console.log(status, response.data);
             return response.data
         }).catch(error => {

@@ -367,8 +367,10 @@ function initCart() {
 
             // Add checkbox change event
             checkbox.addEventListener('change', () => {
+                saveCheckedItemIDs();
                 updateTotalAmount();
-                document.getElementById('c-select-all-checkout').checked=false;
+                checkSelectAllCondition();
+                // document.getElementById('c-select-all-checkout').checked=false;
             });
 
             plusBtn.addEventListener('click', async () => {
@@ -567,7 +569,7 @@ function renderPrice(basisPrice, discountPercent) {
         `;
     }
 
-    return `<span class="price">${formatPrice(basisPrice)}</span>`;
+    return `<span style="font-weight: bold; color: #051931;" class="price">${formatPrice(basisPrice)}</span>`;
 }
 
 
@@ -629,28 +631,37 @@ function restoreCheckedItemIDs() {
     const isSelectAllChecked = JSON.parse(localStorage.getItem('selectAllChecked') || 'false');
     console.log('Restoring savedIDs', savedIDs);
 
-    // Khôi phục từng item
+    // Khôi phục từng item trong DOM
     savedIDs.forEach(id => {
         const checkbox = document.querySelector(`.c-cart-item[data-item-id="${id}"] .c-cart-checkbox`);
         if (checkbox) checkbox.checked = true;
     });
 
-    // Khôi phục "chọn tất cả"
-    const selectAllCheckbox = document.getElementById('c-select-all-checkout');
-    if (selectAllCheckbox) {
-        selectAllCheckbox.checked = isSelectAllChecked;
-    }
+    // Khôi phục trạng thái chọn tất cả
+    checkSelectAllCondition();
 
-    // ✅ XÓA dữ liệu sau khi restore
-    localStorage.removeItem('checkedCartItemIDs');
-    localStorage.removeItem('selectAllChecked');
+    // ✅ Gọi lại tính tổng sau khi restore
+    updateTotalQuantity();
+    updateTotalAmount();
 }
 
 
+function checkSelectAllCondition() {
+    const checkedItemIDs = JSON.parse(localStorage.getItem('checkedCartItemIDs') || '[]');
+
+    // Đếm số phần tử có class "c-cart-item"
+    const totalItems = document.querySelectorAll('.c-cart-item').length;
+
+    const selectAllCheckbox = document.getElementById('c-select-all-checkout');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = (checkedItemIDs.length === totalItems);
+    }
+}
 
 
-
-
+// document.addEventListener('DOMContentLoaded', function () {
+//     restoreCheckedItemIDs();
+// });
 // window.addEventListener('beforeunload', saveCheckedItemIDs);
 
 
