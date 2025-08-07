@@ -100,7 +100,7 @@ public class OrdManagementRestController {
                 try {
                     Map<String, Object> ghnStatus = orderService.getOrderStatus(orderCode);
                     String statuss =(String) ghnStatus.get("shippingStatus");
-                    dto.setStatusGHN((String) ghnStatus.get("updatedTime"));
+                    dto.setStatusGHN(convertShippingStatusToVietnamese(statuss));
                     dto.setUpdatedTimeGHN((String) ghnStatus.get("updatedTime"));
                 } catch (Exception e) {
                     dto.setStatusGHN("Lỗi lấy trạng thái");
@@ -140,7 +140,7 @@ public class OrdManagementRestController {
             List<String> khongChoPhepCapNhat = Arrays.asList("ChuanBiDon", "SanSangGiao", "DaGiao", "ChoGiaoHang");
             if (Objects.equals(role, "ROLE_ADMIN") || Objects.equals(role, "ROLE_AREA")) {
                 if ("ChoXacNhan".equals(status)) {
-                    System.err.println("Có staff: "+staff);
+
                     o.setStaff(staff);
                     o.setStatus("ChuanBiDon");
                     o.setUpdateStatusAt(LocalDateTime.now());

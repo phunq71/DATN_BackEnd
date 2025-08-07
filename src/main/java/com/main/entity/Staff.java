@@ -19,7 +19,7 @@ public class Staff implements Serializable {
     @Column(length = 12)
     private String staffID;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "staffId")
     @MapsId
     private Account account;
