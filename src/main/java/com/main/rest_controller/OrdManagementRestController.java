@@ -87,7 +87,7 @@ public class OrdManagementRestController {
         Pageable pageable = PageRequest.of(pageNumber, 7);
         Page<OrdManagement_OrderDTO> orderDTOS = orderService.getOrders(startDate, endDate
                 , status, storeId, areaId,Orderid, pageable);
-
+        System.err.println("Có orders: "+orderDTOS.getContent().size());
         orderDTOS.forEach(orderDTO -> {
             Integer orderID = orderDTO.getOrderID();
             List<OrdManagement_ProductDTO> productDTOS = orderService.getProductsByOrderID(orderID);
