@@ -62,6 +62,23 @@ public interface FacilityRepository  extends JpaRepository<Facility, String>  {
     String getFacilityNameByManagerId(@Param("managerId") String managerId);
 
     @Query("""
+        SELECT f.facilityId
+        FROM Staff s
+        JOIN s.facility f
+        WHERE s.staffID = :staffId
+        """)
+    String getFacilityIdByStaffId(@Param("staffId") String staffId);
+
+
+    @Query("""
+        SELECT f.facilityId
+        FROM Facility f
+        WHERE f.manager.staffID = :managerId
+        """)
+    String getFacilityIdByManagerId(@Param("managerId") String managerId);
+
+
+    @Query("""
         SELECT p.facilityId
                 , p.facilityName
                 , f.facilityId
@@ -75,7 +92,66 @@ public interface FacilityRepository  extends JpaRepository<Facility, String>  {
         """)
     List<AreaDTO> getArea(@Param("managerId") String managerId);
 
+    @Query("""
+        SELECT p.facilityId
+                , p.facilityName
+                , f.facilityId
+                , f.facilityName
+                , p.manager.staffID
+        FROM Facility f
+        JOIN f.parent p
+        WHERE f.type = 'S'
+        AND  p.facilityId = :areaId
+        ORDER BY p.facilityId
+        """)
+    List<AreaDTO> getAreaDtoByAreaId(@Param("areaId") String areaId);
+
+    @Query("""
+    SELECT p.facilityId
+                , p.facilityName
+                , f.facilityId
+                , f.facilityName
+                , p.manager.staffID
+        FROM Facility f
+        JOIN f.parent p
+        WHERE f.type = 'W'
+        ORDER BY p.facilityId
+    """)
+    List<AreaDTO> getAllAreasDTO();
+
+    @Query("""
+        SELECT grp.facilityId
+                , grp.facilityName
+                , f.facilityId
+                , f.facilityName
+                , grp.manager.staffID
+        FROM Facility f
+        JOIN f.parent p
+        JOIN p.parent grp
+        WHERE grp.facilityId = :areaId
+        """)
+    List<AreaDTO> getAllWarehousesOfShop(@Param("areaId") String areaId);
+
+    @Query("""
+        SELECT p.facilityId
+                , p.facilityName
+                , f.facilityId
+                , f.facilityName
+                , p.manager.staffID
+        FROM Facility f
+        JOIN f.parent p
+        WHERE
+        f.facilityId = :facilityId
+        ORDER BY p.facilityId
+        """)
+    AreaDTO getAreaDtoByFacilityId(@Param("facilityId") String facilityId);
+
+    //Kiểm tra có phải quản lý của cơ sở này hay không
     boolean existsByFacilityIdAndManager_StaffID(String facilityId, String managerId);
+
+    //Kiểm tra có phải là cha con hay không
+    boolean existsByFacilityIdAndParent_FacilityId(String facilityId, String parentFacilityId);
+
     Facility findByManager_StaffID(String staffID);
 
 
@@ -87,4 +163,16 @@ public interface FacilityRepository  extends JpaRepository<Facility, String>  {
             AND p.facilityId =:areaId
         """)
     String getWarehouseByAreaId(@Param("areaId") String areaId);
+
+    @Query("""
+        SELECT p.facilityId
+        FROM Facility f
+        JOIN f.parent p
+        JOIN p.manager m
+        WHERE f.facilityId = :shopId
+        """)
+    String getParentFacilityIdByShopId(@Param("shopId") String shopId);
+
+
+
 }
