@@ -158,4 +158,18 @@ Page<Review_ReviewDTO> findFilteredReviews(@Param("productID") String productID,
     ReviewItemDTO getReviewItemByItemID(@Param("itemID") Integer itemID);
 
     boolean existsByCustomer_CustomerIdAndReviewID(String customerID, Integer reviewID);
+
+    @Query("""
+    SELECT reveiw
+    from Review reveiw
+    where reveiw.customer.customerId=:customerID
+    """)
+    public List<Review> findReviewByCustomer(String customerID);
+    // Điểm trung bình toàn hệ thống
+    @Query("SELECT ROUND(AVG(r.rating), 1) FROM Review r")
+    Double getAverageRating();
+
+    // Đếm số lượng mỗi mức sao
+    @Query("SELECT r.rating, COUNT(r) FROM Review r GROUP BY r.rating ORDER BY r.rating DESC")
+    List<Object[]> getStarCounts();
 }

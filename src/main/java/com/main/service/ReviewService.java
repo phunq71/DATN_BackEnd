@@ -1,11 +1,11 @@
 package com.main.service;
 
 import com.main.dto.ReviewDTO;
+import com.main.dto.ReviewStatsDTO;
 import com.main.dto.Review_ReviewDTO;
 import com.main.entity.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -30,4 +30,5 @@ public interface ReviewService {
     public boolean deleteReview(int reviewID, String customerID);
 
     public Review updateReview(int reviewID, String customerID, int rating, String content, List<MultipartFile> insertedImages, List<String> deletedImages);
+    public ReviewStatsDTO getReviewStats();
 }

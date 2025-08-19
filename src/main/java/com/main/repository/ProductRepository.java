@@ -1,5 +1,6 @@
 package com.main.repository;
 
+import com.main.dto.CusManagement_productDTO;
 import com.main.dto.ProductViewDTO;
 import com.main.entity.Category;
 import com.main.entity.Product;
@@ -335,5 +336,26 @@ ORDER BY mainVar.price DESC
     @Query("SELECT MAX(p.productID) FROM Product p WHERE p.productID LIKE 'Pro%'")
     String findMaxProductId();
 
+    @Query("""
+    SELECT new com.main.dto.CusManagement_productDTO(
+           p.productID,
+           p.productName,
+           v.color,
+           odt.quantity,
+           odt.unitPrice,
+           i.imageUrl,
+           r.rating,
+           r.content)
+    FROM Product p
+         JOIN Variant v ON v.product = p
+         JOIN Image i ON i.variant = v AND i.isMainImage = true
+         JOIN Item item ON item.variant = v
+         JOIN OrderDetail odt ON odt.item = item
+         LEFT JOIN Review r
+             ON r.orderDetail = odt
+             AND r.customer.customerId = :customerID
+         WHERE odt.order.orderID = :orderID
+""")
+    List<CusManagement_productDTO> findProductByOrderID(@Param("orderID") Integer orderID, @Param("customerID") String customerID);
 }
 

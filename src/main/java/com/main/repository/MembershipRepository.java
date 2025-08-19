@@ -1,10 +1,17 @@
 package com.main.repository;
 
+import com.main.dto.MembershipDTO;
 import com.main.entity.Membership;
 import lombok.Data;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface MembershipRepository  extends JpaRepository<Membership, String> {
+
+    @Query("select m.membershipId, m.rank from Membership m")
+    List<MembershipDTO> findAllMemberships();
 }

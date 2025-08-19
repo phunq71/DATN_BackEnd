@@ -32,7 +32,6 @@ public class OrdManagementRestController {
     private final OrderService orderService;
     private final VoucherService voucherService;
     private final TransactionService transactionService;
-    private final AccountService accountService;
     private final StaffService staffService;
 
     @GetMapping("/opulentia_admin/area")
@@ -48,7 +47,7 @@ public class OrdManagementRestController {
             List<FacilityOrdManagerDTO> facility = facilityService.getShopByManager_ID(accountId);
             System.err.println("Size fac: "+facility.size());
             return ResponseEntity.ok(facility);
-        } else if (Objects.equals(role, "ROLE_STAFF00")) {
+        } else if (Objects.equals(role, "ROLE_STAFF")) {
             List<FacilityOrdManagerDTO> facility = facilityService.getShopByStaffID(accountId);
             return ResponseEntity.ok(facility);
         }
@@ -87,7 +86,6 @@ public class OrdManagementRestController {
         Pageable pageable = PageRequest.of(pageNumber, 7);
         Page<OrdManagement_OrderDTO> orderDTOS = orderService.getOrders(startDate, endDate
                 , status, storeId, areaId,Orderid, pageable);
-        System.err.println("Có orders: "+orderDTOS.getContent().size());
         orderDTOS.forEach(orderDTO -> {
             Integer orderID = orderDTO.getOrderID();
             List<OrdManagement_ProductDTO> productDTOS = orderService.getProductsByOrderID(orderID);

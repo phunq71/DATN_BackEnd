@@ -656,4 +656,10 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Gọi GHN thất bại: " + e.getMessage());
         }
     }
+
+    @Override
+    public Page<CusManagement_orderDTO> getOrdersByCustomerId(String customerId, int page) {
+        Pageable pageable = PageRequest.of(page,12);
+        return orderRepository.getOrdersByCustomerId(customerId,pageable);
+    }
 }
