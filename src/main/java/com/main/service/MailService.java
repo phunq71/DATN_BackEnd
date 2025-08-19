@@ -13,6 +13,7 @@ import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +53,7 @@ public class MailService {
             e.printStackTrace();
         }
     }
+
     @Async
     public void sendVoucherEmail(String to, String voucherCode, Integer discountDetail, LocalDateTime expiryDate) {
         try {
@@ -97,7 +99,7 @@ public class MailService {
             <h2 style="color: #e74c3c;">🔒 Tài khoản của bạn đã bị khóa</h2>
             <p>Chào bạn,</p>
             <p>Chúng tôi xin thông báo rằng tài khoản của bạn trên <strong>Opulentia</strong> đã bị <strong>khóa tạm thời</strong> vì lý do vi phạm hoặc bảo mật.</p>
-            
+
             <div style="background-color: #fdf3f3; padding: 15px; margin: 20px 0; 
                         border: 2px solid #e74c3c; border-radius: 5px; color: #c0392b;">
                 Trạng thái hiện tại: <strong>Đang bị khóa</strong>
@@ -114,14 +116,59 @@ public class MailService {
             <p>Trân trọng,<br>Đội ngũ Opulentia</p>
         </div>
         """;
-
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom("huyen.ngocharveynash@gmail.com");
             helper.setTo(to);
-            helper.setSubject("🔒 Thông báo: Tài khoản của bạn đã bị khóa");
+            helper.setSubject("✅ Thông báo: Tài khoản của bạn đã được mở khóa");
             helper.setText(content, true); // HTML content
+
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+    public void sendSlipNotificationEmail(
+            List<String> listTo,
+            String slipType,
+            String slipId,
+            String action
+    ) {
+        try {
+            String content = """
+            <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; line-height: 1.6;">
+                <h2 style="color: #e67e22;">📋 Thông báo phiếu kho</h2>
+                <p>Xin chào,</p>
+                
+                <p>Bạn có một phiếu <strong>%s</strong> từ hệ thống cần được <strong>%s</strong>.</p>
+                
+                <p><strong>Mã phiếu:</strong> %s</p>
+                
+                <p>Vui lòng đăng nhập vào hệ thống quản lý kho để xem chi tiết phiếu, 
+                kiểm tra thông tin liên quan và tiến hành <strong>%s</strong> theo đúng quy trình. 
+                Việc xử lý kịp thời sẽ giúp đảm bảo quá trình luân chuyển hàng hóa diễn ra thuận lợi 
+                và tránh gián đoạn trong công việc.</p>
+                
+                <p>Nếu bạn không phải là người có trách nhiệm %s phiếu này, vui lòng bỏ qua thông báo.</p>
+                
+                <hr style="margin: 20px 0;">
+                <p style="font-size: 12px; color: #888;">
+                    Đây là email tự động, vui lòng không trả lời trực tiếp. 
+                    Nếu có thắc mắc, hãy liên hệ bộ phận quản lý kho hoặc quản trị hệ thống để được hỗ trợ.
+                </p>
+                
+                <p>Trân trọng,<br>Đội ngũ Opulentia</p>
+            </div>
+        """.formatted(slipType, action, slipId, action, action);
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom("huyen.ngocharveynash@gmail.com");
+            if (listTo != null && !listTo.isEmpty()) {
+                helper.setTo(listTo.toArray(new String[0]));
+            }
+            helper.setSubject("📋 Phiếu " + slipType + " cần " + action + " - Mã: " + slipId);
+            helper.setText(content, true);
 
             javaMailSender.send(message);
         } catch (MessagingException e) {
@@ -203,12 +250,10 @@ public class MailService {
             helper.setTo(to);
             helper.setSubject("❌ Thông báo: Tài khoản của bạn đã bị xóa");
             helper.setText(content, true); // HTML content
-
             javaMailSender.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
     }
-
 }
 

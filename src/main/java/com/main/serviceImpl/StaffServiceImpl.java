@@ -190,11 +190,14 @@ public class StaffServiceImpl implements StaffService {
             // Lưu vào database
             staffRepository.save(staff);
             System.err.println("✅ Đã lưu staff thành công - ID: " + id);
-            Facility facility = facilityRepository.findById(staff.getFacility().getFacilityId()).get();
-            if ("AREA".equals(account.getRole()) && facility.getType().equals("Z")) {
-                facility.setManager(staff);
-                facilityRepository.save(facility);
-                System.err.println("👉Đã cập nhật lại manager: " + staff.getStaffID() + "👉👉" + facility.getFacilityId());
+
+            if ("AREA".equals(account.getRole())) {
+                Facility facility = facilityRepository.findById(staff.getFacility().getFacilityId()).get();
+                if(facility.getType().equals("Z")) {
+                    facility.setManager(staff);
+                    facilityRepository.save(facility);
+                    System.err.println("👉Đã cập nhật lại manager: " + staff.getStaffID() + "👉👉" + facility.getFacilityId());
+                }
             }
 
 
