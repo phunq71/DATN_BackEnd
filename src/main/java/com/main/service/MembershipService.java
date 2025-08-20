@@ -8,6 +8,7 @@ import com.main.entity.Membership;
 import java.util.List;
 
 public interface MembershipService {
+
     List<MembershipDTO> findAllMembership();
 
     Membership create(MembershipDTO membershipDTO);
@@ -17,4 +18,7 @@ public interface MembershipService {
     boolean delete(String membershipId);
 
     List<MembershipDTO_Pie> getMembershipPie();
+
+    public List<MembershipDTO> getAllMemberships();
+
 }

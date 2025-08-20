@@ -120,4 +120,9 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findByAccountId(accountId);
     }
 
+    @Override
+    public Account saveAccount(Account account) {
+        return accountRepository.save(account);
+    }
+
 }

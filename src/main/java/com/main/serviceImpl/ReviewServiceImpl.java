@@ -1,7 +1,9 @@
 package com.main.serviceImpl;
 
 import com.main.dto.ReviewDTO;
+import com.main.dto.ReviewStatsDTO;
 import com.main.dto.Review_ReviewDTO;
+import com.main.dto.StarCountDTO;
 import com.main.entity.*;
 import com.main.mapper.ReviewMapper;
 import com.main.repository.OrderDetailRepository;
@@ -265,5 +267,24 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewRepository.save(review);
     }
 
+    @Override
+    public ReviewStatsDTO getReviewStats() {
+        Double avgRating = reviewRepository.getAverageRating();
+        List<Object[]> counts = reviewRepository.getStarCounts();
 
+        // Tạo danh sách đủ 5 sao
+        List<StarCountDTO> starCountList = new ArrayList<>();
+        for (int i = 5; i >= 1; i--) {
+            long count = 0;
+            for (Object[] row : counts) {
+                if (((Integer) row[0]) == i) {
+                    count = (Long) row[1];
+                    break;
+                }
+            }
+            starCountList.add(new StarCountDTO(i, count));
+        }
+
+        return new ReviewStatsDTO(avgRating != null ? avgRating : 0.0, starCountList);
+    }
 }

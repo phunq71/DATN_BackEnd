@@ -2,6 +2,7 @@ package com.main.repository;
 
 import com.main.dto.MembershipDTO;
 import com.main.dto.MembershipDTO_Pie;
+
 import com.main.entity.Membership;
 import lombok.Data;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,4 +36,7 @@ public interface MembershipRepository  extends JpaRepository<Membership, String>
         GROUP BY m.rank
         """)
     List<MembershipDTO_Pie> getMembershipPie();
+
+    @Query("select m.membershipId, m.rank from Membership m")
+    List<MembershipDTO> findAllMemberships();
 }

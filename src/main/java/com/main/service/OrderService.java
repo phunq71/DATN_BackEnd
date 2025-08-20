@@ -54,4 +54,5 @@ public interface OrderService {
     public List<OrderDetailDTO> getAllOrderIdShippingCodes();
     public OrderDetailDTO getOrderIdByShippingCodes(String shippingCode);
     String createGhnOrder(GhnOrderRequestDTO payload);
+    public Page<CusManagement_orderDTO> getOrdersByCustomerId(String customerId,int page);
 }

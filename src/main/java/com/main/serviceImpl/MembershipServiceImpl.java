@@ -1,6 +1,7 @@
 package com.main.serviceImpl;
 
 import com.main.dto.MembershipDTO;
+
 import com.main.dto.MembershipDTO_Pie;
 import com.main.entity.Membership;
 import com.main.repository.MembershipRepository;
@@ -70,4 +71,8 @@ public class MembershipServiceImpl implements MembershipService {
         return String.format("MB%02d", idNumber);
     }
 
+    @Override
+    public List<MembershipDTO> getAllMemberships() {
+        return membershipRepository.findAllMemberships();
+    }
 }
