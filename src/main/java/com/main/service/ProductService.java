@@ -64,4 +64,6 @@ public interface ProductService {
     String generateProductId();
 
     public void createProduct(ProductCreateDTO dto);
+
+    List<CusManagement_productDTO> findProductByOrderID(Integer orderID, String customerID);
 }

@@ -629,4 +629,8 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
+    @Override
+    public List<CusManagement_productDTO> findProductByOrderID(Integer orderID, String customerID) {
+        return productRepository.findProductByOrderID(orderID, customerID);
+    }
 }

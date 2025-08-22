@@ -3,14 +3,17 @@ package com.main.repository;
 import com.main.dto.*;
 import com.main.entity.Facility;
 import com.main.entity.Order;
+import com.main.entity.OrderDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -303,8 +306,35 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             WHERE o.shippingCode = :shippingCode
     """)
     public OrderDetailDTO getOrderByShippingCodes(@Param("shippingCode") String shippingCode);
+<<<<<<< HEAD
 
     boolean existsByFacilityAndStatusNot(Facility facility, String status);
+=======
+    @Query("""
+    SELECT o.orderID
+        , o.orderDate
+        , o.status
+        , o.shippingAddress
+        , o.shippingCode
+        , o.isOnline
+        , o.staff.staffID
+        , o.voucher.voucherID
+        , o.facility.facilityId
+        , o.transaction.amount
+    FROM Order o
+    WHERE o.customer.customerId=:customerId
+    ORDER BY o.orderDate DESC
+    """
+    )
+    public Page<CusManagement_orderDTO> getOrdersByCustomerId(@Param("customerId") String customerId, Pageable pageable);
+
+    @Query("""
+    SELECT o
+    FROM Order o
+    WHERE o.customer.customerId=:customerId
+    """)
+    List<Order> getOrdersByCusID(@Param("customerId") String customerId);
+>>>>>>> bc407da76dbe394066474505dee4ac519780ef88
 }
 
 

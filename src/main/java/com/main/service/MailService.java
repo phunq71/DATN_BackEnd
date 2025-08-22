@@ -13,15 +13,13 @@ import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MailService {
 
     private final JavaMailSender javaMailSender;
-
-
-
     @Async
     public void sendOTP(String to, int randomNumber) {
         try {
@@ -55,6 +53,7 @@ public class MailService {
             e.printStackTrace();
         }
     }
+
     @Async
     public void sendVoucherEmail(String to, String voucherCode, Integer discountDetail, LocalDateTime expiryDate) {
         try {
@@ -92,5 +91,169 @@ public class MailService {
         }
     }
 
+    @Async
+    public void sendAccountLockedEmail(String to) {
+        try {
+            String content = """
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #e74c3c;">🔒 Tài khoản của bạn đã bị khóa</h2>
+            <p>Chào bạn,</p>
+            <p>Chúng tôi xin thông báo rằng tài khoản của bạn trên <strong>Opulentia</strong> đã bị <strong>khóa tạm thời</strong> vì lý do vi phạm hoặc bảo mật.</p>
+
+            <div style="background-color: #fdf3f3; padding: 15px; margin: 20px 0; 
+                        border: 2px solid #e74c3c; border-radius: 5px; color: #c0392b;">
+                Trạng thái hiện tại: <strong>Đang bị khóa</strong>
+            </div>
+            
+            <p>Để biết thêm thông tin chi tiết và cách khôi phục tài khoản, vui lòng liên hệ với bộ phận chăm sóc khách hàng của chúng tôi:</p>
+            
+            <ul>
+                <li>📞 Hotline: <strong>0847 775 585 (Thuận miền Tây)</strong></li>
+            </ul>
+            
+            <p><em>Lưu ý:</em> Sau khi xác minh và xử lý, tài khoản của bạn có thể được khôi phục.</p>
+            <hr style="margin: 20px 0;">
+            <p>Trân trọng,<br>Đội ngũ Opulentia</p>
+        </div>
+        """;
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom("huyen.ngocharveynash@gmail.com");
+            helper.setTo(to);
+            helper.setSubject("✅ Thông báo: Tài khoản của bạn đã được mở khóa");
+            helper.setText(content, true); // HTML content
+
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+    public void sendSlipNotificationEmail(
+            List<String> listTo,
+            String slipType,
+            String slipId,
+            String action
+    ) {
+        try {
+            String content = """
+            <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; line-height: 1.6;">
+                <h2 style="color: #e67e22;">📋 Thông báo phiếu kho</h2>
+                <p>Xin chào,</p>
+                
+                <p>Bạn có một phiếu <strong>%s</strong> từ hệ thống cần được <strong>%s</strong>.</p>
+                
+                <p><strong>Mã phiếu:</strong> %s</p>
+                
+                <p>Vui lòng đăng nhập vào hệ thống quản lý kho để xem chi tiết phiếu, 
+                kiểm tra thông tin liên quan và tiến hành <strong>%s</strong> theo đúng quy trình. 
+                Việc xử lý kịp thời sẽ giúp đảm bảo quá trình luân chuyển hàng hóa diễn ra thuận lợi 
+                và tránh gián đoạn trong công việc.</p>
+                
+                <p>Nếu bạn không phải là người có trách nhiệm %s phiếu này, vui lòng bỏ qua thông báo.</p>
+                
+                <hr style="margin: 20px 0;">
+                <p style="font-size: 12px; color: #888;">
+                    Đây là email tự động, vui lòng không trả lời trực tiếp. 
+                    Nếu có thắc mắc, hãy liên hệ bộ phận quản lý kho hoặc quản trị hệ thống để được hỗ trợ.
+                </p>
+                
+                <p>Trân trọng,<br>Đội ngũ Opulentia</p>
+            </div>
+        """.formatted(slipType, action, slipId, action, action);
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom("huyen.ngocharveynash@gmail.com");
+            if (listTo != null && !listTo.isEmpty()) {
+                helper.setTo(listTo.toArray(new String[0]));
+            }
+            helper.setSubject("📋 Phiếu " + slipType + " cần " + action + " - Mã: " + slipId);
+            helper.setText(content, true);
+
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+    @Async
+    public void sendAccountOpenEmail(String to) {
+        try {
+            String content = """
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #27ae60;">✅ Tài khoản của bạn đã được mở khóa</h2>
+            <p>Chào bạn,</p>
+            <p>Chúng tôi xin thông báo rằng tài khoản của bạn trên <strong>Opulentia</strong> đã được <strong>mở khóa</strong> và bạn có thể đăng nhập, sử dụng dịch vụ bình thường.</p>
+            
+            <div style="background-color: #eafaf1; padding: 15px; margin: 20px 0; 
+                        border: 2px solid #27ae60; border-radius: 5px; color: #2e7d32;">
+                Trạng thái hiện tại: <strong>Hoạt động bình thường</strong>
+            </div>
+            
+            <p>Nếu bạn gặp bất kỳ vấn đề nào khi đăng nhập hoặc sử dụng dịch vụ, vui lòng liên hệ bộ phận chăm sóc khách hàng của chúng tôi:</p>
+            
+            <ul>
+                <li>📞 Hotline: <strong>0847 775 585 (Thuận miền Tây)</strong></li>
+            </ul>
+            
+            <p>Chúc bạn có trải nghiệm mua sắm tuyệt vời tại <strong>Opulentia</strong>!</p>
+            <hr style="margin: 20px 0;">
+            <p>Trân trọng,<br>Đội ngũ Opulentia</p>
+        </div>
+        """;
+
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom("huyen.ngocharveynash@gmail.com");
+            helper.setTo(to);
+            helper.setSubject("✅ Thông báo: Tài khoản của bạn đã được mở khóa");
+            helper.setText(content, true); // HTML content
+
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+    @Async
+    public void sendDeleteAccountEmail(String to) {
+        try {
+            String content = """
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #e74c3c;">❌ Thông báo: Tài khoản của bạn đã bị xóa</h2>
+            <p>Chào bạn,</p>
+            <p>Chúng tôi xin thông báo rằng tài khoản của bạn trên <strong>Opulentia</strong> đã bị <strong>xóa</strong> 
+            do vi phạm chính sách hoặc quá lâu không hoạt động.</p>
+            
+            <div style="background-color: #fdecea; padding: 15px; margin: 20px 0; 
+                        border: 2px solid #e74c3c; border-radius: 5px; color: #c0392b;">
+                Trạng thái hiện tại: <strong>Không còn hoạt động</strong>
+            </div>
+            
+            <p>Nếu bạn có bất kỳ thắc mắc hoặc khiếu nại, vui lòng liên hệ bộ phận chăm sóc khách hàng của chúng tôi:</p>
+            <ul>
+                <li>📞 Hotline: <strong>0847 775 585 (Thuận miền Tây)</strong></li>
+            </ul>
+
+            <p>Bạn có thể đăng ký tài khoản mới để tiếp tục là thành viên của <strong>Opulentia</strong>. 
+            Về mức rank trước đây, bạn có thể trao đổi trực tiếp qua số hotline trên để được hỗ trợ.</p>
+            
+            <p>Cảm ơn bạn đã đồng hành cùng <strong>Opulentia</strong>!</p>
+            <hr style="margin: 20px 0;">
+            <p>Trân trọng,<br>Đội ngũ Opulentia</p>
+        </div>
+        """;
+
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom("huyen.ngocharveynash@gmail.com");
+            helper.setTo(to);
+            helper.setSubject("❌ Thông báo: Tài khoản của bạn đã bị xóa");
+            helper.setText(content, true); // HTML content
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
 }
 
