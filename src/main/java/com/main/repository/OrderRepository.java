@@ -1,6 +1,7 @@
 package com.main.repository;
 
 import com.main.dto.*;
+import com.main.entity.Facility;
 import com.main.entity.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -302,6 +303,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             WHERE o.shippingCode = :shippingCode
     """)
     public OrderDetailDTO getOrderByShippingCodes(@Param("shippingCode") String shippingCode);
+
+    boolean existsByFacilityAndStatusNot(Facility facility, String status);
 }
 
 

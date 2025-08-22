@@ -1,5 +1,6 @@
 package com.main.repository;
 
+import com.main.entity.Facility;
 import com.main.entity.Inventory;
 import com.main.entity.InventoryId;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +35,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, InventoryI
     public Integer getStockQuantityByItemId(@Param("itemId") int itemId);
 
     public Inventory getInventoryById(InventoryId inventoryId);
+
+    boolean existsByFacilityAndQuantityGreaterThan(Facility facility, int quantity);
 }

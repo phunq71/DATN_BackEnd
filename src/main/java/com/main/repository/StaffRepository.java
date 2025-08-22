@@ -1,6 +1,7 @@
 package com.main.repository;
 
 import com.main.dto.StaffDTO;
+import com.main.entity.Facility;
 import com.main.entity.Staff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,5 +76,6 @@ public interface StaffRepository extends JpaRepository<Staff, String> {
     boolean existsByAccount_EmailAndStaffIDNot(String email, String staffId);
     boolean existsByPhoneAndStaffIDNot(String phone, String staffId);
 
+    boolean existsByFacility(Facility facility);
 
 }

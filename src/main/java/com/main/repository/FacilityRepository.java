@@ -13,12 +13,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FacilityRepository  extends JpaRepository<Facility, String>  {
     List<Facility> getFacilityByIsUseTrue();
 
-    Collection<? extends Facility> findByParent(Facility parent);
 
 
     @Query("""
@@ -87,4 +87,9 @@ public interface FacilityRepository  extends JpaRepository<Facility, String>  {
             AND p.facilityId =:areaId
         """)
     String getWarehouseByAreaId(@Param("areaId") String areaId);
+
+    // Lấy tất cả cơ sở con của một khu vực
+    List<Facility> findByParent(Facility parent);
+    boolean existsByTypeAndParent(String type, Facility parent);
+    Optional<Facility> findTopByTypeOrderByFacilityIdDesc(String type);
 }
