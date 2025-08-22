@@ -16,6 +16,13 @@ import java.util.List;
 
 @Repository
 public interface FacilityRepository  extends JpaRepository<Facility, String>  {
+
+    @Query("""
+        Select f
+              FROM Facility f
+              WHERE f.type = 'K'
+              AND f.isUse = true
+        """)
     List<Facility> getFacilityByIsUseTrue();
 
     Collection<? extends Facility> findByParent(Facility parent);

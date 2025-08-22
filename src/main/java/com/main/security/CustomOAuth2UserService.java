@@ -74,16 +74,18 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 account.setCreateAt(LocalDate.now());
                 account.setProvider(provider);
                 account.setProviderId(providerId);
-                accountRepo.save(account);
 
                 Customer customer = new Customer();
-                customer.setCustomerId(generatedId);
+
+                customer.setAccount(account);
                 customer.setFullName(name);
                 customer.setAddress("N/A");
                 customer.setPhone("N/A");
                 customer.setImageAvt(picture);
-                customer.setMembership(membershipRepository.findById("MB01").orElse(null));
+                customer.setMembership(null);
                 customerRepo.save(customer);
+
+                customerService.updateRankByCustomerId(customer);
             }
 
             // ✅ Trả về CustomOAuth2User chứa accountId

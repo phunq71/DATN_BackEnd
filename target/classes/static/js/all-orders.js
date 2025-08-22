@@ -33,6 +33,11 @@
         initOrder(orders)
     });
 
+    yeuCauHuy.addEventListener('click', async function(){
+        orders= await getOrders("YeuCauHuy");
+        initOrder(orders)
+    });
+
     traHang.addEventListener('click',  async function (){
         const returnRequest= await getReturnRequest();
         console.log(returnRequest);
@@ -47,6 +52,7 @@ const choGiaoHang= document.getElementById("cho-giao-hang");
 const daGiao = document.getElementById("da-giao");
 const daHuy = document.getElementById("da-huy");
 const traHang = document.getElementById("tra-hang");
+const yeuCauHuy = document.getElementById("yeu-cau-huy");
 
 const yearSelect = document.getElementById("year-select");
 
@@ -150,22 +156,38 @@ function getOrdersByKeyword(keyword){
     function extractKeyword(input) {
         if (typeof input !== 'string') return input;
 
-        const trimmed = input.trim();
-        const regex = /^#?OD(\d+)$/i;
+        // Xóa khoảng trắng
+        let trimmed = input.trim();
 
-        const match = trimmed.match(regex);
-        if (match) {
-            return match[1]; // Trả về phần số sau OD
-        }
+        // Bỏ ký tự '#' nếu có
+        trimmed = trimmed.replace(/^#/, '');
 
-        return trimmed; // Nếu không phải dạng OD thì trả về nguyên input
+        // Bỏ tiền tố "OD" (không phân biệt hoa thường)
+        trimmed = trimmed.replace(/^OD/i, '');
+
+        // Bỏ số 0 ở đầu
+        trimmed = trimmed.replace(/^0+/, '');
+
+        // Nếu sau khi xử lý vẫn trống thì trả về null
+        console.log('👉👉'+trimmed)
+        return trimmed || null;
     }
 
-function initOrder(orders) {
+
+    function initOrder(orders) {
     const orderListContainer = document.getElementById('order-list-container');
     if (!orderListContainer) return;
 
-    orderListContainer.innerHTML = ''; // Clear existing content
+    orderListContainer.innerHTML = '';
+
+    // ✅ Nếu không có đơn thì hiển thị thông báo
+    if (!orders || orders.length === 0) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.textContent = 'Không có đơn nào!';
+        emptyMsg.className = 'od-empty-msg';
+        orderListContainer.appendChild(emptyMsg);
+        return;
+    }// Clear existing content
 
     orders.forEach(order => {
         // Format order ID and date
@@ -238,7 +260,7 @@ function initOrder(orders) {
             window.location.href="/opulentia_user/orderDetail/"+ order.orderID;
         });
 
-        addActionButtons(actions, order.status);
+        addActionButtons(actions, order.status, order.orderID);
 
         actions.appendChild(trackButton);
 
@@ -258,7 +280,7 @@ function createProductItem(item) {
     productItem.className = 'od-product-item';
 
     const image = document.createElement('img');
-    image.src = "/uploads/"+ item.image || 'https://via.placeholder.com/100';
+    image.src = item.image ? "/uploads/" + item.image : 'https://via.placeholder.com/100';
     image.alt = item.productName;
     image.className = 'od-product-image';
 
@@ -352,16 +374,20 @@ function formatPrice(price) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 }
 
-function addActionButtons(actionElement, status){
+function addActionButtons(actionElement, status, orderId){
     if(status=== "DaYeuCauHuy" || status === "ChoGiaoHang") return;
 
     const btn = document.createElement('button');
     btn.className="od-btn od-btn-outline";
     if(status==="ChoXacNhan"){
         btn.textContent="Hủy đơn hàng";
+        attachCancelOrderHandler(orderId, btn);
     }else if(status==="ChuanBiDon" || status==="SanSangGiao"){
         btn.textContent="Gửi yêu cầu hủy đơn";
-    }else if(status === "DaGiao" || status === "DaHuy"){
+        btn.addEventListener("click", () => {
+            handleCancelOrder(orderId, btn);
+        });
+    }else if(status === "DaGiao" || status === "DaHuy" || status === "YeuCauHuy"){
         btn.textContent="Mua lại";
     }
     actionElement.appendChild(btn);
@@ -514,3 +540,145 @@ function createReturnItem(item) {
 
     return productItem;
 }
+
+// Hủy đơn hàng
+    function attachCancelOrderHandler(orderId, btn) {
+        if (!btn) return;
+
+        btn.addEventListener("click", async () => {
+            const result = await Swal.fire({
+                title: "Xác nhận hủy đơn?",
+                text: "Bạn có chắc muốn hủy đơn hàng này không?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Hủy đơn",
+                cancelButtonText: "Thoát",
+                reverseButtons: true
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                const response = await fetch(`/api/orders/${orderId}/cancel`, {
+                    method: "PUT"
+                });
+
+                if (response.ok) {
+                    await Swal.fire({
+                        title: "Thành công!",
+                        text: "Hủy đơn hàng thành công!",
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    });
+                    // Render lại danh sách đơn
+                    orders= await getOrders("DaHuy");
+                    initOrder(orders)
+                    // Sau khi render xong, chuyển tab
+                    document.getElementById("cho-xac-nhan").classList.remove("active");
+                    document.getElementById("da-huy").classList.add("active");
+                    btn.textContent = "Đã hủy";
+                    btn.disabled = true;
+                } else {
+                    const errorText = await response.text();
+                    Swal.fire({
+                        title: "Thất bại!",
+                        text: "Không thể hủy đơn: " + errorText,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                }
+            } catch (err) {
+                console.error("Lỗi khi hủy đơn:", err);
+                Swal.fire({
+                    title: "Lỗi!",
+                    text: "Có lỗi xảy ra khi hủy đơn hàng.",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+            }
+        });
+    }
+
+    // Hàm hiển thị dialog chọn lý do
+    function showCancelReasonDialog(callback) {
+        Swal.fire({
+            title: 'Chọn lý do hủy đơn',
+            input: 'select',
+            inputOptions: {
+                'Tôi đổi ý': 'Tôi đổi ý',
+                'Đặt nhầm sản phẩm': 'Đặt nhầm sản phẩm',
+                'Muốn thay đổi địa chỉ': 'Muốn thay đổi địa chỉ',
+                'Khác': 'Khác'
+            },
+            inputPlaceholder: 'Chọn lý do',
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                callback(result.value);
+            }
+        });
+    }
+
+    function handleCancelOrder(orderId, btn) {
+        if (!btn) return;
+
+        showCancelReasonDialog(async function(reason) {
+            console.log("Lý do đã chọn:", reason);
+
+            try {
+                const response = await fetch(`/api/orders/${orderId}/requestCancel`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ reason: reason })
+                });
+
+                if (response.ok) {
+                    // Hiển thị alert và sau đó update UI
+                    await Swal.fire({
+                        title: "Thành công",
+                        text: "Đơn đã được gửi yêu cầu hủy!",
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    });
+
+                    // Render lại danh sách đơn
+
+                    orders= await getOrders("YeuCauHuy");
+                    initOrder(orders)
+
+                    // Sau khi render xong, chuyển tab
+                    document.getElementById("cho-lay-hang").classList.remove("active");
+                    document.getElementById("yeu-cau-huy").classList.add("active");
+
+                    // Cập nhật nút
+                    btn.textContent = "Yêu cầu hủy";
+                    btn.disabled = true;
+                } else {
+                    const errorText = await response.text();
+                    Swal.fire({
+                        title: "Thất bại!",
+                        text: "Không thể hủy đơn: " + errorText,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                }
+            } catch (err) {
+                console.error("Lỗi khi hủy đơn:", err);
+                Swal.fire({
+                    title: "Lỗi!",
+                    text: "Có lỗi xảy ra khi hủy đơn hàng.",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+            }
+        });
+    }
+
+
+
+
+

@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface CategoryRepository  extends JpaRepository<Category, String> {
     Category findByCategoryId(String categoryId);
+
     @Query("""
         SELECT p.categoryId AS parentId, p.categoryName AS parentName,
                c.categoryId AS childId, c.categoryName AS childName
@@ -29,6 +30,5 @@ public interface CategoryRepository  extends JpaRepository<Category, String> {
 
     List<Category> findByCategoryNameContainingIgnoreCase(String keyword);
     List<Category> findByCategoryIdStartingWith(String prefix);
-
 
 }

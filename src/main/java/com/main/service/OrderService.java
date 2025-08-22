@@ -54,4 +54,10 @@ public interface OrderService {
     public List<OrderDetailDTO> getAllOrderIdShippingCodes();
     public OrderDetailDTO getOrderIdByShippingCodes(String shippingCode);
     String createGhnOrder(GhnOrderRequestDTO payload);
+
+    Boolean cancelOrder(Integer orderId);
+
+    Boolean cancelOrder2(Integer orderId, String reason);
+
+    Boolean cancelOrder3(Integer orderId, String reason);
 }

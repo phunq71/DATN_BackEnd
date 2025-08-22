@@ -3,6 +3,7 @@ package com.main.dto;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,12 +35,15 @@ public class OrdManagement_OrderDTO {
     private String updatedTimeGHN;
     private List<OrdManagement_ProductDTO> products;
 
+    private LocalDate delivery;
+    private List<LogOrderDTO> logOrders;
+
     public OrdManagement_OrderDTO(Integer orderID, LocalDateTime orderDate
             , String status, LocalDateTime updatedStatusAt, String shippingAddress
             , String note, Boolean isOnline, String shipMethod, String addressIdGHN
             , String customerName, String staffName, String facilityName
             , LocalDateTime transactionDate, BigDecimal totalAmount, String paymentMethod
-            , String paymentCode, String numberPhone, String addressIDGHN_Shop, String shippingCode) {
+            , String paymentCode, String numberPhone, String addressIDGHN_Shop, String shippingCode, LocalDate delivery) {
         this.orderID = orderID;
         this.orderDate = orderDate;
         this.status = status;
@@ -59,6 +63,7 @@ public class OrdManagement_OrderDTO {
         this.numberPhone = numberPhone;
         this.addressIDGHN_Shop = addressIDGHN_Shop;
         this.shippingCode = shippingCode;
+        this.delivery = delivery;
     }
 
 }

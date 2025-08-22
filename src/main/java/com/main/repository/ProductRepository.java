@@ -49,6 +49,7 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
     WHERE pr.startDate <= CURRENT_TIMESTAMP
       AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
       AND pr.type = 'ProductDiscount'
+      AND pp.quantityRemaining > 0
 """)
     List<ProductViewDTO> findDiscountedProducts();
 
@@ -90,7 +91,7 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
       AND pr.startDate <= CURRENT_TIMESTAMP
       AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
       AND pr.type = 'ProductDiscount'
-      AND pp.quantityUsed < pp.quantityRemaining
+      AND pp.quantityRemaining > 0
     """)
     Byte findDiscountPercentByProductID(@Param("productID") String productID);
 
@@ -103,7 +104,7 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
       AND pr.startDate <= CURRENT_TIMESTAMP
       AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
       AND pr.type = 'ProductDiscount'
-      AND pp.quantityUsed < pp.quantityRemaining
+      AND pp.quantityRemaining > 0
     """)
     Integer findPromotionProductIdByProductID(@Param("productID") String productID);
 

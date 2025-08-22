@@ -3,6 +3,7 @@ package com.main.rest_controller;
 import com.main.dto.CustomerDTO;
 import com.main.dto.CustomerRegisterDTO;
 import com.main.entity.Account;
+import com.main.repository.CustomerRepository;
 import com.main.service.AccountService;
 import com.main.service.CustomerService;
 import com.main.service.MailService;
@@ -21,6 +22,7 @@ public class CustomerRegisterRestController {
     private final CustomerService customerService;
     private final MailService mailService;
     private final AccountService accountService;
+    private final CustomerRepository customerRepository;
 
     // 🔹 Bước 1: Gửi OTP và lưu DTO vào session
     @PostMapping("/opulentia/send-otp-register")

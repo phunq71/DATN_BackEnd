@@ -102,8 +102,8 @@ public class ProductManagementRestController {
                 return ResponseEntity.badRequest().body(Map.of("message", "Thiếu thông tin bắt buộc!"));
             }
 
-            if (dto.getDescription() == null || dto.getDescription().trim().length() < 10) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Mô tả phải dài ít nhất 10 ký tự!"));
+            if (dto.getDescription() == null || dto.getDescription().trim().length() < 150) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Mô tả phải dài ít nhất 150 ký tự!"));
             }
 
             // Gọi service lưu

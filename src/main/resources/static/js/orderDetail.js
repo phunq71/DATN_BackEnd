@@ -7,13 +7,46 @@ document.addEventListener('DOMContentLoaded', async function(){
 
     updateProgressBar(order.status);
 
-    // Fill in basic information
+    // order.deliveryDate là LocalDate từ backend, ví dụ "2025-08-22", có thể null
+    function formatLocalDate(ld) {
+        if (!ld) return ""; // kiểm tra null
+        const [year, month, day] = ld.split('-');
+        return `${day}/${month}/${year}`;
+    }
+
+// start date
+    const startDateFormatted = formatLocalDate(order.deliveryDate);
+
+// end date (cộng 1 ngày nếu có giá trị)
+    let endDateFormatted = "";
+    if (order.deliveryDate) {
+        const [year, month, day] = order.deliveryDate.split('-');
+        const endDateObj = new Date(year, month - 1, day);
+        endDateObj.setDate(endDateObj.getDate() + 1); // cộng 1 ngày
+        endDateFormatted = `${String(endDateObj.getDate()).padStart(2,'0')}/${String(endDateObj.getMonth()+1).padStart(2,'0')}/${endDateObj.getFullYear()}`;
+    }
+
+// Thay vào div
+    const deliveryDiv = document.getElementById('od-delivery-date');
+    if (startDateFormatted) {
+        deliveryDiv.textContent = `Ngày nhận hàng dự kiến: ${startDateFormatted} đến ${endDateFormatted}`;
+    } else {
+        deliveryDiv.textContent = "Ngày nhận hàng dự kiến: chưa có";
+    }
+
+
+
+
+
     document.getElementById('shippingName').textContent = order.shippingName;
     document.getElementById('shippingPhone').textContent = order.shippingPhone;
     document.getElementById('shippingAddress').textContent = order.shippingAddress;
     document.getElementById('paymentMethod').textContent = order.paymentMethod;
     document.getElementById('orderDate').textContent = formatDate(order.orderDate);
-    document.getElementById('transactionDate').textContent = formatDate(order.transactionDate);
+    document.getElementById('transactionDate').textContent = order.transactionDate
+        ? formatDate(order.transactionDate)
+        : "Chưa thanh toán";
+
     document.getElementById('orderId').textContent = formatOrderId(order.orderID);
     document.getElementById('orderStatus').textContent= order.statusName;
     const actionDiv = document.getElementById("actions")
@@ -221,15 +254,21 @@ document.addEventListener('DOMContentLoaded', async function(){
 
 
     function addActionButtons(status){
+        const progressBar = document.querySelector(".progress-bar");
         if(status=== "DaYeuCauHuy" || status === "ChoGiaoHang") return;
 
         const btn = document.createElement('button');
         btn.className="od-btn od-btn-cancel";
         if(status==="ChoXacNhan"){
             btn.textContent="Hủy đơn hàng";
+            attachCancelOrderHandler(orderId, btn);
         }else if(status==="ChuanBiDon" || status==="SanSangGiao"){
             btn.textContent="Gửi yêu cầu hủy đơn";
-        }else if(status === "DaHuy"){
+            btn.onclick = function() {
+                handleCancelOrder(orderId);  // nhớ chắc chắn orderId có giá trị
+            };
+        }else if(status === "DaHuy"|| status === "YeuCauHuy"){
+            progressBar.style.display = "none";
             btn.textContent="Mua lại";
         }
         else if (status === "DaGiao") {
@@ -348,4 +387,105 @@ document.addEventListener('DOMContentLoaded', async function(){
         return diffDays > 15;
     }
 });
+
+function attachCancelOrderHandler(orderId, btn) {
+    if (!btn) return;
+
+    btn.addEventListener("click", async () => {
+        const result = await Swal.fire({
+            title: "Xác nhận hủy đơn?",
+            text: "Bạn có chắc muốn hủy đơn hàng này không?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Hủy đơn",
+            cancelButtonText: "Thoát",
+            reverseButtons: true
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const response = await fetch(`/api/orders/${orderId}/cancel`, {
+                method: "PUT"
+            });
+
+            if (response.ok) {
+                await Swal.fire({
+                    title: "Thành công!",
+                    text: "Hủy đơn hàng thành công!",
+                    icon: "success",
+                    confirmButtonText: "OK"
+                });
+                const progressBar = document.querySelector(".progress-bar");
+                document.getElementById("orderStatus").innerText = "Đã hủy";
+                progressBar.style.display = "none";
+
+            } else {
+                const errorText = await response.text();
+                Swal.fire({
+                    title: "Thất bại!",
+                    text: "Không thể hủy đơn: " + errorText,
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+            }
+        } catch (err) {
+            console.error("Lỗi khi hủy đơn:", err);
+            Swal.fire({
+                title: "Lỗi!",
+                text: "Có lỗi xảy ra khi hủy đơn hàng.",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        }
+    });
+}
+
+// Hàm hiển thị dialog chọn lý do
+function showCancelReasonDialog(callback) {
+    Swal.fire({
+        title: 'Chọn lý do hủy đơn',
+        input: 'select',
+        inputOptions: {
+            'Tôi đổi ý': 'Tôi đổi ý',
+            'Đặt nhầm sản phẩm': 'Đặt nhầm sản phẩm',
+            'Muốn thay đổi địa chỉ': 'Muốn thay đổi địa chỉ',
+            'Khác': 'Khác'
+        },
+        inputPlaceholder: 'Chọn lý do',
+        showCancelButton: true,
+        confirmButtonText: 'Xác nhận',
+        cancelButtonText: 'Hủy'
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            callback(result.value);
+        }
+    });
+}
+
+// Hàm riêng xử lý khi bấm "Gửi yêu cầu hủy đơn"
+function handleCancelOrder(orderId) {
+    showCancelReasonDialog(function(reason) {
+        console.log("Lý do đã chọn:", reason);
+
+        // Gọi API hủy đơn
+        fetch(`/api/orders/${orderId}/requestCancel`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ reason: reason })
+        })
+            .then(res => res.json())
+            .then(data => {
+                Swal.fire("Thành công", "Đơn đã được gửi yêu cầu hủy!", "success");
+                const progressBar = document.querySelector(".progress-bar");
+                document.getElementById("orderStatus").innerText = "Yêu cầu hủy";
+                progressBar.style.display = "none";
+            })
+            .catch(err => {
+                Swal.fire("Lỗi", "Không thể hủy đơn, vui lòng thử lại!", "error");
+            });
+    });
+}
 

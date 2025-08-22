@@ -21,6 +21,7 @@ const female= document.getElementById('female');
 const address= document.getElementById('address');
 const imageAvt= document.getElementById('imageAvt');
 const imageInput =document.getElementById('imageInput');
+const hang =document.getElementById('hang');
 const dob=document.getElementById('dob');
 function loadAccount(){
    return axios.get("/opulentia_user/getCustomer")
@@ -38,6 +39,7 @@ function setForm(account){
     if(account!=null){
         displayName.innerText=account.fullName;
         fullName.value=account.fullName;
+        hang.innerText=account.rank;
         if(account.gender == null){
             male.checked=false;
             female.checked=false;

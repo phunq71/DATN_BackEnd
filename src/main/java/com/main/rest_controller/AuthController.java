@@ -1,5 +1,6 @@
 package com.main.rest_controller;
 
+import com.main.repository.AccountRepository;
 import com.main.security.*;
 import com.main.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService customUserDetailsService;
+    private final AccountRepository accountRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
@@ -62,8 +64,6 @@ public class AuthController {
             Authentication auth = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
-
-
 
             Map<String, ResponseCookie> cookies = authService.generateTokenCookies(userDetails, request.isRememberMe());
 
@@ -129,6 +129,20 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
+        return ResponseEntity.ok("Đăng xuất thành công");
+    }
+
+    @PostMapping("/logout2")
+    public ResponseEntity<?> logout2(HttpServletResponse response) {
+        System.out.println("❎❎❎❎❎❎❎❎");
+        System.out.println(AuthUtil.getAccountID());
+        CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(accountRepository.findByAccountId(AuthUtil.getAccountID()).get().getEmail());
+
+        Map<String, ResponseCookie> cookies = authService.generateTokenCookies2(userDetails, false);
+
+        response.addHeader("Set-Cookie", cookies.get("accessToken").toString());
+        response.addHeader("Set-Cookie", cookies.get("refreshToken").toString());
 
         return ResponseEntity.ok("Đăng xuất thành công");
     }

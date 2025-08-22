@@ -55,6 +55,38 @@ document.addEventListener("DOMContentLoaded",async function () {
 
                 // Clear existing size options
                 sizeContainer.innerHTML = '';
+                // Kiểm tra tất cả size hết hàng
+                const allOutOfStock = sizesData.every(size => !size.isInStock);
+                if (allOutOfStock) {
+                    console.log('Tất cả size đều hết hàng!');
+                    stockStatus.textContent = 'Sản phẩm tạm hết hàng';
+
+                    const slider = document.querySelector('.product-images');
+
+                    if (slider) {
+                        // Tạo thẻ img cho nhãn "Sold Out"
+                        const soldOutImg = document.createElement('img');
+                        soldOutImg.src = '/uploads/hetHang.png';
+                        soldOutImg.alt = 'Sold Out';
+                        soldOutImg.className = 'sold-out-overlay';
+
+                        // Đặt style overlay
+                        soldOutImg.style.position = 'absolute';
+                        soldOutImg.style.top = '50%';
+                        soldOutImg.style.left = '50%';
+                        soldOutImg.style.transform = 'translate(-50%, -50%)';
+                        soldOutImg.style.width = '500px'; // chỉnh kích thước nếu cần
+                        soldOutImg.style.height = '500px';
+                        soldOutImg.style.opacity = '0.7';
+                        soldOutImg.style.pointerEvents = 'none';
+                        soldOutImg.style.zIndex = '1';
+
+                        // Đảm bảo container có position relative
+                        slider.style.position = 'relative';
+
+                        slider.appendChild(soldOutImg);
+                    }
+                }
 
                 // Create new size options based on API response
                 sizesData.forEach(size => {

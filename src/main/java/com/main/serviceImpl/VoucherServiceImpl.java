@@ -89,25 +89,29 @@ public class VoucherServiceImpl implements VoucherService {
         totalAmount = transactionRepository.findByOrder_OrderID(orderId).getAmount();
 
         VoucherOrderDTO voucher = getNearestVoucherToReach(customer.getMembership().getMembershipId(), totalAmount);
+        if( voucher != null ){
+            UsedVoucher usedVoucher = new UsedVoucher();
+            usedVoucher.setCustomer(customer);
+            usedVoucher.setType(false);
+            usedVoucher.setVoucher( voucherRepository.findById(voucher.getVoucherID()).get());
+            UsedVoucherID usedVoucherID = new UsedVoucherID();
+            usedVoucherID.setCustomer(order.getCustomer().getCustomerId());
+            usedVoucherID.setVoucher(voucher.getVoucherID());
+            usedVoucher.setUsedVoucherID(usedVoucherID);
 
-        UsedVoucher usedVoucher = new UsedVoucher();
-        usedVoucher.setCustomer(customer);
-        usedVoucher.setType(false);
-        usedVoucher.setVoucher( voucherRepository.findById(voucher.getVoucherID()).get());
-        UsedVoucherID usedVoucherID = new UsedVoucherID();
-        usedVoucherID.setCustomer(order.getCustomer().getCustomerId());
-        usedVoucherID.setVoucher(voucher.getVoucherID());
-        usedVoucher.setUsedVoucherID(usedVoucherID);
+            usedVoucherRepository.save(usedVoucher);
 
-        usedVoucherRepository.save(usedVoucher);
+            Voucher vc = new Voucher();
+            vc = voucherRepository.findById(voucher.getVoucherID()).get();
+            vc.setQuantityUsed( vc.getQuantityUsed() + 1 );
+            vc.setQuantityRemaining(vc.getQuantityRemaining() - 1);
+            voucherRepository.save(vc);
 
 
-
-        mailService.sendVoucherEmail( order.getCustomer().getAccount().getEmail()
+            mailService.sendVoucherEmail( order.getCustomer().getAccount().getEmail()
                     , voucher.getVoucherID()
                     , voucher.getDiscountValue()
                     , voucher.getEndDate());
-
-
+        }
     }
 }

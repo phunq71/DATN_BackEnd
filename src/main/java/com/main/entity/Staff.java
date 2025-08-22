@@ -62,4 +62,7 @@ public class Staff implements Serializable {
     @OneToMany(mappedBy = "staff")
     private List<Order> orders;
 
+    @OneToMany(mappedBy = "staff", fetch = FetchType.LAZY)
+    private List<LogOrders> logOrders;
+
 }

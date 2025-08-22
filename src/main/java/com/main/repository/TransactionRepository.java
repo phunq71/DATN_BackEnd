@@ -4,12 +4,14 @@ import com.main.dto.RevenueByAreaDTO;
 import com.main.dto.RevenueByCategoryDTO;
 import com.main.dto.RevenueByShopDTO;
 import com.main.dto.RevenueByTimeDTO;
+import com.main.entity.Customer;
 import com.main.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +27,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
         FROM Transaction ts
         JOIN ts.order o
         WHERE ts.transactionType =true
+        AND ts.status = 'DaThanhToan'
         GROUP BY YEAR(o.orderDate)
         ORDER BY YEAR(o.orderDate) ASC
         """)
@@ -45,6 +48,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
           OR
           (f.type = 'K' AND parentOfF.type = 'S' AND parentOfParent.type = 'Z' AND parentOfParent.manager.staffID = :managerId)
       )
+      AND ts.status = 'DaThanhToan'
     GROUP BY YEAR(o.orderDate)
     ORDER BY YEAR(o.orderDate) ASC
     """)
@@ -57,6 +61,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
         FROM Transaction ts
         JOIN ts.order o
         WHERE YEAR(o.orderDate) = :year AND ts.transactionType =true
+        AND ts.status = 'DaThanhToan'
         GROUP BY  MONTH(o.orderDate)
         ORDER BY MONTH(o.orderDate) ASC
         """)
@@ -78,6 +83,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
                         OR
                         (f.type = 'K' AND parentOfF.type = 'S' AND parentOfParent.type = 'Z' AND parentOfParent.manager.staffID = :managerId)
                     )
+                AND ts.status = 'DaThanhToan'
         GROUP BY  MONTH(o.orderDate)
         ORDER BY MONTH(o.orderDate) ASC
         """)
@@ -109,6 +115,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
                     OR
                     (f.type = 'K' AND parentOfF.type = 'S' AND parentOfParent.type = 'Z' AND parentOfParent.manager.staffID = :managerId)
                     )
+                AND ts.status = 'DaThanhToan'
             GROUP BY YEAR(o.orderDate)
             ORDER BY YEAR(o.orderDate) DESC
     """)
@@ -132,9 +139,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
             (f.type = 'S' AND f.parent = z) OR
             (f.type = 'K' AND f.parent.parent = z)
         )
-        WHERE ts.transactionType = true 
-        AND YEAR(o.orderDate) = :year 
+        WHERE ts.transactionType = true
+        AND YEAR(o.orderDate) = :year
         AND z.type = 'Z'
+        AND ts.status = 'DaThanhToan'
         GROUP BY MONTH(o.orderDate), z.facilityName
         ORDER BY MONTH(o.orderDate) ASC
         """)
@@ -153,6 +161,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     )
     WHERE ts.transactionType = true
       AND z.type = 'Z'
+      AND ts.status = 'DaThanhToan'
     GROUP BY YEAR(o.orderDate), z.facilityName
     ORDER BY YEAR(o.orderDate) ASC
     """)
@@ -168,6 +177,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
         LEFT JOIN v.items i
         LEFT JOIN i.orderDetails od
         LEFT JOIN od.order o
+        JOIN o.transaction ts ON ts.status = 'DaThanhToan'
         WHERE c.parent IS NOT NULL
           AND (o.orderDate IS NULL OR YEAR(o.orderDate) = :year)
         GROUP BY c.categoryName
@@ -214,6 +224,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
       AND z.type = 'Z'
       AND YEAR(o.orderDate) = :year
       AND (:month IS NULL OR MONTH(o.orderDate) = :month)
+      AND ts.status = 'DaThanhToan'
     GROUP BY 
         z.facilityName,
         CASE 
@@ -223,5 +234,15 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 """)
     List<RevenueByShopDTO> getRevenueByShop(@Param("year") int year,
                                             @Param("month") Integer month);
+
+    @Query("""
+    SELECT COALESCE(SUM(ts.amount), 0)
+    FROM Transaction ts
+    WHERE ts.status = 'DaThanhToan'
+      AND ts.order.customer = :customer
+      AND ts.status = 'DaThanhToan'
+""")
+    BigDecimal sumAmountByCustomer(@Param("customer") Customer customer);
+
 
 }

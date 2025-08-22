@@ -3,6 +3,7 @@ package com.main.service;
 import com.main.dto.CustomerDTO;
 import com.main.entity.Customer;
 import com.main.dto.CustomerRegisterDTO;
+import com.main.entity.Order;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface CustomerService {
@@ -23,4 +24,6 @@ public interface CustomerService {
     public Customer verifyQRCodeToken(String qrToken);
 
     public Boolean updateAddrBoolean(String Address, String AddressIdGHN);
+
+    public Void updateRankByCustomerId(Customer customer);
 }

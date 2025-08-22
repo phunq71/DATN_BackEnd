@@ -83,17 +83,30 @@ public class ProductDetailController {
             sumRating = 0;
         }
         SupportDetailDTO pro = productService.getSupportDetail(variantID);
-        if(pro.getDiscountPercent() != null) {
-            BigDecimal price = variant.get().getPrice(); // BigDecimal
-            byte discountPercent = pro.getDiscountPercent(); // byte
-            // Tính (1 - discountPercent / 100)
+        BigDecimal price = variant.get().getPrice(); // BigDecimal gốc
+        model.addAttribute("priceVariantRaw", price); // giữ BigDecimal để so sánh/tính toán
+        model.addAttribute("priceVariant", formatToVND(price)); // String để hiển thị
+
+        if (pro.getDiscountPercent() != null) {
+            byte discountPercent = pro.getDiscountPercent();
+
+            // Tính giá khuyến mãi (BigDecimal)
             BigDecimal discountMultiplier = BigDecimal.ONE.subtract(
                     BigDecimal.valueOf(discountPercent).divide(BigDecimal.valueOf(100))
             );
-            BigDecimal pricePromotion = price.multiply(discountMultiplier);
-            String promotionPrice = formatToVND(pricePromotion);
-            model.addAttribute("pricePromotion", promotionPrice);
+            BigDecimal pricePromotionRaw = price.multiply(discountMultiplier);
+
+            // Format String để hiển thị
+            String pricePromotion = formatToVND(pricePromotionRaw);
+
+            // Add vào model
+            model.addAttribute("pricePromotionRaw", pricePromotionRaw);
+            model.addAttribute("pricePromotion", pricePromotion);
+
+            // Thêm luôn % giảm để Thymeleaf không cần tính
+            model.addAttribute("discountPercent", discountPercent);
         }
+
 
         // Nhân để ra giá sau khuyến mãi
         model.addAttribute("pro", pro);

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -84,5 +85,12 @@ public class Order {
     public Order(Integer orderID) {
         this.orderID = orderID;
     }
+
+
+    public LocalDate delivery;
+
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    private List<LogOrders> logOrders;
+
 }
 

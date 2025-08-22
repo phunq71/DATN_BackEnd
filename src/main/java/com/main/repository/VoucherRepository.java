@@ -63,7 +63,6 @@ public interface VoucherRepository extends JpaRepository<Voucher, String> {
     );
 
 
-
     // Lấy hậu mãi đã đạt được
     @Query("""
     SELECT v

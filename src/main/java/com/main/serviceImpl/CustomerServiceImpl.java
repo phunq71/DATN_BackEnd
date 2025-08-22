@@ -7,22 +7,20 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.main.dto.CustomerDTO;
 import com.main.dto.CustomerRegisterDTO;
-import com.main.entity.Account;
-import com.main.entity.Customer;
-import com.main.entity.Image;
-import com.main.entity.Membership;
-import com.main.repository.AccountRepository;
-import com.main.repository.CustomerRepository;
-import com.main.repository.MembershipRepository;
+import com.main.entity.*;
+import com.main.repository.*;
 import com.main.service.CustomerService;
+import com.main.service.MailService;
 import com.main.utils.AddressUtil;
 import com.main.utils.AuthUtil;
 import com.main.utils.CommonUtils;
 import com.main.utils.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.mail.MailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -30,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -48,6 +47,16 @@ public class CustomerServiceImpl implements CustomerService {
    private final CustomerRepository customerRepository;
     private final AccountRepository accountRepository;
     private final MembershipRepository membershipRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
+    @Autowired
+    private MailService mailService;
+    @Autowired
+    private VoucherRepository voucherRepository;
+    @Autowired
+    private PromotionRepository promotionRepository;
+    @Autowired
+    private UsedVoucherRepository usedVoucherRepository;
 
     public CustomerServiceImpl(CustomerRepository customerRepository, AccountRepository accountRepository, MembershipRepository membershipRepository) {
         this.customerRepository = customerRepository;
@@ -153,10 +162,8 @@ public class CustomerServiceImpl implements CustomerService {
             acc.setRole("USER");
             acc.setStatus(true);
             acc.setCreateAt(LocalDate.now());
-            accountRepository.save(acc);
-            Membership mber = membershipRepository.findById("MB01").get();
             Customer cus = new Customer();
-            cus.setCustomerId(acc.getAccountId());
+
             cus.setFullName(customerRegisterDTO.getFullname());
             cus.setGender(customerRegisterDTO.getGender());
             cus.setAddress(customerRegisterDTO.getAddress());
@@ -168,10 +175,15 @@ public class CustomerServiceImpl implements CustomerService {
 
             cus.setAddressIdGHN(formatted);
             cus.setDob(customerRegisterDTO.getDob());
-            cus.setMembership(mber);
+            cus.setMembership(null);
             cus.setImageAvt("avatar.png");
-            cus.setPhone("0000000000");
+            cus.setPhone("N/A");
+            cus.setAccount(acc);
             customerRepository.save(cus);
+
+            Customer cus1 = customerRepository.findByCustomerId(cus.getCustomerId());
+
+            updateRankByCustomerId(cus1);
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -279,6 +291,86 @@ public class CustomerServiceImpl implements CustomerService {
             return false;
         }
     }
+
+    @Override
+    @Transactional
+    public Void updateRankByCustomerId(Customer customer) {
+        // Tổng chi tiêu
+        BigDecimal totalAmount = transactionRepository.sumAmountByCustomer(customer);
+
+        // membership hiện tại của KH (có thể null)
+        String membershipId = (customer.getMembership() != null)
+                ? customer.getMembership().getMembershipId()
+                : null;
+
+        // Hạng phù hợp hiện tại
+        List<Membership> memberships = membershipRepository.findMembershipBySpent(totalAmount);
+        Membership newMembership = memberships.isEmpty() ? null : memberships.get(0); // lấy hạng cao nhất phù hợp
+
+        // Nếu có hạng mới
+        if (newMembership != null) {
+            String newMembershipId = newMembership.getMembershipId();
+            System.out.println("😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚");
+            // So sánh an toàn (nếu khác thì update)
+            boolean isDifferent = (membershipId == null)
+                    || (!membershipId.equalsIgnoreCase(newMembershipId));
+
+            if (isDifferent) {
+                // Cập nhật hạng mới
+                customer.setMembership(newMembership);
+                customerRepository.save(customer);
+
+                // Gửi mail chúc mừng
+                mailService.sendCongratulationRank(customer);
+
+                // Lấy promotions của rank mới
+                List<Promotion> promotions = promotionRepository.findByNewRank(newMembershipId);
+                if (promotions != null && !promotions.isEmpty()) {
+                    promotions.forEach(promotion -> {
+                        if (promotion.getVouchers() != null) {
+                            promotion.getVouchers().forEach(voucher -> {
+                                if (voucher != null) {
+                                    UsedVoucher usedVoucher = new UsedVoucher();
+                                    usedVoucher.setType(false);
+                                    usedVoucher.setCustomer(customer);
+                                    usedVoucher.setVoucher(voucher);
+
+                                    UsedVoucherID usedVoucherID = new UsedVoucherID();
+                                    usedVoucherID.setCustomer(customer.getCustomerId());
+                                    usedVoucherID.setVoucher(voucher.getVoucherID());
+                                    usedVoucher.setUsedVoucherID(usedVoucherID);
+
+                                    usedVoucherRepository.save(usedVoucher);
+
+                                    // Trừ số lượng
+                                    if (voucher.getQuantityRemaining() != null && voucher.getQuantityRemaining() > 0) {
+                                        voucher.setQuantityRemaining(voucher.getQuantityRemaining() - 1);
+                                    }
+                                    voucher.setQuantityUsed(
+                                            (voucher.getQuantityUsed() == null ? 0 : voucher.getQuantityUsed()) + 1
+                                    );
+                                    voucherRepository.save(voucher);
+
+                                    // Gửi mail voucher
+                                    if (customer.getAccount() != null) {
+                                        mailService.sendVoucherEmail(
+                                                customer.getAccount().getEmail(),
+                                                voucher.getVoucherID(),
+                                                voucher.getDiscountValue(),
+                                                voucher.getEndDate()
+                                        );
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        }
+
+        return null;
+    }
+
 }
 
 

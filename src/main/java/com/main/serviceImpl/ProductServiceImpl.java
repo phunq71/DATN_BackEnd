@@ -74,8 +74,20 @@ public class ProductServiceImpl implements ProductService {
 
             productViewDTOList.add(productViewDTO);
         });
-        markFavorites(productViewDTOList);
-        return new PageImpl<>(productViewDTOList, pageable, productPage.getTotalElements());
+        // Lấy danh sách product không có variant hoặc item
+        List<Product> listTemp = productRepository.findProductsWithoutVariantsOrItems();
+        Set<String> invalidProductIds = listTemp.stream()
+                .map(Product::getProductID)
+                .collect(Collectors.toSet());
+
+        // Lọc ra các sản phẩm hợp lệ
+        List<ProductViewDTO> dtoList = productViewDTOList.stream()
+                .filter(p -> !invalidProductIds.contains(p.getProductID()))
+                .collect(Collectors.toList());
+
+        markFavorites(dtoList);
+        return new PageImpl<>(dtoList, pageable, productPage.getTotalElements());
+
 
     }
 
@@ -97,7 +109,18 @@ public class ProductServiceImpl implements ProductService {
             });
 
         }
-        return list;
+
+        // Lấy danh sách product không có variant hoặc item
+        List<Product> listTemp = productRepository.findProductsWithoutVariantsOrItems();
+        Set<String> invalidProductIds = listTemp.stream()
+                .map(Product::getProductID)
+                .collect(Collectors.toSet());
+
+        // Lọc ra các sản phẩm hợp lệ
+        List<ProductViewDTO> dtoList = list.stream()
+                .filter(p -> !invalidProductIds.contains(p.getProductID()))
+                .collect(Collectors.toList());
+        return dtoList;
     }
 
     @Override
@@ -130,7 +153,18 @@ public class ProductServiceImpl implements ProductService {
             dto.setVariantID(variant.getVariantID());
             result.add(dto);
         });
-        return result;
+
+        // Lấy danh sách product không có variant hoặc item
+        List<Product> listTemp = productRepository.findProductsWithoutVariantsOrItems();
+        Set<String> invalidProductIds = listTemp.stream()
+                .map(Product::getProductID)
+                .collect(Collectors.toSet());
+
+        // Lọc ra các sản phẩm hợp lệ
+        List<ProductViewDTO> dtoList = result.stream()
+                .filter(p -> !invalidProductIds.contains(p.getProductID()))
+                .collect(Collectors.toList());
+        return dtoList;
     }
     @Override
     public List<ProductViewDTO> findBestSellingProducts() {
@@ -144,7 +178,17 @@ public class ProductServiceImpl implements ProductService {
             enrichProductViewDTO(dto, product, hotProductIDs, productRepository.isNewProduct(product.getProductID()) > 0);
             listDTO.add(dto);
         });
-        return listDTO;
+        // Lấy danh sách product không có variant hoặc item
+        List<Product> listTemp = productRepository.findProductsWithoutVariantsOrItems();
+        Set<String> invalidProductIds = listTemp.stream()
+                .map(Product::getProductID)
+                .collect(Collectors.toSet());
+
+        // Lọc ra các sản phẩm hợp lệ
+        List<ProductViewDTO> dtoList = listDTO.stream()
+                .filter(p -> !invalidProductIds.contains(p.getProductID()))
+                .collect(Collectors.toList());
+        return dtoList;
     }
 
 
@@ -192,6 +236,8 @@ public class ProductServiceImpl implements ProductService {
         // bổ sung thuộc tính số totalLikes
         dto.setTotalLikes(favoriteRepository.countFavoriteByProduct_ProductID(product.getProductID()));
     }
+
+
 
     @Override
     public void markFavorites(List<ProductViewDTO> products) {
@@ -310,10 +356,18 @@ public class ProductServiceImpl implements ProductService {
             enrichProductViewDTO(dto, product, hotProductIDs, productRepository.isNewProduct(dto.getProductID()) > 0);
             dtos.add(dto);
         });
-        // 4. Đánh dấu sản phẩm yêu thích (nếu có login)
-        markFavorites(dtos);
-        return dtos;
+        // Lấy danh sách product không có variant hoặc item
+        List<Product> listTemp = productRepository.findProductsWithoutVariantsOrItems();
+        Set<String> invalidProductIds = listTemp.stream()
+                .map(Product::getProductID)
+                .collect(Collectors.toSet());
 
+        // Lọc ra các sản phẩm hợp lệ
+        List<ProductViewDTO> dtoList = dtos.stream()
+                .filter(p -> !invalidProductIds.contains(p.getProductID()))
+                .collect(Collectors.toList());
+        markFavorites(dtoList);
+        return dtoList;
     }
 
     @Override
@@ -347,7 +401,21 @@ public class ProductServiceImpl implements ProductService {
 
         // 4. Đánh dấu sản phẩm yêu thích (nếu có login)
         markFavorites(dtos);
-        return dtos;
+        dtos.forEach(dto -> {
+            System.out.println( "👉" + dto.getProductID());
+        });
+
+        // Lấy danh sách product không có variant hoặc item
+        List<Product> listTemp = productRepository.findProductsWithoutVariantsOrItems();
+        Set<String> invalidProductIds = listTemp.stream()
+                .map(Product::getProductID)
+                .collect(Collectors.toSet());
+
+        // Lọc ra các sản phẩm hợp lệ
+        List<ProductViewDTO> dtoList = dtos.stream()
+                .filter(p -> !invalidProductIds.contains(p.getProductID()))
+                .collect(Collectors.toList());
+        return dtoList;
     }
 
     //3 trong 1
@@ -437,11 +505,22 @@ public class ProductServiceImpl implements ProductService {
 
             dtos.add(dto);
         }
+        // Lấy danh sách product không có variant hoặc item
+        List<Product> listTemp = productRepository.findProductsWithoutVariantsOrItems();
+        Set<String> invalidProductIds = listTemp.stream()
+                .map(Product::getProductID)
+                .collect(Collectors.toSet());
+
+        // Lọc ra các sản phẩm hợp lệ
+        List<ProductViewDTO> dtoList = dtos.stream()
+                .filter(p -> !invalidProductIds.contains(p.getProductID()))
+                .collect(Collectors.toList());
 
         // Gắn yêu thích nếu có login
-        markFavorites(dtos);
+        markFavorites(dtoList);
 
-        return new PageImpl<>(dtos, pageable, rawPage.getTotalElements());
+
+        return new PageImpl<>(dtoList, pageable, rawPage.getTotalElements());
     }
 
     public Page<ProductTableAdminDTO> getPagedProducts(
@@ -553,8 +632,7 @@ public class ProductServiceImpl implements ProductService {
             product.setProductName(productDetail.getName());
             product.setDescription(productDetail.getDescription());
             product.setTargetCustomer(productDetail.getTargetCustomer());
-            product.setBrand(productDetail.getBrand());
-
+            product.setBrand(productDetail.getBrand().toUpperCase());
             System.out.println("💾💾💾💾💾💾💾💾"+product.getTargetCustomer());
             productRepository.save(product);
         }catch (Exception e){
@@ -623,9 +701,9 @@ public class ProductServiceImpl implements ProductService {
         product.setProductName(dto.getName());
         product.setDescription(dto.getDescription());
         product.setTargetCustomer(dto.getTargetCustomer());
-        product.setBrand(dto.getBrand());
+        product.setBrand(dto.getBrand().toUpperCase());
         product.setCategory( categoryRepository.findByCategoryName (dto.getCategoryName()));
-        product.setCreatedDate(dto.getCreatedDate()); // Nếu là LocalDate thì ok
+        product.setCreatedDate(dto.getCreatedDate());
         productRepository.save(product);
     }
 

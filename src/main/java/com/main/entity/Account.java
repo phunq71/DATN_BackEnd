@@ -50,6 +50,6 @@ public class Account implements Serializable {
     @OneToOne(mappedBy = "account")
     private Staff staff;
 
-    @OneToOne(mappedBy = "account")
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
     private Customer customer;
 }

@@ -225,3 +225,6 @@ function clearCartLocalStorage(){
 document.addEventListener('DOMContentLoaded', function () {
     restoreCheckedItemIDs();
 });
+
+
+

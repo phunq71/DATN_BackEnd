@@ -6,6 +6,8 @@ import com.main.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
@@ -15,6 +17,7 @@ public class TransactionServiceImpl implements TransactionService {
     public void updateStatusByOrderId(Integer orderId) {
         Transaction transaction = new Transaction();
         transaction = transactionRepository.findByOrder_OrderID(orderId);
+        transaction.setTransactionDate(LocalDateTime.now());
         transaction.setStatus("DaThanhToan");
         transactionRepository.save(transaction);
     }
