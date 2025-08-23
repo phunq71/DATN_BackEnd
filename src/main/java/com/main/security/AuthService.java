@@ -56,27 +56,58 @@ public class AuthService {
         return cookies;
     }
 
-    public Map<String, ResponseCookie> generateTokenCookies2(UserDetails userDetails, boolean rememberMe) {
+    public Map<String, ResponseCookie> generateTokenCookiesAdmin(UserDetails userDetails, boolean rememberMe) {
         String accessToken = jwtService.generateAccessToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-        long accessTokenMaxAge = 0;
-        long refreshTokenMaxAge = 0; // 7 ngày nếu nhớ, -1 nếu không
+        long accessTokenMaxAge = 60 * 60; // 1h
+        long refreshTokenMaxAge = rememberMe ? 7 * 24 * 60 * 60 : -1; // 7 ngày hoặc session cookie
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true) // bắt buộc khi SameSite=None
                 .path("/")
+                .sameSite("None") // cho phép cross-site
                 .maxAge(accessTokenMaxAge)
-                .sameSite("Lax")
                 .build();
 
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
+                .sameSite("None")
                 .maxAge(refreshTokenMaxAge)
-                .sameSite("Lax")
+                .build();
+
+        Map<String, ResponseCookie> cookies = new HashMap<>();
+        cookies.put("accessToken", accessTokenCookie);
+        cookies.put("refreshToken", refreshTokenCookie);
+        return cookies;
+    }
+
+
+
+    public Map<String, ResponseCookie> generateTokenCookies2(UserDetails userDetails, boolean rememberMe) {
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+        long accessTokenMaxAge = 0; // 1h
+        long refreshTokenMaxAge = 0; // 7 ngày hoặc session cookie
+
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(true) // bắt buộc khi SameSite=None
+                .path("/")
+                .sameSite("None") // cho phép cross-site
+                .maxAge(accessTokenMaxAge)
+                .build();
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .sameSite("None")
+                .maxAge(refreshTokenMaxAge)
                 .build();
 
         Map<String, ResponseCookie> cookies = new HashMap<>();
