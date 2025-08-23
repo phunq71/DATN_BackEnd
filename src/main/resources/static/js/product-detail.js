@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded",async function () {
                     if (slider) {
                         // Tạo thẻ img cho nhãn "Sold Out"
                         const soldOutImg = document.createElement('img');
-                        soldOutImg.src = '/uploads/hetHang.png';
+                        soldOutImg.src = 'https://phudatn.blob.core.windows.net/images/hetHang.png';
                         soldOutImg.alt = 'Sold Out';
                         soldOutImg.className = 'sold-out-overlay';
 
@@ -392,7 +392,7 @@ document.addEventListener("DOMContentLoaded",async function () {
                     const images = review.reviewImages?.length > 0
                         ? `<div class="review-images">${
                             review.reviewImages.map(img =>
-                                `<img src="/uploads/${img.imageUrl}" alt="Review ${review.reviewID}" class="review-image">`
+                                `<img src="https://phudatn.blob.core.windows.net/images/${img.imageUrl}" alt="Review ${review.reviewID}" class="review-image">`
                             ).join('')
                         }</div>`
                         : '';

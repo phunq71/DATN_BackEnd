@@ -829,7 +829,7 @@
             <div class="product-container item" th:each="pro : ${products}">
                 <a th:href="@{'/opulentia/' + ${pro.parentCategoryId} + '/' + ${pro.childCategoryId} + '/' + ${pro.productID} + '/' + ${pro.variantID}}" style="text-decoration: none;">
                     <div class="product-wrapper">
-                        <img th:src="@{'/uploads/' + ${pro.imageUrl}}"
+                        <img th:src="@{'https://phudatn.blob.core.windows.net/images/' + ${pro.imageUrl}}"
                              alt="Product" class="product-image">
 
                         <!-- Bán chạy -->

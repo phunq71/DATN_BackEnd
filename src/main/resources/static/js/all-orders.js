@@ -280,7 +280,7 @@ function createProductItem(item) {
     productItem.className = 'od-product-item';
 
     const image = document.createElement('img');
-    image.src = item.image ? "/uploads/" + item.image : 'https://via.placeholder.com/100';
+    image.src = item.image ? "https://phudatn.blob.core.windows.net/images/" + item.image : 'https://via.placeholder.com/100';
     image.alt = item.productName;
     image.className = 'od-product-image';
 
@@ -490,7 +490,7 @@ function createReturnItem(item) {
     productItem.className = 'od-product-item';
 
     const image = document.createElement('img');
-    image.src = "/uploads/"+ item.image || 'https://via.placeholder.com/100';
+    image.src = "https://phudatn.blob.core.windows.net/images/"+ item.image || 'https://via.placeholder.com/100';
     image.alt = item.productName;
     image.className = 'od-product-image';
 
