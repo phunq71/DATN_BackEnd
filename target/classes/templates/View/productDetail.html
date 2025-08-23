@@ -1037,10 +1037,10 @@
             <div class="color-options">
                 <th:block th:each="variant, iterStat : ${listV}">
                     <a th:href="@{/opulentia/{parent}/{categoryId}/{productId}/{variantId}
-    (parent=${product.category.parent.categoryId},
-     categoryId=${product.category.categoryId},
-     productId=${product.getProductID()},
-     variantId=${variant.variantId})}">
+                    (parent=${product.category.parent.categoryId},
+                     categoryId=${product.category.categoryId},
+                     productId=${product.getProductID()},
+                     variantId=${variant.variantId})}">
                     <div class="color-option"
                              th:classappend="${iterStat.index == 0}"
                              th:attr="data-color-index=${iterStat.index}"

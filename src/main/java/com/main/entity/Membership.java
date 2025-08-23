@@ -33,5 +33,13 @@ public class Membership implements Serializable {
     @OneToMany(mappedBy = "membership")
     private List<Customer> customers;
 
+
+    public Membership(String membershipId, String rank, String description, BigDecimal minPoint) {
+        this.membershipId = membershipId;
+        this.rank = rank;
+        this.description = description;
+        this.minPoint = minPoint;
+    }
+
 }
 

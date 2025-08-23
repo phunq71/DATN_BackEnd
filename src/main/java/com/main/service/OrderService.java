@@ -60,4 +60,7 @@ public interface OrderService {
     Boolean cancelOrder2(Integer orderId, String reason);
 
     Boolean cancelOrder3(Integer orderId, String reason);
+
+    public Page<CusManagement_orderDTO> getOrdersByCustomerId(String customerId,int page);
+
 }

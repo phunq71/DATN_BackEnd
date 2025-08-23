@@ -56,7 +56,7 @@ public class Order {
     private BigDecimal discountCost;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CustomerID",nullable = false)
+    @JoinColumn(name = "CustomerID")
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -18,6 +18,7 @@ import com.main.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -797,7 +798,7 @@ public class OrderServiceImpl implements OrderService {
             Order order = orderRepository.findById(orderId).get();
             // lưu log + Lưu lại thành đã hủy
             LogOrders logOrders = new LogOrders();
-            logOrders.setStaff( null );
+            logOrders.setStaff(null);
             logOrders.setOrder(order);
             logOrders.setContent("Khách yêu cầu hủy đơn, lý do: " + reason.toLowerCase(Locale.ROOT));
             logOrders.setUpdateAt(LocalDateTime.now());
@@ -810,8 +811,14 @@ public class OrderServiceImpl implements OrderService {
             System.out.println("😚😚😚😚😚😚😚😚😚😚😚😚😚");
 
             return true;
-        }catch (Exception e) {
+        } catch (Exception e) {
             return false;
         }
+    }
+
+    public Page<CusManagement_orderDTO> getOrdersByCustomerId(String customerId, int page) {
+        Pageable pageable = PageRequest.of(page,12);
+        return orderRepository.getOrdersByCustomerId(customerId,pageable);
+
     }
 }

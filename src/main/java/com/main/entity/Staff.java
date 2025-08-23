@@ -1,9 +1,7 @@
 package com.main.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -13,7 +11,8 @@ import java.util.List;
 @Table(name = "staffs")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class Staff implements Serializable {
     @Id
     @Column(length = 12)
@@ -62,7 +61,13 @@ public class Staff implements Serializable {
     @OneToMany(mappedBy = "staff")
     private List<Order> orders;
 
+
     @OneToMany(mappedBy = "staff", fetch = FetchType.LAZY)
     private List<LogOrders> logOrders;
+
+
+    public Staff(String staffID) {
+        this.staffID = staffID;
+    }
 
 }

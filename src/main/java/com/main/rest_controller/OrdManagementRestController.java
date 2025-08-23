@@ -34,7 +34,6 @@ public class OrdManagementRestController {
     private final OrderService orderService;
     private final VoucherService voucherService;
     private final TransactionService transactionService;
-    private final AccountService accountService;
     private final StaffService staffService;
     private final LogOrderRepository logOrderRepository;
     private final StaffRepository staffRepository;
@@ -115,7 +114,6 @@ public class OrdManagementRestController {
         Pageable pageable = PageRequest.of(pageNumber, 7);
         Page<OrdManagement_OrderDTO> orderDTOS = orderService.getOrders(startDate, endDate
                 , status, storeId, areaId,Orderid, pageable);
-
         orderDTOS.forEach(orderDTO -> {
             Integer orderID = orderDTO.getOrderID();
             List<OrdManagement_ProductDTO> productDTOS = orderService.getProductsByOrderID(orderID);

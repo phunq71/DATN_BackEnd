@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -25,5 +26,22 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     boolean existsByEmailAndProviderIsNotNull(String email);
 
     Optional<Account> findByAccountId(String accountId);
+
+    @Query("""
+        SELECT a.email
+        FROM Account a
+        WHERE a.role ='ADMIN'
+        """)
+    List<String> getEmailAdmin();
+
+    @Query("""
+        SELECT a.email
+        FROM Facility f
+        JOIN f.manager m
+        JOIN m.account a
+        WHERE f.facilityId = :areaId
+        """)
+    String getEmailArea(@Param("areaId") String areaId);
+
 
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -49,7 +50,24 @@ public class InventorySlip implements Serializable {
     @Column(name = "Note", length = 500)
     private String note;
 
-    @OneToMany(mappedBy = "inventorySlip")
+    @OneToMany(mappedBy = "inventorySlip", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InventorySlipDetail> inventorySlipDetails;
+
+    public InventorySlip(String isid) {
+        this.isid = isid;
+    }
+
+    public InventorySlip(InventorySlip slip) {
+        this.isid = null;
+        this.type = slip.getType();
+        this.fromFacility = slip.getFromFacility();
+        this.toFacility = slip.getToFacility();
+        this.status = slip.getStatus();
+        this.createDate = slip.getCreateDate();
+        this.staff = slip.getStaff();
+        this.approver = slip.getApprover();
+        this.note = slip.getNote();
+        this.inventorySlipDetails = new ArrayList<>();
+    }
 }
 
