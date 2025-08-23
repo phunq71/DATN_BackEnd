@@ -20,7 +20,7 @@ public class Customer implements Serializable {
     @Column(name = "FullName", nullable = false, length = 55)
     private String fullName;
 
-    @Column(name = "Phone", nullable = false, length = 10)
+    @Column(name = "Phone", nullable = true, length = 10)
     private String phone;
 
     @Column(name = "Gender")
@@ -41,8 +41,8 @@ public class Customer implements Serializable {
     @Column(name = "ImageAvt", nullable = false, length = 255)
     private String imageAvt;
 
-    @ManyToOne
-    @JoinColumn(name = "MembershipID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MembershipID", nullable = true)
     private Membership membership;
 
     @OneToMany(mappedBy = "customer")
@@ -58,6 +58,7 @@ public class Customer implements Serializable {
     private List<Review> reviews;
 
     @OneToOne
+    @MapsId
     @JoinColumn(name = "CustomerID")
     private Account account;
 

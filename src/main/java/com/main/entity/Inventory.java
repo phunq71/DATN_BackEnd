@@ -15,12 +15,12 @@ public class Inventory implements Serializable {
     @EmbeddedId
     private InventoryId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("itemId")
     @JoinColumn(name = "ItemID")
     private Item item;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("facilityId")
     @JoinColumn(name = "FacilityID")
     private Facility facility;

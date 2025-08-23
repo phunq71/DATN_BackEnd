@@ -23,8 +23,6 @@ import java.util.List;
 public class ReturnRequestRestController {
     private final ReturnItemService returnItemService;
     private final ReturnRequestService returnRequestService;
-
-
     @GetMapping("/opulentia_user/returnItem/get/{orderID}")
     public ResponseEntity<List<ReturnItemDTO>> getReturnItemByOrderID(@PathVariable int orderID) {
 
@@ -83,7 +81,7 @@ public class ReturnRequestRestController {
         return ResponseEntity.ok(returnRequestService.getReturnRequestByCustomerID(accountId, year));
     }
 
-        @GetMapping("/opulentia_user/returnRequestDetail/get/{id}")
+    @GetMapping("/opulentia_user/returnRequestDetail/get/{id}")
     public ResponseEntity<ReturnRequestDTO> getReturnRequestDetail(@PathVariable int id) {
         String accountId = AuthUtil.getAccountID();
 

@@ -1,10 +1,12 @@
 package com.main.repository;
 
+import com.main.dto.CusManagement_productDTO;
 import com.main.dto.ProductViewDTO;
 import com.main.entity.Category;
 import com.main.entity.Product;
 import com.main.entity.Review;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -48,6 +50,7 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
     WHERE pr.startDate <= CURRENT_TIMESTAMP
       AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
       AND pr.type = 'ProductDiscount'
+      AND pp.quantityRemaining > 0
 """)
     List<ProductViewDTO> findDiscountedProducts();
 
@@ -89,7 +92,7 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
       AND pr.startDate <= CURRENT_TIMESTAMP
       AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
       AND pr.type = 'ProductDiscount'
-      AND pp.quantityUsed < pp.quantityRemaining
+      AND pp.quantityRemaining > 0
     """)
     Byte findDiscountPercentByProductID(@Param("productID") String productID);
 
@@ -102,7 +105,7 @@ public interface ProductRepository  extends JpaRepository<Product, String> {
       AND pr.startDate <= CURRENT_TIMESTAMP
       AND (pr.endDate IS NULL OR pr.endDate >= CURRENT_TIMESTAMP)
       AND pr.type = 'ProductDiscount'
-      AND pp.quantityUsed < pp.quantityRemaining
+      AND pp.quantityRemaining > 0
     """)
     Integer findPromotionProductIdByProductID(@Param("productID") String productID);
 
@@ -297,7 +300,63 @@ ORDER BY mainVar.price DESC
             Pageable pageable
     );
 
+    @Query("""
+        SELECT p 
+        FROM Product p 
+        WHERE p.productName LIKE %:keyword%
+        AND (
+              ((:categoryId IS NOT NULL AND :categoryId <> '') AND p.category.categoryId = :categoryId)
+                OR ((:categoryId IS NULL OR :categoryId = '') AND :parentCategoryId IS NOT NULL AND p.category.parent.categoryId = :parentCategoryId)
+        )
+    """
+    )
+    Page<Product> searchByNameAndCategory(@Param("keyword") String keyword
+            ,@Param("categoryId") String categoryId
+            ,@Param("parentCategoryId") String parentCategoryId
+            ,  Pageable pageable);
 
+    @Query(value = """
+        SELECT p.*
+        FROM Products p
+        WHERE 
+            NOT EXISTS (
+                SELECT 1 
+                FROM Variants v 
+                WHERE v.ProductID = p.ProductID
+            )
+            OR 
+            NOT EXISTS (
+                SELECT 1
+                FROM Variants v
+                JOIN Items i ON i.VariantID = v.VariantID
+                WHERE v.ProductID = p.ProductID
+            )
+        """, nativeQuery = true)
+    List<Product> findProductsWithoutVariantsOrItems();
 
+    @Query("SELECT MAX(p.productID) FROM Product p WHERE p.productID LIKE 'Pro%'")
+    String findMaxProductId();
+
+    @Query("""
+    SELECT new com.main.dto.CusManagement_productDTO(
+           p.productID,
+           p.productName,
+           v.color,
+           odt.quantity,
+           odt.unitPrice,
+           i.imageUrl,
+           r.rating,
+           r.content)
+    FROM Product p
+         JOIN Variant v ON v.product = p
+         JOIN Image i ON i.variant = v AND i.isMainImage = true
+         JOIN Item item ON item.variant = v
+         JOIN OrderDetail odt ON odt.item = item
+         LEFT JOIN Review r
+             ON r.orderDetail = odt
+             AND r.customer.customerId = :customerID
+         WHERE odt.order.orderID = :orderID
+""")
+    List<CusManagement_productDTO> findProductByOrderID(@Param("orderID") Integer orderID, @Param("customerID") String customerID);
 }
 

@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import com.main.entity.Staff;
 import com.main.entity.Customer;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -14,7 +12,8 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "Accounts")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account implements Serializable {
@@ -31,7 +30,6 @@ public class Account implements Serializable {
 
     @Column(name = "provider_id")
     private String providerId; // id duy nhất từ OAuth provider
-
 
     @Column(name = "Password", nullable = false)
     private String password;
@@ -51,6 +49,6 @@ public class Account implements Serializable {
     @OneToOne(mappedBy = "account")
     private Staff staff;
 
-    @OneToOne(mappedBy = "account")
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
     private Customer customer;
 }

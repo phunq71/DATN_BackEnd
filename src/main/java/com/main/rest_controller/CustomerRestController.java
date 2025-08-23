@@ -135,6 +135,7 @@ public class CustomerRestController {
                 }
             }
 
+
             // 6. Tạo và lưu thông tin khách hàng
             CustomerDTO customerDTO = new CustomerDTO(
                     accountId,

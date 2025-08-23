@@ -17,9 +17,10 @@ public class Image implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ImageID")
     private Integer imageId;
+
     @JsonIgnore //Thuận thêm xử lý ở ProductDetailDTO
-    @ManyToOne
-    @JoinColumn(name = "VariantID", referencedColumnName = "VariantID", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "VariantID", referencedColumnName = "VariantID")
     private Variant variant;
 
     @Column(name = "ImageURL", nullable = false, length = 95)

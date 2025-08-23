@@ -7,6 +7,7 @@ import com.main.service.AccountService;
 import com.main.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,12 +29,20 @@ public class Admin_LoginRestController {
     public ResponseEntity<?> isAminLogin() {
 
         if(AuthUtil.isLogin()){
-            System.err.println("🙂role đã đăng nhập từ FE"+AuthUtil.getRole());
+            System.err.println("🙂role đã đăng nhập từ FE "+AuthUtil.getRole());
+            System.out.println( AuthUtil.getAccountID() );
             return ResponseEntity.ok(Map.of(
                     "loggedIn", true,
                     "displayName", Objects.requireNonNull(AuthUtil.getFullName())
             ));
         }
         return ResponseEntity.ok(Map.of("loggedIn", false));
+    }
+
+
+    @GetMapping("/admin/isAdmin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public boolean isAdmin() {
+        return true;
     }
 }

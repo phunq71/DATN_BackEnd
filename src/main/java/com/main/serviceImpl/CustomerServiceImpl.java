@@ -6,23 +6,27 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.main.dto.CustomerDTO;
+import com.main.dto.CustomerManagementDTO;
 import com.main.dto.CustomerRegisterDTO;
-import com.main.entity.Account;
-import com.main.entity.Customer;
-import com.main.entity.Image;
-import com.main.entity.Membership;
-import com.main.repository.AccountRepository;
-import com.main.repository.CustomerRepository;
-import com.main.repository.MembershipRepository;
+import com.main.entity.*;
+import com.main.repository.*;
+import com.main.security.CustomOAuth2UserService;
 import com.main.service.CustomerService;
+import com.main.service.MailService;
 import com.main.utils.AddressUtil;
 import com.main.utils.AuthUtil;
 import com.main.utils.CommonUtils;
 import com.main.utils.FileUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.mail.MailSender;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -30,30 +34,35 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 @Service
+@RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-    @Lazy
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
-   private final CustomerRepository customerRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    private final CustomerRepository customerRepository;
     private final AccountRepository accountRepository;
     private final MembershipRepository membershipRepository;
 
-    public CustomerServiceImpl(CustomerRepository customerRepository, AccountRepository accountRepository, MembershipRepository membershipRepository) {
-        this.customerRepository = customerRepository;
-        this.accountRepository = accountRepository;
-        this.membershipRepository = membershipRepository;
-    }
+
+    private final TransactionRepository transactionRepository;
+
+    private final MailService mailService;
+
+    private final VoucherRepository voucherRepository;
+
+    private final PromotionRepository promotionRepository;
+
+    private final UsedVoucherRepository usedVoucherRepository;
+    private final OrderRepository orderRepository;
 
 
     @Override
@@ -153,10 +162,8 @@ public class CustomerServiceImpl implements CustomerService {
             acc.setRole("USER");
             acc.setStatus(true);
             acc.setCreateAt(LocalDate.now());
-            accountRepository.save(acc);
-            Membership mber = membershipRepository.findById("MB01").get();
             Customer cus = new Customer();
-            cus.setCustomerId(acc.getAccountId());
+
             cus.setFullName(customerRegisterDTO.getFullname());
             cus.setGender(customerRegisterDTO.getGender());
             cus.setAddress(customerRegisterDTO.getAddress());
@@ -168,10 +175,15 @@ public class CustomerServiceImpl implements CustomerService {
 
             cus.setAddressIdGHN(formatted);
             cus.setDob(customerRegisterDTO.getDob());
-            cus.setMembership(mber);
+            cus.setMembership(null);
             cus.setImageAvt("avatar.png");
-            cus.setPhone("0000000000");
+            cus.setPhone("N/A");
+            cus.setAccount(acc);
             customerRepository.save(cus);
+
+            Customer cus1 = customerRepository.findByCustomerId(cus.getCustomerId());
+
+            updateRankByCustomerId(cus1);
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -253,13 +265,10 @@ public class CustomerServiceImpl implements CustomerService {
             if (customer == null || !customer.getCustomerId().equals(customerId)) {
                 throw new IllegalArgumentException("Không tìm thấy khách hàng phù hợp");
             }
-
             // 5. Xóa QR token sau khi xác thực (1 lần dùng)
             customer.setQrToken(null);
             customerRepository.save(customer);
-
             return customer;
-
         } catch (Exception e) {
             // Có thể log ra chi tiết nếu cần
             return null; // Hoặc ném exception cụ thể tùy mục đích dùng
@@ -279,6 +288,182 @@ public class CustomerServiceImpl implements CustomerService {
             return false;
         }
     }
+
+    @Override
+    @Transactional
+    public Void updateRankByCustomerId(Customer customer) {
+        // Tổng chi tiêu
+        BigDecimal totalAmount = transactionRepository.sumAmountByCustomer(customer);
+
+        // membership hiện tại của KH (có thể null)
+        String membershipId = (customer.getMembership() != null)
+                ? customer.getMembership().getMembershipId()
+                : null;
+
+        // Hạng phù hợp hiện tại
+        List<Membership> memberships = membershipRepository.findMembershipBySpent(totalAmount);
+        Membership newMembership = memberships.isEmpty() ? null : memberships.get(0); // lấy hạng cao nhất phù hợp
+
+        // Nếu có hạng mới
+        if (newMembership != null) {
+            String newMembershipId = newMembership.getMembershipId();
+            System.out.println("😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚😚");
+            // So sánh an toàn (nếu khác thì update)
+            boolean isDifferent = (membershipId == null)
+                    || (!membershipId.equalsIgnoreCase(newMembershipId));
+
+            if (isDifferent) {
+                // Cập nhật hạng mới
+                customer.setMembership(newMembership);
+                customerRepository.save(customer);
+
+                // Gửi mail chúc mừng
+                mailService.sendCongratulationRank(customer);
+
+                // Lấy promotions của rank mới
+                List<Promotion> promotions = promotionRepository.findByNewRank(newMembershipId);
+                if (promotions != null && !promotions.isEmpty()) {
+                    promotions.forEach(promotion -> {
+                        if (promotion.getVouchers() != null) {
+                            promotion.getVouchers().forEach(voucher -> {
+                                if (voucher != null) {
+                                    UsedVoucher usedVoucher = new UsedVoucher();
+                                    usedVoucher.setType(false);
+                                    usedVoucher.setCustomer(customer);
+                                    usedVoucher.setVoucher(voucher);
+
+                                    UsedVoucherID usedVoucherID = new UsedVoucherID();
+                                    usedVoucherID.setCustomer(customer.getCustomerId());
+                                    usedVoucherID.setVoucher(voucher.getVoucherID());
+                                    usedVoucher.setUsedVoucherID(usedVoucherID);
+
+                                    usedVoucherRepository.save(usedVoucher);
+
+                                    // Trừ số lượng
+                                    if (voucher.getQuantityRemaining() != null && voucher.getQuantityRemaining() > 0) {
+                                        voucher.setQuantityRemaining(voucher.getQuantityRemaining() - 1);
+                                    }
+                                    voucher.setQuantityUsed(
+                                            (voucher.getQuantityUsed() == null ? 0 : voucher.getQuantityUsed()) + 1
+                                    );
+                                    voucherRepository.save(voucher);
+
+                                    // Gửi mail voucher
+                                    if (customer.getAccount() != null) {
+                                        mailService.sendVoucherEmail(
+                                                customer.getAccount().getEmail(),
+                                                voucher.getVoucherID(),
+                                                voucher.getDiscountValue(),
+                                                voucher.getEndDate()
+                                        );
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    public Page<CustomerManagementDTO> getAllCustomer(String membershipId, String customerId, int page) {
+        Pageable pageable = PageRequest.of(page, 12);
+        return customerRepository.getAllCustomer(membershipId, customerId, pageable);
+    }
+    @Override
+    @Transactional
+    public Boolean deleteCustomer(String customerId) {
+        Optional<Account> acc = accountRepository.findByAccountId(customerId);
+        try {
+            System.err.println("🔹 Bắt đầu xóa dữ liệu cho customer: " + customerId);
+            System.err.println("1️⃣ Xóa ReviewImage...");
+            customerRepository.deleteReviewImageByCustomer(customerId);
+            System.err.println("2️⃣ Xóa Review...");
+            customerRepository.deleteReviewByCustomer(customerId);
+            System.err.println("3️⃣ Xóa Favorite...");
+            customerRepository.deleteFavouriteByCustomer(customerId);
+            System.err.println("4️⃣ Xóa Cart...");
+            customerRepository.deleteCartByCustomer(customerId);
+            System.err.println("5️⃣ Xóa UsedVoucher...");
+            List<Order> orders = orderRepository.getOrdersByCusID(customerId);
+            for (Order o : orders) {
+                System.err.println("   - Order ID: " + o.getOrderID());
+                o.setCustomer(null);
+                orderRepository.save(o);
+            }
+            orderRepository.flush(); //ép xuống db
+            customerRepository.deleteUsedVoucherByCustomer(customerId);
+            System.err.println("6️⃣ Xóa Customer...");
+            customerRepository.deleteCustomerByCustomer(customerId);
+            System.err.println("6️⃣.1 Xóa Account...");
+            customerRepository.deleteAccountByCustomer(customerId);
+            System.err.println("7️⃣ Lấy danh sách Order...");
+            System.err.println("✅ Hoàn tất xóa dữ liệu cho customer: " + customerId);
+            mailService.sendDeleteAccountEmail(acc.get().getEmail());
+        } catch (Exception e) {
+            System.err.println("❌ Lỗi khi xóa dữ liệu cho customer: " + customerId);
+            e.printStackTrace();
+            throw e; // Ném lại lỗi để rollback transaction
+        }
+        return true;
+    }
+
+    @Override
+    public Map<String, Object> findAllAddresses() {
+        List<String> addresses = customerRepository.findAllAddresses();
+
+        // Đếm số lượng theo tỉnh
+        Map<String, Long> grouped = new HashMap<>();
+        for (String addr : addresses) {
+            String province = "Không xác định";
+            if(addr.equals("N/A")){
+                addr = province;
+            }
+            if (addr != null && !addr.isBlank()) {
+                String[] parts = addr.split(",");
+                province = parts[parts.length - 1].trim();
+            }
+
+            // Tăng số lượng cho tỉnh này
+            if (grouped.containsKey(province)) {
+                grouped.put(province, grouped.get(province) + 1);
+            } else {
+                grouped.put(province, 1L);
+            }
+        }
+
+        // Chuyển Map thành List để sắp xếp
+        List<Map.Entry<String, Long>> sortedList = new ArrayList<>(grouped.entrySet());
+        Collections.sort(sortedList, new Comparator<Map.Entry<String, Long>>() {
+            @Override
+            public int compare(Map.Entry<String, Long> o1, Map.Entry<String, Long> o2) {
+                return o2.getValue().compareTo(o1.getValue()); // giảm dần
+            }
+        });
+
+        // Tách thành labels và data
+        List<String> labels = new ArrayList<>();
+        List<Long> data = new ArrayList<>();
+        for (Map.Entry<String, Long> entry : sortedList) {
+            labels.add(entry.getKey());
+            data.add(entry.getValue());
+        }
+        // In kết quả ra console
+        System.err.println("===== THỐNG KÊ KHÁCH HÀNG THEO TỈNH =====");
+        for (int i = 0; i < labels.size(); i++) {
+            System.err.println(labels.get(i) + " : " + data.get(i));
+        }
+        System.err.println("========================================");
+        // Trả về kết quả
+        Map<String, Object> response = new HashMap<>();
+        response.put("labels", labels);
+        response.put("data", data);
+        return response;
+    }
+
 }
 
 

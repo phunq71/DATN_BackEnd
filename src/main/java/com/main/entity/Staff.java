@@ -1,9 +1,7 @@
 package com.main.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -13,15 +11,16 @@ import java.util.List;
 @Table(name = "staffs")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class Staff implements Serializable {
     @Id
     @Column(length = 12)
     private String staffID;
 
-    @OneToOne
-    @MapsId
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "staffId")
+    @MapsId
     private Account account;
 
 
@@ -37,7 +36,7 @@ public class Staff implements Serializable {
     @Column(nullable = false)
     private LocalDate dob;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FacilityId")
     private Facility facility;
 
@@ -61,5 +60,14 @@ public class Staff implements Serializable {
 
     @OneToMany(mappedBy = "staff")
     private List<Order> orders;
+
+
+    @OneToMany(mappedBy = "staff", fetch = FetchType.LAZY)
+    private List<LogOrders> logOrders;
+
+
+    public Staff(String staffID) {
+        this.staffID = staffID;
+    }
 
 }

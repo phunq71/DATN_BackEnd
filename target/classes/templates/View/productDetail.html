@@ -22,6 +22,7 @@
     }
 
     .product-slider {
+        padding: 0 112px;
         display: flex;
         width: 100%;
         height: 100vh;
@@ -35,21 +36,22 @@
     }
 
     .product-info {
-        padding: 2rem;
+        padding-top: 2rem;
+        padding-left: 2rem;
+        padding-bottom: 2rem;
         /*padding-top: 10rem;*/
     }
 
     .product-images {
+        margin-top: 5%;
         position: relative;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        background-color: #fff;
         touch-action: pan-y; /* Allow vertical touch scrolling but prevent browser handling horizontal */
-        height: 100%;
-        padding: 0;
-        margin: 0;
+        height: 85%;
+        filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.25));
     }
 
     .image-slider {
@@ -125,8 +127,8 @@
     }
 
     .color-option {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 80px;
         border-radius: 4px;
         cursor: pointer;
         border: 2px solid transparent;
@@ -237,7 +239,7 @@
 
     .rating-progress {
         width: 100%;
-        background-color: #eee;
+        background-color: #bebdbd;
         height: 6px;
         border-radius: 3px;
         overflow: hidden;
@@ -245,7 +247,7 @@
     }
     .rating-progress-bar {
         height: 100%;
-        background-color: #999;
+        background-color: #f3cb06;
         width: 84%; /* Tương đương 4.2 sao */
     }
 
@@ -255,7 +257,7 @@
 
     /* Phần mô tả sản phẩm */
     .product-description {
-        margin: 20px;
+        margin: 20px 112px;
         border-bottom: 1px solid #e0e0e0;
         padding-bottom: 15px;
     }
@@ -267,8 +269,9 @@
     }
 
     .review-otherProducts{
+        margin: 0 102px;
         display: flex;
-        width: 100%;
+        width: 87.5%;
     }
 
     .review{
@@ -425,7 +428,7 @@
 
     .favorite-btnt:hover {
         color: #ff4757;
-        transform: scale(1.2) !important;
+        transform: scale(1.1) !important;
     }
 
 
@@ -840,8 +843,9 @@
 
     /* --- Style mặc định của mỗi size --- */
     .size-option {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
         border: 2px solid black;
         display: flex;
         align-items: center;
@@ -892,19 +896,16 @@
     .favorite-btnt {
         position: relative; /* hoặc absolute nếu bạn muốn đặt ở vị trí cố định */
         z-index: 10; /* hoặc lớn hơn, ví dụ 1000 nếu cần */
-
-        background-color: rgba(255, 255, 255, 0.9);
-        color: #333;
-        font-size: larger;
         border: none;
+        background-color: transparent;
         width: 50px;
         height: 50px;
+        font-size: 27px;
         border-radius: 50%;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
         margin-top: -10px;
         margin-left: 10px;
@@ -919,6 +920,7 @@
         font-size: 1rem;            /* Nhỏ hơn giá mới */
         margin-right: 12px;
         vertical-align: middle;
+        vertical-align: super;
     }
 
     .sale-price {
@@ -1020,19 +1022,25 @@
             <span th:text="${colorVariant}" style="padding: 4px 10px; background-color: #eee; border-radius: 6px; font-weight: 500; color: #333;"></span>
 
             <!-- Hiển thị ảnh "NEW" nếu variantNew == true -->
-            <img class="new-badge"
+            <span class="new-badge"
                  th:if="${pro.isNew}"
-                 src="/uploads/NewImage.png"
-                 alt="New"/>
+                  style="padding: 4px 10px; background-color: #f60404; border-radius: 6px; font-weight: 500; color: #faf7f7;"
+                  >Mới</span>
 
+            <!-- Phần trăm giảm -->
+            <span class="discount-percent"
+                  th:if="${discountPercent != null}"
+                  style="padding: 4px 10px; background-color: #090909; border-radius: 6px; font-weight: 500; color: #faf7f7;"
+                  th:text="'-' + ${discountPercent} + '%'">
+</span>
 
             <div class="color-options">
                 <th:block th:each="variant, iterStat : ${listV}">
                     <a th:href="@{/opulentia/{parent}/{categoryId}/{productId}/{variantId}
-    (parent=${product.category.parent.categoryId},
-     categoryId=${product.category.categoryId},
-     productId=${product.getProductID()},
-     variantId=${variant.variantId})}">
+                    (parent=${product.category.parent.categoryId},
+                     categoryId=${product.category.categoryId},
+                     productId=${product.getProductID()},
+                     variantId=${variant.variantId})}">
                     <div class="color-option"
                              th:classappend="${iterStat.index == 0}"
                              th:attr="data-color-index=${iterStat.index}"
@@ -1055,7 +1063,7 @@
             <span th:text="'Số sản phẩm đã bán: ' + ${pro.getSoldQuantity()}"></span>
 
             <img th:if="${pro.isHot}"
-                 src="/uploads/hoticon.png"
+                 src="/uploads/Screenshot 2025-08-13 175547.png"
                  style="height: 50px; width: 50px; margin-top: -10px;"
                  alt="Hot product" />
         </div>
@@ -1084,7 +1092,7 @@
             </button>
 
         </div>
-        <div>
+        <div style="margin-top: -10px; margin-bottom: 10px;">
         <!-- Khi có giảm giá -->
             <span class="price sale-price" style="padding-right: 5px;" th:if="${pricePromotion != null}" th:text="${pricePromotion}"></span>
             <span class="price original-price" th:if="${pricePromotion != null}" th:text="${priceVariant}"></span>

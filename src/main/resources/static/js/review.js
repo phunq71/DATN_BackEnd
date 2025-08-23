@@ -458,7 +458,6 @@ function lockReviewForm() {
     }
 }
 
-// Hàm reset form
 function resetReviewForm() {
     // Reset rating
     rvCurrentRating = 0;
@@ -473,11 +472,16 @@ function resetReviewForm() {
     previewWrappers.forEach(wrapper => wrapper.remove());
     rvSelectedImages = [];
     rvUploadedImages = 0;
-    rvAddImageBtn.classList.remove('rv-hidden')
+    rvAddImageBtn.classList.remove('rv-hidden');
 
-    document.querySelector(".rv-review-card").removeChild(document.querySelector(".rv-btn-del"));
-
+    // Xóa nút delete nếu có
+    const reviewCard = document.querySelector(".rv-review-card");
+    const delBtn = document.querySelector(".rv-btn-del");
+    if (reviewCard && delBtn && reviewCard.contains(delBtn)) {
+        reviewCard.removeChild(delBtn);
+    }
 }
+
 
 
 

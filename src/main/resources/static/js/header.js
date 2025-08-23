@@ -29,7 +29,7 @@ let miniCarts=[];
 function getCartsFromLocalStorage(){
     let dataCartString= localStorage.getItem('carts');
     let dataCarts= JSON.parse(dataCartString);
-    if(dataCarts.length>0)
+    if(dataCarts!= null && dataCarts.length>0)
 
     {
         carts= JSON.parse(localStorage.getItem('carts'));

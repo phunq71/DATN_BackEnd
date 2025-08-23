@@ -205,7 +205,6 @@ function deleteCookie(name) {
 async function mergeCartLocalStorageAndServer(){
     const carts= JSON.parse(localStorage.getItem('carts'));
     await checkMergeCart(carts);
-
 }
 
 function checkMergeCart(carts){
@@ -221,3 +220,11 @@ function checkMergeCart(carts){
 function clearCartLocalStorage(){
     localStorage.removeItem('carts');
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    restoreCheckedItemIDs();
+});
+
+
+

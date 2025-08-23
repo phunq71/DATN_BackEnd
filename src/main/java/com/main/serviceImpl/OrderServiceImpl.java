@@ -1,6 +1,7 @@
 package com.main.serviceImpl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.dto.*;
 
@@ -15,6 +16,10 @@ import com.main.service.ReviewService;
 
 import com.main.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,12 +29,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -41,7 +50,6 @@ public class OrderServiceImpl implements OrderService {
     private final CustomerRepository customerRepository;
     private final FacilityService facilityService;
 
-
     private final RestTemplate restTemplate = new RestTemplate();
     private final VoucherRepository voucherRepository;
     private final FacilityRepository facilityRepository;
@@ -52,6 +60,8 @@ public class OrderServiceImpl implements OrderService {
     private final UsedVoucherRepository usedVoucherRepository;
     private final InventoryRepository inventoryRepository;
     private final CartRepository cartRepository;
+    private final StaffRepository staffRepository;
+    private final LogOrderRepository logOrderRepository;
 
     @Value("${ghn.token}")
     private String ghnToken;
@@ -74,8 +84,9 @@ public class OrderServiceImpl implements OrderService {
             }
         } else {
             orders = orderRepository.getOrdersByCustomerIdAndStatus(customerId, status, year);
-
+            System.out.println("Đã chạy xong 🤬🤬🤬🤬🤬🤬");
             orderPrices= getOrderPricesByCustomer(customerId, status, year);
+            System.out.println("🥕🥕🥕🥕🥕🥕🥕🥕🥕🥕🥕🥕");
         }
 
 
@@ -167,12 +178,18 @@ public class OrderServiceImpl implements OrderService {
             Integer orderId = (Integer) orderPrice[0];
             System.out.println("OrderID: 😎😎😎😎😎😎😎😎😎😎" + orderId);
             BigDecimal totalPrice = new BigDecimal(transactionRepository.findByOrder_OrderID(orderId).getAmount().toString());
+            System.out.println("🙉");
             BigDecimal productDiscount = new BigDecimal(orderPrice[2].toString());
+            System.out.println("🙉 🙉");
             BigDecimal voucherDiscount = new BigDecimal(orderPrice[3].toString());
+            System.out.println("🙉 🙉 🙉");
             BigDecimal finalPrice = new BigDecimal(orderPrice[4].toString());
-
+            System.out.println("🙉 🙉 🙉 🙉");
             orderPriceDTOs.add(new OrderPriceDTO(orderId, totalPrice, productDiscount, voucherDiscount, finalPrice));
+            System.out.println("🙉 🙉 🙉 🙉 🙉");
         });
+
+
 
         return orderPriceDTOs;
     }
@@ -342,6 +359,7 @@ public class OrderServiceImpl implements OrderService {
             }
         }
     }
+    //Gọi API GHN để laays trạng thái đơn hàng
     public Map<String, Object> getOrderStatus(String orderCode) {
         String url = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail";
 
@@ -430,7 +448,38 @@ public class OrderServiceImpl implements OrderService {
             return false;
         }
     }
+    @Override
+    public Page<OrdManagement_OrderDTO> getOrders(
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            String status,
+            String facilityId,
+            String parentId,
+            Integer orderId,
+            Pageable pageable){
+        Page<OrdManagement_OrderDTO> page = orderRepository.getOrders(startDate, endDate, status, facilityId, parentId, orderId, pageable);
+        page.forEach(orderDTO -> {
+             List <LogOrderDTO> list = new ArrayList();
+             list = logOrderRepository.findByOrderId(orderDTO.getOrderID());
+             orderDTO.setLogOrders(list);
+        });
+        return page;
+    }
 
+    @Override
+    public Page<OrdManagement_OrderDTO> getOrdersWithOrderDate(Pageable pageable, LocalDateTime orderDate, String status) {
+        return orderRepository.getOrdersWithOrderDate(pageable, orderDate, status);
+    }
+
+    @Override
+    public List<OrdManagement_ProductDTO> getProductsByOrderID(Integer orderID) {
+        return orderRepository.getProductsByOrderID(orderID);
+    }
+
+    @Override
+    public Order save(Order order) {
+        return orderRepository.save(order);
+    }
 
     @Override
     public Boolean addOrderCustomer(Map<String, Object> checkoutInfo) {
@@ -449,7 +498,8 @@ public class OrderServiceImpl implements OrderService {
             // 3. Các trường còn lại
             List<String> facilities = (List<String>) checkoutInfo.get("facilities");
             String facilityId = (String) checkoutInfo.get("facilityId");
-            String lastTime = (String) checkoutInfo.get("lastTime");
+            String lastTimeStr = (String) checkoutInfo.get("lastTime");
+            LocalDate lastTime = OffsetDateTime.parse(lastTimeStr).toLocalDate();
             String paymentMethod = (String) checkoutInfo.get("paymentMethod");
             String voucherId = (String) checkoutInfo.get("voucherId");
             Boolean type = checkoutInfo.get("type") != null ? (Boolean) checkoutInfo.get("type") : null;
@@ -476,9 +526,10 @@ public class OrderServiceImpl implements OrderService {
 
             order.setFacility(facilityRepository.findById(facilityId).get());
             order.setUpdateStatusAt(LocalDateTime.now());
-            order.setAddressIdGHN(customer.getCustomerAddress());
+            order.setAddressIdGHN(customer.getCustomerAddressIdGHN());
             order.setDiscountCost(customer.getDiscountCost());
             order.setShippingCode(null);
+            order.setDelivery(lastTime);
 
             order = orderRepository.save(order);
 
@@ -491,11 +542,21 @@ public class OrderServiceImpl implements OrderService {
                 orderDetail.setQuantity(item.getQuantity());
                 orderDetail.setUnitPrice(item.getPrice());
                 orderDetail.setTotalPrice(item.getTotal_price());
-                orderDetail.setPromotionProduct(promotionProductRepository.findById(item.getPPID()).get());
+
+                // trừ vào khuyến mãi của sản phẩm
+                PromotionProduct pp = null;
+                if (item.getPPID() != null) {
+                    pp = promotionProductRepository.findById(item.getPPID()).orElse(null);
+                    pp.setQuantityRemaining(pp.getQuantityRemaining() - orderDetail.getQuantity());
+                    pp.setQuantityUsed(pp.getQuantityUsed() +  orderDetail.getQuantity());
+                    promotionProductRepository.save(pp);
+                }
+                orderDetail.setPromotionProduct(pp);
                 orderDetails.add(orderDetail);
             });
 
             orderDetailRepository.saveAll(orderDetails);
+
 
             // Tạo phiếu thu
             Transaction transaction = new Transaction();
@@ -518,9 +579,7 @@ public class OrderServiceImpl implements OrderService {
 
             transactionRepository.save(transaction);
 
-
-
-                // Trừ voucher đã xử dụng
+            // Trừ voucher đã xử dụng
             if (voucherId != null && !voucherId.equals("")) {
                 if (type != null && type == true) {
                     Voucher voucher = voucherRepository.findById(voucherId).orElseThrow();
@@ -540,13 +599,18 @@ public class OrderServiceImpl implements OrderService {
                     ));
                     usedVoucherRepository.save(usedVoucher);
 
+                    voucher.setQuantityRemaining(voucher.getQuantityRemaining() -1);
+                    voucher.setQuantityUsed(voucher.getQuantityUsed() + 1);
+                    usedVoucherRepository.save(usedVoucher);
 
-                } else if (type != null) {
+
+                } else if (type != null ) {
                     UsedVoucher usedVoucher = new UsedVoucher();
                     Voucher voucher = voucherRepository.findById(voucherId).get();
                     Customer cus = customerRepository.findById(customer.getCustomerId()).get();
-
+                    System.out.println( voucher.getVoucherID() + customer.getCustomerId() +"👉👉👉👉👉" );
                     usedVoucher = usedVoucherRepository.findByVoucherAndCustomer(voucher, cus);
+                    System.out.println(usedVoucher.getVoucher().getVoucherID());
                     usedVoucher.setType(true);
                     usedVoucherRepository.save(usedVoucher);
                 }
@@ -563,6 +627,13 @@ public class OrderServiceImpl implements OrderService {
                cartRepository.delete(cart);
             });
 
+            // lưu thêm vào log
+            LogOrders logOrders = new LogOrders();
+            logOrders.setContent("Khách hàng đặt hàng");
+            logOrders.setUpdateAt(LocalDateTime.now());
+            logOrders.setOrder(order);
+            logOrderRepository.save(logOrders);
+
 
             return true;
         } catch (Exception e) {
@@ -571,5 +642,183 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public List<OrderDetailDTO> getAllOrderIdShippingCodes() {
+        return orderRepository.getAllOrderIdShippingCodes();
+    }
 
+    @Override
+    public OrderDetailDTO getOrderIdByShippingCodes(String shippingCode) {
+        return orderRepository.getOrderByShippingCodes(shippingCode);
+    }
+    //Tạo đơn GHN
+    @Override
+    public String createGhnOrder(GhnOrderRequestDTO payload) {
+        String idStaff = AuthUtil.getAccountID();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Token", ghnToken);
+            headers.set("ShopId", shopId);
+
+            HttpEntity<GhnOrderRequestDTO> requestEntity = new HttpEntity<>(payload, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
+                    requestEntity,
+                    String.class
+            );
+//            Sau khi đơn hàng đc tạo lấy order_code
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.getBody());
+            String ghnOrderCode = root.path("data").path("order_code").asText();
+//            ghi staff chuảẩn bị đơn
+            Order order = orderRepository.findByOrderID(payload.getOrderID());
+            if (order == null) {
+                throw new RuntimeException("Không tìm thấy đơn hàng với ID: " + payload.getOrderID());
+            }
+            Staff staff = staffRepository.getByStaffID(idStaff);
+            order.setStaff(staff);
+            order.setStatus("SanSangGiao");
+            order.setShippingCode(ghnOrderCode);
+            order.setUpdateStatusAt(LocalDateTime.now());
+            orderRepository.save(order);
+
+            // thêm lưu log
+            LogOrders logOrders = new LogOrders();
+            logOrders.setStaff(staff);
+            logOrders.setOrder(order);
+            logOrders.setContent("Đóng hàng xong, đợi shipper lấy đơn");
+            logOrders.setUpdateAt(LocalDateTime.now());
+            logOrderRepository.save(logOrders);
+
+            return response.getBody(); // có thể parse JSON nếu cần
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Gọi GHN thất bại: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Boolean cancelOrder(Integer orderId) {
+        try {
+            Order order = orderRepository.findById(orderId).get();
+            String facilityId = order.getFacility().getFacilityId();
+            // Cộng lại trong kho
+            order.getOrderDetails().forEach(orderDetail -> {
+                InventoryId inventoryId = new InventoryId(orderDetail.getItem().getItemId(), facilityId);
+                Inventory inventory = inventoryRepository.getInventoryById(inventoryId);
+                inventory.setQuantity(inventory.getQuantity() + orderDetail.getQuantity());
+                inventoryRepository.save(inventory);
+
+                // Hoàn lại khuyến mãi cho sản phẩm
+                PromotionProduct pp = null;
+                if (orderDetail.getPromotionProduct() != null) {
+                    pp = promotionProductRepository.findById(orderDetail.getPromotionProduct().getPromotionProductID()).orElse(null);
+                    pp.setQuantityRemaining(pp.getQuantityRemaining() + orderDetail.getQuantity());
+                    pp.setQuantityUsed(pp.getQuantityUsed() -  orderDetail.getQuantity());
+                    promotionProductRepository.save(pp);
+                }
+            });
+
+            // chỉnh phiếu thu
+            Transaction transaction = order.getTransaction();
+            transaction.setStatus("KhongThanhToan");
+            transactionRepository.save(transaction);
+            // lưu log + Lưu lại thành đã hủy
+            LogOrders logOrders = new LogOrders();
+            logOrders.setStaff(null);
+            logOrders.setOrder(order);
+            logOrders.setContent("khách đã hủy đơn vì lý do cá nhân!");
+            logOrders.setUpdateAt(LocalDateTime.now());
+            logOrderRepository.save(logOrders);
+
+            // Lưu đơn hàng thành đã hủy
+            order.setUpdateStatusAt(LocalDateTime.now());
+            order.setStatus("DaHuy");
+            orderRepository.save(order);
+
+            return true;
+        }catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    @Override
+    public Boolean cancelOrder2(Integer orderId, String reason) {
+        try {
+            Order order = orderRepository.findById(orderId).get();
+            String facilityId = order.getFacility().getFacilityId();
+            // Cộng lại trong kho
+            order.getOrderDetails().forEach(orderDetail -> {
+                InventoryId inventoryId = new InventoryId(orderDetail.getItem().getItemId(), facilityId);
+                Inventory inventory = inventoryRepository.getInventoryById(inventoryId);
+                inventory.setQuantity(inventory.getQuantity() + orderDetail.getQuantity());
+                inventoryRepository.save(inventory);
+
+                // Hoàn lại khuyến mãi cho sản phẩm
+                PromotionProduct pp = null;
+                if (orderDetail.getPromotionProduct() != null) {
+                    pp = promotionProductRepository.findById(orderDetail.getPromotionProduct().getPromotionProductID()).orElse(null);
+                    pp.setQuantityRemaining(pp.getQuantityRemaining() + orderDetail.getQuantity());
+                    pp.setQuantityUsed(pp.getQuantityUsed() -  orderDetail.getQuantity());
+                    promotionProductRepository.save(pp);
+                }
+            });
+
+            // chỉnh phiếu thu
+            Transaction transaction = order.getTransaction();
+            transaction.setStatus("KhongThanhToan");
+            transactionRepository.save(transaction);
+            // lưu log + Lưu lại thành đã hủy
+            LogOrders logOrders = new LogOrders();
+            Staff staff = staffRepository.findById(AuthUtil.getAccountID()).get();
+            logOrders.setStaff( staff );
+            logOrders.setOrder(order);
+            logOrders.setContent("Từ chối nhận đơn, lý do: " + reason.toLowerCase(Locale.ROOT));
+            logOrders.setUpdateAt(LocalDateTime.now());
+            logOrderRepository.save(logOrders);
+
+            // Lưu đơn hàng thành đã hủy
+            order.setUpdateStatusAt(LocalDateTime.now());
+            order.setStatus("DaHuy");
+            orderRepository.save(order);
+
+            return true;
+        }catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    @Override
+    public Boolean cancelOrder3(Integer orderId, String reason) {
+        try {
+            Order order = orderRepository.findById(orderId).get();
+            // lưu log + Lưu lại thành đã hủy
+            LogOrders logOrders = new LogOrders();
+            logOrders.setStaff(null);
+            logOrders.setOrder(order);
+            logOrders.setContent("Khách yêu cầu hủy đơn, lý do: " + reason.toLowerCase(Locale.ROOT));
+            logOrders.setUpdateAt(LocalDateTime.now());
+            logOrderRepository.save(logOrders);
+
+            // Lưu đơn hàng thành đã hủy
+            order.setUpdateStatusAt(LocalDateTime.now());
+            order.setStatus("YeuCauHuy");
+            orderRepository.save(order);
+            System.out.println("😚😚😚😚😚😚😚😚😚😚😚😚😚");
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Page<CusManagement_orderDTO> getOrdersByCustomerId(String customerId, int page) {
+        Pageable pageable = PageRequest.of(page,12);
+        return orderRepository.getOrdersByCustomerId(customerId,pageable);
+
+    }
 }

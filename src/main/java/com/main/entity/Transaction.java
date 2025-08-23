@@ -41,11 +41,11 @@ public class Transaction implements Serializable {
     @Column(length = 20, nullable = false)
     private String status;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name ="staffId")
     private Staff staff;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name ="approver")
     private Staff approver;
 
@@ -57,7 +57,7 @@ public class Transaction implements Serializable {
     @JoinColumn(name = "orderID")
     private Order order;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "facilityId")
     private Facility facility;
 

@@ -2,9 +2,12 @@ package com.main.service;
 
 import com.main.dto.*;
 import com.main.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +43,24 @@ public interface OrderService {
 
     Boolean saveOrders(List<OrderDTO> orders);
 
+    public Page<OrdManagement_OrderDTO> getOrders(LocalDateTime startDate,LocalDateTime endDate
+            ,String status, String facilityId,String parentId,Integer orderId, Pageable pageable);
+    public Page<OrdManagement_OrderDTO> getOrdersWithOrderDate(Pageable pageable
+                ,LocalDateTime orderDate
+                , String status);
+    public List<OrdManagement_ProductDTO> getProductsByOrderID(Integer orderID);
+    public Order save(Order order);
     Boolean addOrderCustomer(Map<String, Object> checkoutInfo);
+    public List<OrderDetailDTO> getAllOrderIdShippingCodes();
+    public OrderDetailDTO getOrderIdByShippingCodes(String shippingCode);
+    String createGhnOrder(GhnOrderRequestDTO payload);
+
+    Boolean cancelOrder(Integer orderId);
+
+    Boolean cancelOrder2(Integer orderId, String reason);
+
+    Boolean cancelOrder3(Integer orderId, String reason);
+
+    public Page<CusManagement_orderDTO> getOrdersByCustomerId(String customerId,int page);
 
 }

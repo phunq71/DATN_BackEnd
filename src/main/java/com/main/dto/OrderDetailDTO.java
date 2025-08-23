@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,6 +37,8 @@ public class OrderDetailDTO {
     private String updatedTime;
     private List<ShippingLogDTO> trackingHistory;
 
+    private LocalDate deliveryDate;
+
 
     public OrderDetailDTO(Integer orderID, LocalDateTime orderDate, String status, String address) {
         this.orderID = orderID;
@@ -47,7 +50,7 @@ public class OrderDetailDTO {
     }
 
 
-    public OrderDetailDTO(Integer orderID, LocalDateTime orderDate, String status, String shippingAddress, String shippingName, String shippingPhone, BigDecimal shippingCost,BigDecimal shippinngCostDiscountPrice , String paymentMethod, LocalDateTime transactionDate, LocalDateTime updateStatusAt, String shippingCode) {
+    public OrderDetailDTO(Integer orderID, LocalDateTime orderDate, String status, String shippingAddress, String shippingName, String shippingPhone, BigDecimal shippingCost,BigDecimal shippinngCostDiscountPrice , String paymentMethod, LocalDateTime transactionDate, LocalDateTime updateStatusAt, String shippingCode, LocalDate deliveryDate) {
         this.orderID = orderID;
         this.orderDate = orderDate;
         this.status = status;
@@ -62,5 +65,12 @@ public class OrderDetailDTO {
         this.transactionDate = transactionDate;
         this.updateStatusAt = updateStatusAt;
         this.shippingCode = shippingCode;
+        this.deliveryDate = deliveryDate;
     }
+    public OrderDetailDTO(Integer orderID, String shippingCode, String status) {
+        this.orderID = orderID;
+        this.shippingCode = shippingCode;
+        this.status = status;
+    }
+
 }

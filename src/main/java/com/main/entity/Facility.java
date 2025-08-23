@@ -29,7 +29,7 @@ public class Facility implements Serializable {
     private String addressIdGHN;
 
     // Quan hệ tự thân: nhiều Facility con có thể có 1 parent
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ParentID")
     private Facility parent;
 
@@ -37,7 +37,7 @@ public class Facility implements Serializable {
     private List<Facility> childrens;
 
     // Quản lý bởi 1 người (giả sử là Account)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Manager", nullable = true)
     private Staff manager;
 
@@ -61,5 +61,9 @@ public class Facility implements Serializable {
 
     @OneToMany(mappedBy = "facility")
     private List<Transaction> Transactions;
+
+    public Facility(String facilityId) {
+        this.facilityId = facilityId;
+    }
 }
 

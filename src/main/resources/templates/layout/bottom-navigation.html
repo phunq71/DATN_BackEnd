@@ -447,6 +447,27 @@
       el.setAttribute('title', el.getAttribute('data-original-title'));
       document.querySelectorAll('.custom-tooltip').forEach(tip => tip.remove());
     });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentPath = window.location.pathname;
+
+      if (currentPath === '/index') {
+        const searchBtn = document.getElementById('search-btn');
+
+        // Thay hẳn div thành thẻ a
+        searchBtn.outerHTML = `
+            <a id="search-btn"
+               class="fn-item fn-item-search"
+               href="/opulentia_user/edit-profile"
+               title="Tài khoản">
+                <i class="fas fa-user"></i>
+            </a>
+        `;
+      }
+    });
+
+
+
   </script>
 
 </div>

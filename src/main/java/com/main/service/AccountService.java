@@ -22,4 +22,6 @@ public interface AccountService {
 
     // vô hiệu hóa tk
     boolean deactivateAccount(String accountId);
+    Optional<Account> finByAccountId(String accountId);
+    Account saveAccount(Account account);
 }

@@ -1,20 +1,24 @@
 package com.main.rest_controller;
 
 import com.main.dto.*;
+import com.main.entity.LogOrders;
 import com.main.entity.Order;
 import com.main.entity.Transaction;
 import com.main.enums.OrderStatusEnum;
+import com.main.repository.CustomerRepository;
+import com.main.repository.LogOrderRepository;
+import com.main.repository.OrderRepository;
 import com.main.repository.TransactionRepository;
+import com.main.service.CustomerService;
 import com.main.service.OrderService;
 import com.main.service.TransactionService;
 import com.main.service.VoucherService;
 import com.main.utils.AuthUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,12 +28,20 @@ public class OrderRestController {
     private final TransactionRepository transactionRepository;
     private final TransactionService transactionService;
     private final VoucherService voucherService;
+    private final CustomerService customerService;
+    private final CustomerRepository customerRepository;
+    private final LogOrderRepository logOrderRepository;
+    private final OrderRepository orderRepository;
 
-    public OrderRestController(OrderService orderService, TransactionRepository transactionRepository, TransactionService transactionService, VoucherService voucherService) {
+    public OrderRestController(OrderService orderService, TransactionRepository transactionRepository, TransactionService transactionService, VoucherService voucherService, CustomerService customerService, CustomerRepository customerRepository, LogOrderRepository logOrderRepository, OrderRepository orderRepository) {
         this.orderService = orderService;
         this.transactionRepository = transactionRepository;
         this.transactionService = transactionService;
         this.voucherService = voucherService;
+        this.customerService = customerService;
+        this.customerRepository = customerRepository;
+        this.logOrderRepository = logOrderRepository;
+        this.orderRepository = orderRepository;
     }
 
 //    @GetMapping("/opulentia_user/orders/allOrders/{status}/{year}")
@@ -70,10 +82,7 @@ public class OrderRestController {
         }
 
         List<OrderDTO> orderDTOs = orderService.getOrdersByCustomerIdAndStatus(accountId, status, year);
-        for (OrderDTO orderDTO : orderDTOs) {
-            System.out.println(orderDTO.getTotalPrice() + "Test");
-        }
-        System.err.println("OOOOOOOOOO"+orderDTOs.size());
+
         List<OrderDTO> saveOrderIds = new ArrayList<>();
 
         if (orderDTOs.isEmpty()) {
@@ -82,7 +91,7 @@ public class OrderRestController {
 
         for (OrderDTO orderDTO : orderDTOs) {
             String currentStatus = orderDTO.getStatus();
-
+            System.out.println("😚😚😚😚😚😚😚😚");
             if ("SanSangGiao".equals(currentStatus) || "ChoGiaoHang".equals(currentStatus)) {
                 System.err.println("🔍 Kiểm tra đơn hàng: " + orderDTO.getOrderID() + ", shippingCode: " + orderDTO.getShippingCode());
 
@@ -96,12 +105,27 @@ public class OrderRestController {
                     System.err.println("  GHN Status: " + ghnStatus + " ➝ Mapped: " + newStatus);
 
                     if (newStatus != null && !newStatus.equals(currentStatus)) {
+
                         System.err.println("  ✅ Cập nhật trạng thái đơn hàng từ " + currentStatus + " ➝ " + newStatus);
+
+                        LogOrders logOrders = new LogOrders();
+                        logOrders.setStaff(null);
+                        logOrders.setOrder(orderRepository.findByOrderID(orderDTO.getOrderID()));
+
+                        logOrders.setUpdateAt(LocalDateTime.now());
+
+                        if (newStatus.equals("ChoGiaoHang")){
+                            logOrders.setContent("Shipper đã lấy đơn, đợi giao hàng");
+                        }else if(newStatus.equals("DaGiao")){
+                            logOrders.setContent("Đơn hàng đã được giao thành công");
+                        }
+                        logOrderRepository.save(logOrders);
+
                         orderDTO.setStatus(newStatus);
                         if(newStatus.equals("DaGiao")){
                             transactionService.updateStatusByOrderId(orderDTO.getOrderID());
                             voucherService.addVoucherCustomerOrderSuccess(orderDTO.getOrderID());
-
+                            customerService.updateRankByCustomerId(customerRepository.findByCustomerId(accountId));
                         }
                         saveOrderIds.add(orderDTO);
                     } else {
@@ -111,8 +135,10 @@ public class OrderRestController {
                     System.err.println("  ❌ Không tìm thấy shippingStatus trong phản hồi GHN.");
                 }
             }
-        }
 
+            System.out.println("😚😚💾💾");
+        }
+        System.out.println("😚😚💾");
         if (!saveOrderIds.isEmpty()) {
             orderService.saveOrders(saveOrderIds);
             System.err.println("💾 Đã cập nhật trạng thái cho " + saveOrderIds.size() + " đơn hàng.");
@@ -199,4 +225,40 @@ public class OrderRestController {
             default -> null; // hoặc trạng thái mặc định
         };
     }
+
+
+    // Hủy đơn hàng
+    @PutMapping("/api/orders/{orderId}/cancel")
+    public ResponseEntity<?> cancelOrder(@PathVariable Integer orderId) {
+        System.out.println("Hủy đơn hàng với ID: " + orderId); // in ra để debug
+        Boolean flag = orderService.cancelOrder(orderId);
+        if (flag) {
+            return ResponseEntity.ok("Đơn hàng " + orderId + " đã được hủy");
+        }else{
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // Yêu cầu hủy đơn hàng
+    @PostMapping("/api/orders/{orderId}/requestCancel")
+    public ResponseEntity<?> requestCancelOrder(
+            @PathVariable("orderId") Integer orderId,
+            @RequestBody Map<String, String> body
+    ) {
+        String reason = body.get("reason");
+        System.out.println("📌 Nhận yêu cầu hủy đơn:");
+        System.out.println("Order ID: " + orderId);
+        System.out.println("Reason: " + reason);
+
+        orderService.cancelOrder3(orderId, reason);
+
+        // Trả về response test
+        return ResponseEntity.ok(Map.of(
+                "status", "received",
+                "orderId", orderId,
+                "reason", reason
+        ));
+    }
+
+
 }

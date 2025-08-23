@@ -23,15 +23,15 @@
     }
 
     .color-circle {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         border-radius: 50%;
-        border: 1px solid #eee;
+        border: 1px solid #0a0a0a;
         cursor: pointer;
         transform: translateY(-30px);
         transition: transform 0.3s ease;
     }
-
+    .product-wrapper.hover .color-options,
     .product-wrapper:hover .color-options {
         height: auto;
         opacity: 1;
@@ -39,11 +39,12 @@
 
     .review {
         position: absolute;
-        color: #ffffff;
         bottom: 5px;
         right: 5px;
+        font-size: 12px;
     }
 
+    .product-wrapper.hover .color-circle,
     .product-wrapper:hover .color-circle {
         transform: translateY(0);
     }
@@ -54,6 +55,7 @@
         transition: border 0.3s ease;
     }
 
+    .product-wrapper.hover,
     .product-wrapper:hover {
         border: 2px solid #ffc001; /* đổi màu thôi, không đổi độ dày */
     }
@@ -130,6 +132,7 @@
 
     /*mới thêm để mỗi khối sp cao 100% ô lưới*/
     .product-container {
+        position: relative;
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -146,62 +149,66 @@
     }
 
     .product-image {
-        background-color: #EEEEEE;
         height: 300px;
+        background-color: transparent;
         width: 100%;
         object-fit: cover;
         display: block;
         transition: transform 0.3s ease;
+        filter: drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.25));
     }
 
+    .product-wrapper.hover .product-image,
     .product-wrapper:hover .product-image {
         transform: scale(1.05);
     }
 
+    .product-wrapper.hover .new-label,
+    .product-wrapper:hover .new-label {
+        width: 55px;
+    }
     .new-label {
         position: absolute;
-        top: 15px;
+        top: 10px;
         left: 10px;
-        background-color: #000;
-        color: #fff;
-        padding: 5px 10px;
-        font-size: 12px;
-        font-weight: bold;
         z-index: 2;
-        transform: rotate(-15deg);
+        width: 50px;      /* điều chỉnh kích thước nhãn */
+        height: auto;transition: all 0.3s ease;
+
+    }
+    .new-label img {
+        width: 100%;
+        height: auto;
+        display: block;
         transition: all 0.3s ease;
-        border-radius: 3px;
     }
 
     .discount-label {
         position: absolute;
         top: 10px;
-        right: 10px;
-        background-color: red;
-        color: white;
+        right: 0px;
+        color:  black;
         padding: 5px 10px;
-        font-size: 12px;
-        font-weight: bold;
+        font-size: 13px;
+        font-weight: 550;
         transition: all 0.3s ease;
         z-index: 2;
-        border-radius: 3px;
     }
 
+    .product-wrapper.hover .discount-label,
     .product-wrapper:hover .discount-label {
-        font-size: large;
-        padding: 10px 20px;
+        padding: 7px 14px;
     }
 
-    .product-wrapper:hover .new-label {
-        padding: 5px 20px;
-    }
+
+
+
 
     .product-info {
         position: relative;
         bottom: 0;
         left: 0;
         right: 0;
-        background-color: rgb(0, 0, 0, 0.9);
         padding: 15px;
         display: flex;
         flex-direction: column;
@@ -210,10 +217,11 @@
         opacity: 0;
         transition: all 0.3s ease;
         z-index: 1;
-        color: #ffffff;
-        height: 100px;
+        color: black;
+        height: 90px;
     }
 
+    .product-wrapper.hover .product-info,
     .product-wrapper:hover .product-info {
         transform: translateY(0);
         opacity: 1;
@@ -222,6 +230,7 @@
 
     .price-container {
         display: flex;
+        margin-top: -10px;
         gap: 10px;
         align-items: center;
     }
@@ -229,20 +238,22 @@
     .original-price {
         text-decoration: line-through;
         color: #999;
-        font-size: 14px;
+        font-size: 11px;
+        margin-left: -6px;
+        transform: scaleY(0.8); /* 80% chiều cao chữ */
+        display: inline-block;
     }
 
     .sale-price {
-        font-weight: bold;
-        color: #ef0918;
-        font-size: 16px;
+        font-weight: 500;
+        font-size: 12px;
     }
 
     .favorite-btn {
         position: absolute;
-        bottom: 110px;
-        right: 4%;
-        background-color: rgba(255, 255, 255, 0.9);
+        top: 66.0%;
+        background-color: transparent;
+        right: -1%; /* ⛔️ Không dùng -230px */
         color: #333;
         font-size: larger;
         border: none;
@@ -253,19 +264,25 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
-        z-index: 2;
+        z-index: -1; /* đủ lớn */
         transform: translateY(350%);
     }
 
-    .product-wrapper:hover .favorite-btn {
+    .product-container:hover .favorite-btn {
         transform: translateY(0);
+        z-index: 1; /* đủ lớn */
     }
 
     .favorite-btn:hover {
         color: #ff4757;
-        transform: scale(1.2) !important;
+    }
+    .new{
+        position: absolute;
+        color: #f80303;
+        bottom: 5px;
+        left: 15px;
+        font-size: 14px;
     }
 
     /* Animations */
@@ -753,55 +770,115 @@
         text-align: center;
         font-weight: bold;
     }
+    .c-cart-title {
+         margin-left: 105px;
+         margin-top: 100px;
+         font-size: 2rem;
+         font-weight: 700;
+         margin-bottom: 1.5rem;
+         color: #2c3e50;
+         display: flex;
+         align-items: center;
+         gap: 0.75rem;
+     }
+    .back-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: none;
+    }
+
+    .back-button i {
+        color: #191b1f;
+        font-size: 24px;
+        transform: scaleX(-1); /* Lật ngang icon */
+    }
+
+    .back-button:hover {
+        background-color: #f0f0f0; /* Màu hover nhẹ nhàng */
+        transform: translateY(-2px) scale(1.05); /* Thêm hiệu ứng phóng to nhẹ */
+    }
+
 </style>
 <div class="reels-row">
     <section class="banner-section">
-        <img src="https://theme.hstatic.net/1000306633/1001194548/14/slideshow_2.jpg?v=383"
-             alt="Khuyến mãi thời trang" class="banner-img">
-        <div class="banner-overlay">
-            <div class="section-header">
-                <h2 class="section-title text-dark fw-bold m-1">Yêu thích</h2>
-            </div>
-        </div>
-
+        <div class="c-cart-title">
+        <button class="back-button" title="Quay lại" onclick="history.back()">
+            <i class="fa-solid fa-share"></i>
+        </button>
+        Sản pẩm yêu thích của bạn</div>
     </section>
     <!--hiển thị sp dc yêu thích-->
     <section class="products-section">
         <div class="products-grid">
-            <div class="product-container" th:each="product : ${products}">
+            <div class="product-container item" th:each="pro : ${products}" th:attr="data-product=${pro.productID}">
+                <a th:href="@{'/opulentia/' +  ${pro. parentCategory} + '/' + ${pro.childCategory} + '/' + ${pro.productID}
+                                + '/' + ${pro.productID}}" style="text-decoration: none;">
+                    <div class="product-wrapper" th:attr="data-product=${pro.productID}">
+                        <img th:src="@{'/uploads/' + ${pro.mainImageUrl}}"
+                             alt="Product" class="product-image">
+                        <div th:if="${pro.isHot}" class="new-label">
+                            <img src="/uploads/Screenshot 2025-08-13 175547.png" alt="Bestseller">
+                        </div>
+                        <div class="discount-label"  th:if="${pro.getDiscountPercent()}" th:text="'- ' + ${pro.getDiscountPercent() +' %'}">-15%</div>
 
-                    <div class="product-wrapper">
-                        <a th:href="@{'/opulentia/' + ${product.parentCategory} + '/' + ${product.childCategory} + '/' + '?idPro=' + ${product.productID}}" style="text-decoration: none;">
-                            <img th:src="@{'/uploads/' + ${product.mainImageUrl}}" alt="Product" class="product-image"></a>
-
-
-                        <button class="favorite-btn" th:attr="data-id=${product.productID}">
-                            <i class="fas fa-heart" style="color: black;"></i>
-                        </button>
-
-
-                        <a th:href="@{'/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + '?idPro=' + ${product.productID}}" style="text-decoration: none;">
                         <div class="product-info">
                             <div class="color-options">
-                                <div class="color-circle" style="background-color: #201714;"></div>
-                                <div class="color-circle" style="background-color: #e1d5bc;"></div>
-                                <div class="color-circle" style="background-color: #656565;"></div>
+                                <div class="color-circle"
+                                     th:each="color : ${pro.options}"
+                                     th:style="'background-color:' + ${color.ma} + ';'">
+                                </div>
                             </div>
-                            <div th:text="${product.productName}">Tên sản phẩm</div>
+                            <h3 th:text="${pro.productName}"
+                                style="font-size:12px;
+                                 text-transform: uppercase;
+            margin-top: -10px;
+            padding-top: 5px;
+            display:-webkit-box;
+            font-family: 'Basic Commercial Soft Rounded', sans-serif;
+            border-top: 1px solid #333; /* #333 là xám đen */
+            font-weight: 800;
+            -webkit-box-orient:vertical;
+            overflow:hidden;
+            text-overflow:ellipsis;">
+                            </h3>
                             <div class="price-container">
-                            <span class="sale-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA',0, 'POINT')} + 'đ'">
-                                900.000đ
-                            </span>
-                            </div>
-                            <div class="review">4.2 ★</div>
-                        </div>
-                        </a>
-                    </div>
+                <span class="sale-price"
+                      th:if="${pro.discountPercent != null}"
+                      th:text="${#numbers.formatDecimal(pro.price.multiply(100 - pro.discountPercent).divide(100), 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
+                                <span class="original-price text-decoration-line-through text-secondary"
+                                      th:if="${pro.discountPercent != null}"
+                                      th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                </span>
 
+                                <!-- Nếu không giảm -->
+                                <span class="sale-price"
+                                      th:unless="${pro.discountPercent != null}"
+                                      th:text="${#numbers.formatDecimal(pro.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+              </span>
+                            </div>
+                            <div class="review">
+                                <span th:text="${pro.totalLikes != 0 ? pro.totalLikes + ' ❤ ' : ''}"/>
+                                <span th:text="${pro.avg_rating != null ? pro.avg_rating + ' ★' : ''}"/>
+                            </div>
+                            <div class="new"
+                                 th:if="${pro.isNew}"> Mới
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <button class="favorite-btn" th:attr="data-product=${pro.productID}, data-idpro=${pro.productID}">
+                    <i th:class="${pro.isFavorite} ? 'fas fa-heart text-dark' : 'far fa-heart'"></i>
+                </button>
             </div>
         </div>
-
-
     </section>
 </div>
 
@@ -1247,7 +1324,7 @@
                 event.preventDefault();     // Ngăn điều hướng
                 event.stopPropagation();    // Ngăn lan sang thẻ <a>
 
-                const productId = this.getAttribute("data-id");
+                const productId = this.getAttribute("data-idpro");
                 if (!productId) return;
 
                 // Gửi request DELETE bằng axios
@@ -1270,6 +1347,23 @@
                         }
                     });
             });
+        });
+    });
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+            const selector = `.product-container[data-product="${btn.dataset.product}"] .product-wrapper`;
+            const wrapper = document.querySelector(selector);
+            if (wrapper) {
+                wrapper.classList.add('hover');
+            }
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            const selector = `.product-container[data-product="${btn.dataset.product}"] .product-wrapper`;
+            const wrapper = document.querySelector(selector);
+            if (wrapper) {
+                wrapper.classList.remove('hover');
+            }
         });
     });
 </script>

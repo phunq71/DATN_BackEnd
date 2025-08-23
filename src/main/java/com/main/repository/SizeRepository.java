@@ -23,12 +23,12 @@ FROM Variant v
 JOIN Item i ON i.variant.variantID = v.variantID
 JOIN Size s ON s.sizeID = i.size.sizeID
 LEFT JOIN Inventory inv ON inv.item.itemId = i.itemId
-    AND inv.facility.isUse = true
+    AND inv.facility.type = 'K'
 WHERE v.variantID = :variantId
 GROUP BY v.variantID, s.sizeID, s.code, i.itemId
 """)
     List<SizeDTO> getSizeDTOByVariantID(@Param("variantId") String variantId);
 
-
+    Size findByCode(String code);
 
 }

@@ -99,7 +99,7 @@ public class ReturnItemServiceImpl implements ReturnItemService {
             // Lưu file xuống ổ cứng từng cái
             savedFiles.forEach(file -> {
                 try {
-                    FileUtil.saveImage(file);
+                    FileUtil.saveImage2(file);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

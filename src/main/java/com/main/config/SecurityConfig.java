@@ -23,32 +23,28 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+
+    public SecurityConfig(CustomUserDetailsService userDetailsService,
+                          OAuth2SuccessHandler oAuth2SuccessHandler) {
+        this.userDetailsService = userDetailsService;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+    }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
         return new JwtAuthenticationFilter(jwtService, userDetailsService);
     }
 
-
-    @Autowired
-    private OAuth2SuccessHandler oAuth2SuccessHandler;
-
-
-    @Autowired
-    private CustomOAuth2UserService customOAuth2UserService;
-
-    @Autowired
-    private OAuth2RefererSavingFilter oAuth2RefererSavingFilter;
-
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        System.out.println("✅ SecurityFilterChain from SecurityConfigTest is active");
-        http    .cors(Customizer.withDefaults())
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           JwtAuthenticationFilter jwtAuthenticationFilter,
+                                           CustomOAuth2UserService customOAuth2UserService) throws Exception {
+
+        http.cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN", "STAFF", "AREA", "STOCK")
                         .requestMatchers("/opulentia/rest/**").permitAll()
@@ -59,42 +55,31 @@ public class SecurityConfig {
                         .requestMatchers("/opulentia_user/**", "/edit-profile").hasRole("USER")
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            String requestURI = request.getRequestURI();
-
-                            // Nếu request đến từ trình duyệt (text/html) => chuyển hướng
-                            String acceptHeader = request.getHeader("Accept");
-                            if (acceptHeader != null && acceptHeader.contains("text/html")) {
-                                response.sendRedirect("/auth");
-                            } else {
-                                // Request kiểu API (json, axios,...) thì trả về 401
-                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                                response.getWriter().write("Unauthorized");
-                            }
-                        })
-                )
+                .exceptionHandling(e -> e.authenticationEntryPoint((request, response, authException) -> {
+                    String acceptHeader = request.getHeader("Accept");
+                    if (acceptHeader != null && acceptHeader.contains("text/html")) {
+                        response.sendRedirect("/auth");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.getWriter().write("Unauthorized");
+                    }
+                }))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/auth")
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
-                        )
-                                .successHandler(oAuth2SuccessHandler)
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
                 );
+
         return http.build();
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        authBuilder
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
+        authBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
         return authBuilder.build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

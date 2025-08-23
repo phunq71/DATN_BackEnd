@@ -20,7 +20,7 @@ public class ReturnItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer returnItemId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rrid", nullable = false)
     private ReturnRequest returnRequest;
 

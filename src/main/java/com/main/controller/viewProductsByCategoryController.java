@@ -138,6 +138,14 @@ public class viewProductsByCategoryController {
         model.addAttribute("filterQuery", finalFilterQuery);
 
 
+        // Bổ sung thêm banner và content cho danh mục
+        if( child != null) {
+            model.addAttribute("banner", categoryService.findByCategoryId(child).getBanner());
+            model.addAttribute("content", categoryService.findByCategoryId(child).getContent());
+        }else{
+            model.addAttribute("banner", categoryService.findByCategoryId(parent).getBanner());
+            model.addAttribute("content", categoryService.findByCategoryId(parent).getContent());
+        }
 
         return "View/viewProductsByCategory";
     }

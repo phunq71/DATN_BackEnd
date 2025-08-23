@@ -87,7 +87,7 @@ async function fetchDataCheckout() {
         const info = data?.customer;
         console.log(data);
 
-        if (!info?.customerPhone || info.customerPhone.trim() === '' || info.customerPhone === 'N/A') {
+        if (!info?.customerPhone || info.customerPhone.trim() === '' || info.customerPhone.trim() === 'N/A') {
             Swal.fire({
                 icon: 'warning',
                 title: 'Thiếu thông tin',
@@ -335,15 +335,50 @@ document.querySelector('.submit-btn').addEventListener('click', async () => {
             alert("❌ Lỗi khi cập nhật địa chỉ");
             console.error(error);
         }
+        if (service_id === null && service_type_id === null) {
+            Swal.fire({
+                icon: 'warning',  // 'success', 'error', 'info', 'question' cũng được
+                title: 'Xin lỗi!',
+                text: 'Hiện tại địa chỉ của bạn không có phương thức vận chuyển phù hợp.',
+                confirmButtonText: 'OK'
+            });
+            const shipPriceEl = document.querySelector('.c-ship-price');
+            const shipPriceEl1 = document.getElementById('ship');
+
+            const zeroShip = `₫${(0).toLocaleString('vi-VN')}`;
+
+            shipPriceEl.textContent = zeroShip;
+            shipPriceEl1.textContent = zeroShip;
+        }
+
     } else {
         checkoutInfo.customer.customerAddressIdGHN = addressIdGHN;
         checkoutInfo.customer.customerAddress = addressText;
         checkoutInfo.customer.note = savedNote;
         await fetchSuggestedVouchers();
         renderCheckoutInfo();
-        fetchLeadtimes();
         closeModal('address-modal');
+         await calculateShippingFee();
+        console.log('teststttt' +service_id)
+        if (service_id === null && service_type_id === null) {
+            Swal.fire({
+                icon: 'warning',  // 'success', 'error', 'info', 'question' cũng được
+                title: 'Xin lỗi!',
+                text: 'Hiện tại địa chỉ của bạn không có phương thức vận chuyển phù hợp.',
+                confirmButtonText: 'OK'
+            });
+            const shipPriceEl = document.querySelector('.c-ship-price');
+            const shipPriceEl1 = document.getElementById('ship');
+
+            const zeroShip = `₫${(0).toLocaleString('vi-VN')}`;
+
+            shipPriceEl.textContent = zeroShip;
+            shipPriceEl1.textContent = zeroShip;
+        }else {
+            await fetchLeadtimes();
+        }
     }
+
 });
 
 
@@ -363,8 +398,9 @@ async function fetchLeadtimes() {
 
     for (let facility of checkoutInfo.facilities) {
         const { district_id: fromDistrictId, ward_code: fromWardCode } = parseGHNAddressId(facility.addressIdGHN);
-
+        await getGHNService( fromDistrictId, toDistrictId );
         try {
+            console.log('🙉🙉🙉: ' + service_id)
             const res = await fetch('https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime', {
                 method: 'POST',
                 headers: {
@@ -442,41 +478,41 @@ let service_id = null;
 let service_type_id = null;
 
 // 👉 Hàm tách riêng để lấy danh sách dịch vụ GHN
-async function getGHNService(from_district_id, to_district_id) {
-    try {
-        const res = await axios.post(
-            'https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services',
-            {
-                shop_id: shopId,
-                from_district: from_district_id,
-                to_district: to_district_id
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Token': token
+    async function getGHNService(from_district_id, to_district_id) {
+        try {
+            const res = await axios.post(
+                'https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services',
+                {
+                    shop_id: shopId,
+                    from_district: from_district_id,
+                    to_district: to_district_id
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Token': token
+                    }
                 }
+            );
+
+            const services = res.data?.data;
+            console.log("📋 Danh sách dịch vụ GHN:", services);
+
+            if (!services || services.length === 0) {
+                console.error("❌ Không tìm thấy dịch vụ vận chuyển phù hợp.");
+                service_type_id = null;
+                service_id = null;
+                return null;
             }
-        );
-
-        const services = res.data?.data;
-        console.log("📋 Danh sách dịch vụ GHN:", services);
-
-        if (!services || services.length === 0) {
-            console.error("❌ Không tìm thấy dịch vụ vận chuyển phù hợp.");
+            // Gán vào biến toàn cục
+            service_id = services[0].service_id;
+            service_type_id = services[0].service_type_id;
+            return services[0]; // hoặc trả về cả danh sách nếu muốn
+        } catch (err) {
+            console.error("❌ Lỗi khi lấy dịch vụ GHN:", err.response?.data || err.message);
             return null;
         }
-
-        // Gán vào biến toàn cục
-        service_id = services[0].service_id;
-        service_type_id = services[0].service_type_id;
-
-        return services[0]; // hoặc trả về cả danh sách nếu muốn
-    } catch (err) {
-        console.error("❌ Lỗi khi lấy dịch vụ GHN:", err.response?.data || err.message);
-        return null;
     }
-}
 
 async function calculateShippingFee() {
     const addressIdGHN = checkoutInfo.customer.customerAddressIdGHN;
@@ -504,6 +540,9 @@ async function calculateShippingFee() {
     const flag = totalAmount < 700000;
     // 🔹 Gọi hàm lấy dịch vụ GHN
     const service = await getGHNService(from_district_id, to_district_id);
+    const discount = totalAmount -  checkoutInfo.discountTotal;
+    document.getElementById('tongTien').textContent =
+        '₫' + discount.toLocaleString('vi-VN');
     if (!service) return;
     console.log(totalAmount)
     const bodyData = {
@@ -584,6 +623,7 @@ async function calculateShippingFee() {
         } else {
             console.error("❌ Lỗi không xác định:", error.message);
         }
+
         return null;
     }
 }
@@ -698,15 +738,25 @@ function datHang() {
         });
         return;
     }
+    if (service_id === null && service_type_id === null) {
+        Swal.fire({
+            icon: 'warning',  // 'success', 'error', 'info', 'question' cũng được
+            title: 'Xin lỗi!',
+            text: 'Hiện tại địa chỉ của bạn không có phương thức vận chuyển phù hợp.',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
 
     axios.post('/opulentia_user/order/add', checkoutInfo, {
         withCredentials: true,
     })
+
         .then(function (response) {
             Swal.fire({
                 icon: 'success',
                 title: 'Đặt hàng thành công!',
-                text: response.data.message || 'Cảm ơn bạn đã mua hàng tại Opulentia.',
+                text: 'Cảm ơn bạn đã mua hàng tại Opulentia.',
                 confirmButtonColor: '#3085d6',
                 confirmButtonText: 'Đến trang đơn hàng'
             }).then(() => {
@@ -715,6 +765,9 @@ function datHang() {
             });
 
             console.log('Đặt hàng thành công:', response.data);
+            localStorage.removeItem('checkedCartItemIDs');
+            localStorage.removeItem('selectAllChecked');
+
         })
 
         .catch(function (error) {
