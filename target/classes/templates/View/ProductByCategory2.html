@@ -868,7 +868,7 @@
                 <a th:href="@{'/opulentia/' +  ${pro.parentCategoryId} + '/' + ${pro.childCategoryId} + '/' + ${pro.productID}
                                 + '/' + ${pro.variantID}}" style="text-decoration: none;">
                     <div class="product-wrapper">
-                        <img th:src="@{'/uploads/' + ${pro.getImageUrl()}}"
+                        <img th:src="@{'https://phudatn.blob.core.windows.net/images/' + ${pro.getImageUrl()}}"
                              alt="Product" class="product-image">
                         <div th:if="${pro.isHot}" class="new-label">Bán chạy &nbsp; ●</div>
                         <div class="discount-label"  th:if="${pro.getDiscountPercent()}" th:text="'- ' + ${pro.getDiscountPercent() +' %'}">-15%</div>

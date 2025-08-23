@@ -117,7 +117,7 @@ function initReturnItem(returnItems) {
         const productHTML = `
         <div class="r-product" data-product-id="${productId}" data-product-name="${item.productName}">
             <input type="checkbox" class="r-checkbox product-checkbox">
-            <img class="r-product-img" src="/uploads/${item.image}" alt="${item.productName}">
+            <img class="r-product-img" src="https://phudatn.blob.core.windows.net/images/${item.image}" alt="${item.productName}">
             <div class="r-product-info">
                 <div class="r-product-name">${item.productName}</div>
                 <div class="r-product-loai">Size: ${item.size} | Màu: ${item.color}</div>

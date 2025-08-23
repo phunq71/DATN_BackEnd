@@ -874,10 +874,10 @@
                 <a th:href="@{'/opulentia/' +  ${pro.parentCategoryId} + '/' + ${pro.childCategoryId} + '/' + ${pro.productID}
                                 + '/' + ${pro.variantID}}" style="text-decoration: none;">
                     <div class="product-wrapper" th:attr="data-product=${pro.productID}">
-                        <img th:src="@{'/uploads/' + ${pro.getImageUrl()}}"
+                        <img th:src="@{'https://phudatn.blob.core.windows.net/images/' + ${pro.getImageUrl()}}"
                              alt="Product" class="product-image">
                         <div th:if="${pro.isHot}" class="new-label">
-                            <img src="/uploads/Screenshot 2025-08-13 175547.png" alt="Bestseller">
+                            <img src="https://phudatn.blob.core.windows.net/images/Screenshot 2025-08-13 175547.png" alt="Bestseller">
                         </div>
                         <div class="discount-label"  th:if="${pro.getDiscountPercent()}" th:text="'- ' + ${pro.getDiscountPercent() +' %'}">-15%</div>
 

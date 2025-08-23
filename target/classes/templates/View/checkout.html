@@ -733,7 +733,7 @@
                     <tr class="c-cart-item" th:each="item : ${listItems}">
                         <td>
                             <div class="c-product-info">
-                                <img th:src="@{${'/uploads/' + item.image_url}}" class="c-product-image" alt="Ảnh sản phẩm">
+                                <img th:src="@{${'https://phudatn.blob.core.windows.net/images/' + item.image_url}}" class="c-product-image" alt="Ảnh sản phẩm">
                                 <div>
                                     <strong th:text="${item.item_name}">Tên sản phẩm</strong>
                                     <div class="c-variant">
