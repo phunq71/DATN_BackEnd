@@ -63,6 +63,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final UsedVoucherRepository usedVoucherRepository;
     private final OrderRepository orderRepository;
+    private final FileUtil fileUtil;
 
 
     @Override
@@ -108,9 +109,9 @@ public class CustomerServiceImpl implements CustomerService {
             Customer oldCustomer = customerRepository.findById(customer.getCustomerId()).get();
             Customer savedCustomer =mergeCustomer(oldCustomer, customer);
             if(avatar!=null){
-                String filename=FileUtil.saveImage(avatar);
+                String filename=fileUtil.saveImage(avatar);
                 savedCustomer.setImageAvt(filename);
-                FileUtil.deleteFile(oldCustomer.getImageAvt());
+                fileUtil.deleteFile(oldCustomer.getImageAvt());
             }
             savedCustomer.setMembership(oldCustomer.getMembership());
             customerRepository.save(savedCustomer);

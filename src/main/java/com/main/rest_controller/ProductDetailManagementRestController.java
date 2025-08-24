@@ -50,6 +50,7 @@ public class ProductDetailManagementRestController {
     private final ImageRepository imageRepository;
     private final ItemRepository itemRepository;
     private final ProductRepository productRepository;
+    private final FileUtil fileUtil;
 
     @GetMapping("/getProduct")
     public ResponseEntity<ProductDetailAdminDTO> getProductDetail(@RequestParam String id) {
@@ -194,7 +195,7 @@ public class ProductDetailManagementRestController {
         List<Image> oldImages = imageRepository.findByVariant_VariantID(id);
         for (Image img : oldImages) {
             if (!jsonFileNames.contains(img.getImageUrl())) {
-                FileUtil.deleteFile(img.getImageUrl());
+                fileUtil.deleteFile(img.getImageUrl());
                 imageRepository.delete(img);
             }
         }
@@ -202,7 +203,7 @@ public class ProductDetailManagementRestController {
         // 4️⃣ Thêm ảnh mới
         if (files != null) {
             for (MultipartFile file : files) {
-                String fileName = FileUtil.saveImage(file);
+                String fileName = fileUtil.saveImage(file);
 
                 Image img = new Image();
                 img.setImageUrl(fileName);
@@ -249,7 +250,7 @@ public class ProductDetailManagementRestController {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
                 @Override
                 public void afterCommit() {
-                    images.forEach(img -> FileUtil.deleteFile(img.getImageUrl()));
+                    images.forEach(img -> fileUtil.deleteFile(img.getImageUrl()));
                 }
             });
 

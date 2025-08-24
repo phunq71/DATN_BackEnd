@@ -25,6 +25,8 @@ import java.util.Map;
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
     CategoryRepository categoryRepository;
+    @Autowired
+    private FileUtil fileUtil;
 
 
     @Override
@@ -97,7 +99,7 @@ public class CategoryServiceImpl implements CategoryService {
         String nameFile = null;
         if(file != null){
             try {
-                nameFile = FileUtil.saveImage(file);
+                nameFile = fileUtil.saveImage(file);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -124,11 +126,11 @@ public class CategoryServiceImpl implements CategoryService {
         String nameFile = null;
         if(file != null){
             try {
-                nameFile = FileUtil.saveImage(file);
+                nameFile = fileUtil.saveImage(file);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            FileUtil.deleteFile(dto.getBanner());
+            fileUtil.deleteFile(dto.getBanner());
             entity.setBanner(nameFile);
         }
         entity.setContent(dto.getContent());
@@ -148,7 +150,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (hasActiveProduct) {
             throw new RuntimeException("Không thể xóa danh mục vì có sản phẩm đang hoạt động.");
         }
-        FileUtil.deleteFile(entity.getBanner());
+        fileUtil.deleteFile(entity.getBanner());
         categoryRepository.delete(entity);
 
     }

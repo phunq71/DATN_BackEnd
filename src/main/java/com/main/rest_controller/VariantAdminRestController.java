@@ -37,6 +37,7 @@ public class VariantAdminRestController {
     private final VariantMapper variantMapper;
     private final ProductRepository productRepository;
     private final ItemRepository itemRepository;
+    private final FileUtil fileUtil;
 
     @PostMapping("/add")
     public ResponseEntity<?> createVariant(
@@ -81,7 +82,7 @@ public class VariantAdminRestController {
                 MultipartFile file = files.get(i);
 
                 // Lưu file
-                String fileName = FileUtil.saveImage(file);
+                String fileName = fileUtil.saveImage(file);
 
                 // Lấy isMain theo index từ imagesJson
                 boolean isMain = false;
@@ -135,7 +136,7 @@ public class VariantAdminRestController {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
                 @Override
                 public void afterCommit() {
-                    images.forEach(img -> FileUtil.deleteFile(img.getImageUrl()));
+                    images.forEach(img -> fileUtil.deleteFile(img.getImageUrl()));
                 }
             });
             System.out.println("‼️‼️‼️‼️‼️️");

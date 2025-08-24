@@ -37,12 +37,14 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final FileUtil fileUtil;
 
-    public ReviewServiceImpl(ReviewRepository reviewRepository, ReviewImageRepository reviewImageRepository, OrderRepository orderRepository, OrderDetailRepository orderDetailRepository) {
+    public ReviewServiceImpl(ReviewRepository reviewRepository, ReviewImageRepository reviewImageRepository, OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, FileUtil fileUtil) {
         this.reviewRepository = reviewRepository;
         this.reviewImageRepository = reviewImageRepository;
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
+        this.fileUtil = fileUtil;
     }
 
 
@@ -101,7 +103,7 @@ public class ReviewServiceImpl implements ReviewService {
 
             images.forEach(image -> {
                 try {
-                    String fileName = FileUtil.saveImage(image);
+                    String fileName = fileUtil.saveImage(image);
                     ReviewImage reviewImage = new ReviewImage(savedReview, fileName);
 
                     reviewImageRepository.save(reviewImage);
@@ -181,7 +183,7 @@ public class ReviewServiceImpl implements ReviewService {
 
                 images.forEach(image -> {
         //            System.err.println("Xóa file: " + image);
-                    FileUtil.deleteFile(image);
+                    fileUtil.deleteFile(image);
                 });
 
                 //reviewImageRepository.deleteByReviewID(reviewID);
@@ -240,7 +242,7 @@ public class ReviewServiceImpl implements ReviewService {
             reviewImageRepository.deleteAll(imagesToDelete);
 
             // Xóa file vật lý
-            deletedImages.forEach(FileUtil::deleteFile);
+            deletedImages.forEach(fileUtil::deleteFile);
 
             // Cập nhật lại danh sách ảnh hiện tại
             currentImages.removeAll(imagesToDelete);
@@ -252,7 +254,7 @@ public class ReviewServiceImpl implements ReviewService {
 
             for (MultipartFile image : insertedImages) {
                 try {
-                    String imageUrl = FileUtil.saveImage(image);
+                    String imageUrl = fileUtil.saveImage(image);
                     ReviewImage reviewImage = new ReviewImage(review, imageUrl);
                     newImages.add(reviewImage);
                 } catch (IOException e) {
