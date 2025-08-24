@@ -109,7 +109,7 @@ function createCartItemRow(chosenProduct, productGroup) {
         <td><input type="checkbox" class="c-cart-checkbox"></td>
         <td>
             <div class="c-product-info">
-                <img src="/uploads/${chosenProduct.mainImage}" alt="${chosenProduct.productName}" class="c-product-image">
+                <img src="https://phudatn.blob.core.windows.net/images/${chosenProduct.mainImage}" alt="${chosenProduct.productName}" class="c-product-image">
                 <div>
                     <strong>${chosenProduct.productName}</strong>
                     <div class="c-variant-container">

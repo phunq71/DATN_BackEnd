@@ -1,5 +1,12 @@
 package com.main.utils;
 
+import com.azure.storage.blob.BlobClient;
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.models.BlobHttpHeaders;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -20,7 +27,17 @@ public final class FileUtil {
     /**
      * Thư mục uploads (nằm ngang với thư mục src).
      */
-    private static final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads";
+    @Value("${azure.storage.connection-string}")
+    private String injectedConnectionString;
+
+    private static String CONNECTION_STRING;
+    private static final String CONTAINER_NAME = "images";
+
+    @PostConstruct
+    public void init() {
+        CONNECTION_STRING = injectedConnectionString; // gán vào static sau khi Spring inject
+    }
+
 
     /**
      * Lưu file ảnh vào thư mục uploads.
@@ -38,14 +55,25 @@ public final class FileUtil {
         // Tạo tên file duy nhất
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
-        // Đường dẫn lưu file
-        Path filePath = Paths.get(UPLOAD_DIR, fileName);
+        BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
+                .connectionString(CONNECTION_STRING)
+                .buildClient();
 
-        // Ghi file
-        Files.write(filePath, file.getBytes());
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME);
+        BlobClient blobClient = containerClient.getBlobClient(fileName);
 
+        // Upload file
+        blobClient.upload(file.getInputStream(), file.getSize(), true);
+
+        // Gán Content-Type (để browser hiểu đây là ảnh)
+        BlobHttpHeaders headers = new BlobHttpHeaders()
+                .setContentType(file.getContentType());
+        blobClient.setHttpHeaders(headers);
+
+        // Trả về tên file
         return fileName;
     }
+
 
 
     public static String saveImage2(MultipartFile file) throws IOException {
@@ -53,14 +81,25 @@ public final class FileUtil {
             throw new IllegalArgumentException("File is empty");
         }
 
+        // Tạo tên file duy nhất
         String fileName = file.getOriginalFilename();
 
-        // Đường dẫn lưu file
-        Path filePath = Paths.get(UPLOAD_DIR, fileName);
+        BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
+                .connectionString(CONNECTION_STRING)
+                .buildClient();
 
-        // Ghi file
-        Files.write(filePath, file.getBytes());
+        BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME);
+        BlobClient blobClient = containerClient.getBlobClient(fileName);
 
+        // Upload file
+        blobClient.upload(file.getInputStream(), file.getSize(), true);
+
+        // Gán Content-Type (để browser hiểu đây là ảnh)
+        BlobHttpHeaders headers = new BlobHttpHeaders()
+                .setContentType(file.getContentType());
+        blobClient.setHttpHeaders(headers);
+
+        // Trả về tên file
         return fileName;
     }
 
@@ -75,14 +114,25 @@ public final class FileUtil {
             return false;
         }
 
-        Path filePath = Paths.get(UPLOAD_DIR, imageName);
-        File file = filePath.toFile();
+        try {
+            BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
+                    .connectionString(CONNECTION_STRING)
+                    .buildClient();
 
-        if (file.exists()) {
-            return file.delete();
+            BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(CONTAINER_NAME);
+
+            BlobClient blobClient = containerClient.getBlobClient(imageName);
+
+            if (blobClient.exists()) {
+                blobClient.delete();
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return false;
     }
+
 }
 

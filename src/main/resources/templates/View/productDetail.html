@@ -1006,7 +1006,7 @@
         <div class="image-slider">
             <th:block th:each="variant, colorStat : ${listV}">
                 <th:block th:each="image, imgStat : ${listImage}">
-                    <img th:src="@{'/uploads/' + ${image.imageUrlDTO}}"
+                    <img th:src="@{'https://phudatn.blob.core.windows.net/images/' + ${image.imageUrlDTO}}"
                          th:alt="'Ảnh ' + ${imgStat.index}"
                          th:classappend="${colorStat.index == 0 and imgStat.index == 0} ? 'active' : ''"
                          th:attr="data-color-index=${colorStat.index}, data-image-index=${imgStat.index}"/>
@@ -1044,7 +1044,7 @@
                     <div class="color-option"
                              th:classappend="${iterStat.index == 0}"
                              th:attr="data-color-index=${iterStat.index}"
-                             th:style="'background-image: url(/uploads/' + ${variant.mainImage} + ')'">
+                             th:style="'background-image: url(https://phudatn.blob.core.windows.net/images/' + ${variant.mainImage} + ')'">
                         </div>
                     </a>
                 </th:block>
@@ -1063,7 +1063,7 @@
             <span th:text="'Số sản phẩm đã bán: ' + ${pro.getSoldQuantity()}"></span>
 
             <img th:if="${pro.isHot}"
-                 src="/uploads/Screenshot 2025-08-13 175547.png"
+                 src="https://phudatn.blob.core.windows.net/images/Screenshot 2025-08-13 175547.png"
                  style="height: 50px; width: 50px; margin-top: -10px;"
                  alt="Hot product" />
         </div>
@@ -1220,7 +1220,7 @@
                                     </div>
 
                                     <div class="ot-product-image-container">
-                                        <img th:src="@{'/uploads/' + ${products.getImageUrl()}}"
+                                        <img th:src="@{'https://phudatn.blob.core.windows.net/images/' + ${products.getImageUrl()}}"
                                              class="ot-product-image"
                                              alt="Ảnh sản phẩm">
                                     </div>

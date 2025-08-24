@@ -109,7 +109,7 @@ function updateMiniCart() {
             row.innerHTML = `
                 <td>
                     <div class="cart-item-content">
-                        <img src="/uploads/${item.image}" alt="${item.name}" />
+                        <img src="https://phudatn.blob.core.windows.net/images/${item.image}" alt="${item.name}" />
                         <span>${item.name}</span>
                     </div>
                 </td>

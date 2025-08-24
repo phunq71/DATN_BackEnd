@@ -103,7 +103,7 @@
 
 </style>
 <body>
-	<header class="container" th:replace="~{Layout/header :: header}"></header>
+	<header class="container" th:replace="~{layout/header :: header}"></header>
     <main th:replace="${view}"></main>
 
 
@@ -123,7 +123,7 @@
     </div>
 
 </body>
-<footer th:replace="~{Layout/footer :: footer}"></footer>
+<footer th:replace="~{layout/footer :: footer}"></footer>
 <script>
     window.addEventListener("DOMContentLoaded", () => {
         const footer = document.querySelector("footer");

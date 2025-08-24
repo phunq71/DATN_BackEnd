@@ -335,7 +335,7 @@ function getReview(orderDetailId){
 }
 
 function initReviewItem(item){
-    imageItem.src= "/uploads/"+item.imageItem;
+    imageItem.src= "https://phudatn.blob.core.windows.net/images/"+item.imageItem;
     productName.textContent= item.productName;
     color.textContent= item.color;
     size.textContent= item.size;
@@ -367,7 +367,7 @@ function initReviewForm(review) {
 
             // Tạo ảnh preview
             const img = document.createElement('img');
-            img.src ="/uploads/"+ imageUrl; // Giả sử imageUrl là đường dẫn đầy đủ
+            img.src ="https://phudatn.blob.core.windows.net/images/"+ imageUrl; // Giả sử imageUrl là đường dẫn đầy đủ
             img.className = 'rv-image-preview';
 
             // Tạo nút xóa

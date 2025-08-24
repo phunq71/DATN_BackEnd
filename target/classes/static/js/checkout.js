@@ -93,8 +93,9 @@ async function fetchDataCheckout() {
                 title: 'Thiếu thông tin',
                 text: 'Vui lòng thêm số điện thoại để mua hàng.',
                 confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = '/opulentia_user/edit-profile';
             });
-            window.location.href = '/opulentia_user/edit-profile';
             return;
         }
 
@@ -761,7 +762,7 @@ function datHang() {
                 confirmButtonText: 'Đến trang đơn hàng'
             }).then(() => {
                 // Chuyển hướng sau khi người dùng bấm OK
-                window.location.href = 'http://localhost:8989/opulentia_user/allOrder';
+                window.location.href = '/opulentia_user/allOrder';
             });
 
             console.log('Đặt hàng thành công:', response.data);

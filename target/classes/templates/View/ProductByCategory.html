@@ -790,7 +790,7 @@
                 <a th:href="@{'/opulentia/' + ${parentCategory} + '/' + ${childCategory} + '/' + ${product.productID}
                                 + '/' + ${product.variantMainID}}" style="text-decoration: none;">
                     <div class="product-wrapper">
-                        <img th:src="@{'/uploads/' + ${product.mainImageUrl}}" alt="Product" class="product-image">
+                        <img th:src="@{'https://phudatn.blob.core.windows.net/images/' + ${product.mainImageUrl}}" alt="Product" class="product-image">
 <!--                        <div class="new-label">NEW</div>-->
 <!--                        <div class="discount-label">-10%</div>-->
                         <button class="favorite-btn"><i class="far fa-heart"></i></button>

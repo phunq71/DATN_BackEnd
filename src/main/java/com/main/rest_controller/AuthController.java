@@ -54,24 +54,27 @@ public class AuthController {
     @PostMapping("/login2")
     public ResponseEntity<?> login2(@RequestBody LoginRequest request, HttpServletResponse response) {
         try {
-
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
 
-            CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(request.getEmail());
+            CustomUserDetails userDetails =
+                    (CustomUserDetails) customUserDetailsService.loadUserByUsername(request.getEmail());
 
             Authentication auth = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            Map<String, ResponseCookie> cookies = authService.generateTokenCookies(userDetails, request.isRememberMe());
+            Map<String, ResponseCookie> cookies =
+                    authService.generateTokenCookiesAdmin(userDetails, request.isRememberMe());
 
-            response.addHeader("Set-Cookie", cookies.get("accessToken").toString());
-            response.addHeader("Set-Cookie", cookies.get("refreshToken").toString());
-            System.err.println("🙂role đã đăng nhập từ FE"+AuthUtil.getRole());
+            // ⚡ dùng addHeader 2 lần sẽ bị ghi đè -> phải dùng addHeader(HttpHeaders.SET_COOKIE, ...) cho từng cookie
+            response.addHeader(HttpHeaders.SET_COOKIE, cookies.get("accessToken").toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, cookies.get("refreshToken").toString());
+
+            System.err.println("🙂role đã đăng nhập từ FE " + AuthUtil.getRole());
             String role = AuthUtil.getRole();
-            if(role== null || role.equals("ROLE_USER")){
+            if (role == null || role.equals("ROLE_USER")) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -81,6 +84,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
         }
     }
+
 
 
 
@@ -141,8 +145,8 @@ public class AuthController {
 
         Map<String, ResponseCookie> cookies = authService.generateTokenCookies2(userDetails, false);
 
-        response.addHeader("Set-Cookie", cookies.get("accessToken").toString());
-        response.addHeader("Set-Cookie", cookies.get("refreshToken").toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookies.get("accessToken").toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookies.get("refreshToken").toString());
 
         return ResponseEntity.ok("Đăng xuất thành công");
     }

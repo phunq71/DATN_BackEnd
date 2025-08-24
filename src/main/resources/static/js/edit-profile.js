@@ -56,8 +56,8 @@ function setForm(account){
             imageAvt.title="Bạn không thể thay ảnh đại diện khi đăng nhập bằng Google hoặc Facebook";
         }
         else {
-            if(account.imageAvt==null || account.imageAvt==="") imageAvt.src="/uploads/default-avt.jpg";
-            else imageAvt.src=`/uploads/${account.imageAvt}`;
+            if(account.imageAvt==null || account.imageAvt==="") imageAvt.src="https://phudatn.blob.core.windows.net/images/default-avt.jpg";
+            else imageAvt.src=`https://phudatn.blob.core.windows.net/images/${account.imageAvt}`;
         }
         dob.value=account.dob;
     }
