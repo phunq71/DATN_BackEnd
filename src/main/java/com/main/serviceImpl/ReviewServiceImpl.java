@@ -51,7 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
     public Page<Review_ReviewDTO> findFilteredReviews(String productID, Integer rating, String color, String size, Boolean hasImage, Pageable pageable) {
         return reviewRepository.findFilteredReviews(productID, rating, color, size, hasImage, pageable);
     }
-    public Integer countReviewsByProductID(@Param("productID") String productID){
+    public Integer countReviewsByProductID(String productID){
         return reviewRepository.countReviewsByProductID(productID);
     };
     @Override
