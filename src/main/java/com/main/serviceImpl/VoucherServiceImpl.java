@@ -1,22 +1,26 @@
 package com.main.serviceImpl;
 
+import com.main.dto.VoucherManagermetDTO;
 import com.main.dto.VoucherOrderDTO;
 import com.main.entity.*;
 import com.main.mapper.CustomerMapper;
 import com.main.mapper.VoucherMapper;
 import com.main.repository.*;
 import com.main.service.MailService;
+import com.main.service.UsedVoucherService;
 import com.main.service.VoucherService;
 import com.main.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -110,4 +114,48 @@ public class VoucherServiceImpl implements VoucherService {
 
 
     }
+
+    @Override
+    public List<VoucherManagermetDTO> findVoucherByPromotionId(String promotionId) {
+        return voucherRepository.findVoucherByPromotionId(promotionId);
+    }
+
+    @Override
+    public String findMaxVoucherId() {
+        Voucher voucher = voucherRepository.findTop1ByOrderByVoucherIDDesc();
+        return voucher != null ? voucher.getVoucherID() : null;
+    }
+
+    @Override
+    public Voucher save(Voucher voucher) {
+        return voucherRepository.save(voucher);
+    }
+
+    @Override
+    public Voucher findVoucherById(String voucherId) {
+        return voucherRepository.findById(voucherId).get();
+    }
+
+    @Override
+    @Transactional
+    public Boolean deleteVoucher(String voucherId) {
+        // Kiểm tra voucher có tồn tại không
+        Optional<Voucher> optionalVoucher = voucherRepository.findById(voucherId);
+        if (optionalVoucher.isEmpty()) {
+            return false;
+        }
+        Voucher voucher = optionalVoucher.get();
+        System.err.println("ừng ở voucher: "+voucher.getVoucherID());
+        // Nếu đã có bản ghi dùng voucher thì không cho xóa
+        if (usedVoucherRepository.existsByVoucher(voucher)){
+            System.out.println("Có ngời dun rồi nh, dung co xoa");
+            return false;
+        }
+        System.err.println("ừng ở usedVoucherRepository: ");
+        // Xóa voucher
+        voucherRepository.deleteVoucher(voucherId);
+        System.err.println("ừng khi delete ");
+        return true;
+    }
+
 }

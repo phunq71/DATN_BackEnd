@@ -1,8 +1,10 @@
 package com.main.repository;
 
+import com.main.dto.VoucherManagermetDTO;
 import com.main.entity.Voucher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -84,6 +86,23 @@ public interface VoucherRepository extends JpaRepository<Voucher, String> {
             @Param("totalAmount") BigDecimal totalAmount,
             @Param("customerID") String customerID
     );
+    @Query("""
+    SELECT v.voucherID
+        ,v.discountType
+        ,v.discountValue
+        ,v.minOrderValue
+        ,v.quantityUsed
+        ,v.quantityRemaining
+        ,v.endDate
+        ,v.claimConditions
+        ,v.promotion.promotionID
+        FROM Voucher v
+            WHERE v.promotion.promotionID = :promotionID
+    """)
+    List<VoucherManagermetDTO> findVoucherByPromotionId(@Param("promotionID") String promotionId);
 
-
+    Voucher findTop1ByOrderByVoucherIDDesc();
+    @Modifying
+    @Query("DELETE FROM Voucher v WHERE v.voucherID = :id")
+    void deleteVoucher(@Param("id") String id);
 }
