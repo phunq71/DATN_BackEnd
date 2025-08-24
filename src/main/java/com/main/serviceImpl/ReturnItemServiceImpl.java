@@ -26,12 +26,14 @@ public class ReturnItemServiceImpl implements ReturnItemService {
     private final ReturnItemRepository returnItemRepository;
     private final OrderRepository orderRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final FileUtil fileUtil;
 
-    public ReturnItemServiceImpl(ReturnRequestRepository returnRequestRepository, ReturnItemRepository returnItemRepository, OrderRepository orderRepository, ReviewImageRepository reviewImageRepository) {
+    public ReturnItemServiceImpl(ReturnRequestRepository returnRequestRepository, ReturnItemRepository returnItemRepository, OrderRepository orderRepository, ReviewImageRepository reviewImageRepository, FileUtil fileUtil) {
         this.returnRequestRepository = returnRequestRepository;
         this.returnItemRepository = returnItemRepository;
         this.orderRepository = orderRepository;
         this.reviewImageRepository = reviewImageRepository;
+        this.fileUtil = fileUtil;
     }
 
     @Override
@@ -99,7 +101,7 @@ public class ReturnItemServiceImpl implements ReturnItemService {
             // Lưu file xuống ổ cứng từng cái
             savedFiles.forEach(file -> {
                 try {
-                    FileUtil.saveImage2(file);
+                    fileUtil.saveImage2(file);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
