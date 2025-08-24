@@ -30,6 +30,7 @@ public class Admin_LoginRestController {
 
         if(AuthUtil.isLogin()){
             System.err.println("🙂role đã đăng nhập từ FE "+AuthUtil.getRole());
+            System.out.println( AuthUtil.getAccountID() );
             return ResponseEntity.ok(Map.of(
                     "loggedIn", true,
                     "displayName", Objects.requireNonNull(AuthUtil.getFullName())

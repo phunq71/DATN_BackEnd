@@ -81,7 +81,7 @@ public class ReturnRequestRestController {
         return ResponseEntity.ok(returnRequestService.getReturnRequestByCustomerID(accountId, year));
     }
 
-        @GetMapping("/opulentia_user/returnRequestDetail/get/{id}")
+    @GetMapping("/opulentia_user/returnRequestDetail/get/{id}")
     public ResponseEntity<ReturnRequestDTO> getReturnRequestDetail(@PathVariable int id) {
         String accountId = AuthUtil.getAccountID();
 

@@ -105,7 +105,7 @@
 <body>
 	<header class="container" th:replace="~{Layout/header :: header}"></header>
     <main th:replace="${view}"></main>
-	<div th:replace="~{Layout/bottom-navigation :: b-nav}"></div>
+
 
     <div th:if="${messageLayout}"
          th:id="'logout-alert'"

@@ -43,6 +43,7 @@ public class VariantAdminRestController {
             @RequestParam("selectedVariant") String selectedVariantJson,
             @RequestParam(value = "files", required = false) List<MultipartFile> files
     ) throws IOException {
+
         ObjectMapper mapper = new ObjectMapper();
 
         // Parse JSON sang Map
@@ -63,7 +64,16 @@ public class VariantAdminRestController {
         variant.setIsMainVariant(Boolean.TRUE.equals(variantMap.get("isMainVariant")));
         variant.setIsUse(Boolean.TRUE.equals(variantMap.get("isUse")));
         variant.setCreatedDate(LocalDate.now());
+        Boolean isMainVariant = (Boolean) variantMap.get("isMainVariant");
 
+        if (Boolean.TRUE.equals(isMainVariant)) {
+            Variant oldMain = variantRepository.findMainVariantsByProductID(variant.getProduct().getProductID());
+            if (oldMain != null && !oldMain.getVariantID().equals(variant.getVariantID())) {
+                oldMain.setIsMainVariant(false);
+                variantRepository.save(oldMain);
+            }
+        }
+        variant.setIsMainVariant(isMainVariant);
         variantRepository.save(variant);
 
         if (files != null && !files.isEmpty()) {
@@ -96,20 +106,30 @@ public class VariantAdminRestController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteVariant(@PathVariable("id") String id) {
         try {
+            System.out.println("Delete Variant : " + id);
             if (!variantRepository.existsById(id)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("Không tìm thấy variant với ID: " + id);
             }
 
+
              Variant variant =  variantRepository.findById(id).get();
 
+            if(variant.getIsMainVariant()) {
+                return ResponseEntity.ok("Không thể xóa biến thể vì là bến thể chính!");
+            }
 
+            if(productRepository.findById(variant.getProduct().getProductID()).get().getVariants().size() == 1){
+                return ResponseEntity.ok("Không thể xóa biến thể vì sản phẩm cần ít nhất 1 biến thể! ");
+            }
+
+            System.out.println("‼️");
             itemRepository.deleteByVariant(variant);
-
+            System.out.println("‼️‼️");
             imageRepository.deleteByVariant(variant);
-
+            System.out.println("‼️‼️‼️");
             variantRepository.delete(variant);
-
+            System.out.println("‼️‼️‼️‼️️");
             List<Image> images = new ArrayList<>(variant.getImages());
 
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
@@ -118,7 +138,7 @@ public class VariantAdminRestController {
                     images.forEach(img -> FileUtil.deleteFile(img.getImageUrl()));
                 }
             });
-
+            System.out.println("‼️‼️‼️‼️‼️️");
             return ResponseEntity.ok("Xóa thành công variant " + id);
 
         } catch (DataIntegrityViolationException e) {

@@ -668,11 +668,6 @@
 
                 <a href="#" class="active"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a>
 
-                <!-- Menu lớn: Thứ hạng -->
-                <a class="e-toggle d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#rankingMenu" role="button" aria-expanded="false">
-                    <span><i class="fas fa-medal me-2"></i>Thứ hạng</span>
-                    <i class="fas fa-chevron-down"></i>
-                </a>
 <!--                <form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;"></form>-->
                 <div class="collapse ps-3" id="rankingMenu">
                     <a href="#" class="e-sub-link">Thứ hạng</a>
@@ -692,12 +687,21 @@
 
         <!-- Main Content -->
         <div class="col-md-9 p-4 main-content">
-            <h4>Thông tin cá nhân</h4>
-                <div class="e-form-section row">
+            <h4>
+                Thông tin cá nhân _
+                <label id="hang" style="color: #0930d2">
+                    Hạng Vàng
+                </label>
+                <i class="fa-solid fa-crown" style="color: gold;"></i>
+            </h4>
+
+
+            <div class="e-form-section row">
                     <div class="col-md-8">
+
                         <div class="e-input-group">
                             <label class="e-form-label">Họ và tên</label>
-                            <input type="text" id="fullName" class="e-form-control" value="">
+                            <input type="text" id="fullName" class="e-form-control" value=""><br>
                         </div>
 
                         <div class="e-input-group">

@@ -1,12 +1,17 @@
 package com.main.rest_controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.dto.CategoryDTO;
 import com.main.service.CategoryService;
 import com.main.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -31,18 +36,33 @@ public class CategoryRestController {
 
     // Tạo mới danh mục
     @PostMapping
-    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO dto) {
+    public ResponseEntity<CategoryDTO> createCategory(@RequestParam("category") String categoryJson,
+                                                      @RequestParam(value = "file", required = false) MultipartFile file) throws JsonProcessingException {
         checkAdmin();
-        CategoryDTO created = categoryService.createCategory(dto);
+        CategoryDTO created = null;
+        CategoryDTO dto = new ObjectMapper().readValue(categoryJson, CategoryDTO.class);
+        try {
+            created = categoryService.createCategory(dto, file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return ResponseEntity.ok(created);
     }
 
     // Cập nhật danh mục
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable String id,
-                                                      @RequestBody CategoryDTO dto) {
+    public ResponseEntity<CategoryDTO> updateCategory(
+            @PathVariable String id,
+            @RequestParam("category") String categoryJson,
+            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
         checkAdmin();
-        CategoryDTO updated = categoryService.updateCategory(id, dto);
+        CategoryDTO updated = null;
+        CategoryDTO dto = new ObjectMapper().readValue(categoryJson, CategoryDTO.class);
+        try {
+            updated = categoryService.updateCategory(id, dto, file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return ResponseEntity.ok(updated);
     }
 

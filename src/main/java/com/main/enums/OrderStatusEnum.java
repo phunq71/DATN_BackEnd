@@ -10,6 +10,7 @@ public enum OrderStatusEnum {
     Da_yeu_cau_huy("DaYeuCauHuy", "Đã yêu cầu hủy"),
     Cho_giao_hang("ChoGiaoHang","Chờ giao hàng"),
     Da_giao("DaGiao", "Đã giao"),
+    YEU_CAU_HUY("YeuCauHuy", "Yêu cầu hủy"),
     Da_huy("DaHuy", "Đã hủy");
 
 

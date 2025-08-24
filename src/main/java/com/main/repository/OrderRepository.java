@@ -1,6 +1,7 @@
 package com.main.repository;
 
 import com.main.dto.*;
+import com.main.entity.Facility;
 import com.main.entity.Order;
 import com.main.entity.OrderDetail;
 import org.springframework.data.domain.Page;
@@ -90,10 +91,12 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         , o.costShip
         , o.discountCost
         , o.transaction.paymentMethod
-        , o.transaction.transactionDate
+        , t.transactionDate
         , o.updateStatusAt
         , o.shippingCode
+        , o.delivery
     FROM Order o
+        LEFT JOIN o.transaction t ON t.status = 'DaThanhToan'
     WHERE o.orderID=:orderId
     """)
     OrderDetailDTO getOrderDetailByOrderId(@Param("orderId") Integer orderId);
@@ -181,21 +184,21 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     @Query("""
     SELECT od.item.itemId,
-    od.item.variant.product.productName,
-    (SELECT img.imageUrl AS image FROM Image img WHERE img.variant = od.item.variant AND img.isMainImage = true),
-    od.item.variant.color,
-    od.item.size.code,
-    od.unitPrice,
-    od.promotionProduct.discountPercent,
-    od.quantity,
-        CASE WHEN EXISTS (
-                        SELECT 1 FROM Review r WHERE r.orderDetail = od
-                    ) THEN true ELSE false END
-            ,od.orderDetailID
+           od.item.variant.product.productName,
+           (SELECT img.imageUrl FROM Image img WHERE img.variant = od.item.variant AND img.isMainImage = true),
+           od.item.variant.color,
+           od.item.size.code,
+           od.unitPrice,
+           COALESCE(pp.discountPercent, 0),
+           od.quantity,
+           CASE WHEN EXISTS (SELECT 1 FROM Review r WHERE r.orderDetail = od) THEN true ELSE false END,
+           od.orderDetailID
     FROM OrderDetail od
+    LEFT JOIN od.promotionProduct pp
     WHERE od.order.orderID = :orderId
-    """)
+""")
     List<OrderItemDTO> getOrderItemsByOrderId(@Param("orderId") Integer orderId);
+
 
     boolean existsByOrderIDAndCustomer_CustomerId(Integer orderID, String customerCustomerId);
 
@@ -245,7 +248,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     @Query("""
     SELECT  o.orderID, o.orderDate, o.status, o.updateStatusAt, o.shippingAddress,
            o.note, o.isOnline, o.shipMethod, o.addressIdGHN, c.fullName, s.fullname, f.facilityName,
-           t.transactionDate, t.amount, t.paymentMethod, t.paymentCode, c.phone, pr.addressIdGHN, o.shippingCode
+           CASE WHEN t.status = 'DaThanhToan' THEN t.transactionDate ELSE NULL END, t.amount, t.paymentMethod, t.paymentCode, c.phone, pr.addressIdGHN, o.shippingCode, o.delivery
     FROM Order o
     LEFT JOIN o.customer c
     LEFT JOIN o.staff s
@@ -258,8 +261,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
       AND (:status IS NULL OR o.status = :status)
    
       AND (
-           (:facilityId IS NOT NULL AND f.facilityId = :facilityId OR f.parent.facilityId = :facilityId) 
-        OR (:facilityId IS NULL AND :parentId IS NOT NULL AND 
+           (:facilityId IS NOT NULL AND f.facilityId = :facilityId OR f.parent.facilityId = :facilityId)
+        OR (:facilityId IS NULL AND :parentId IS NOT NULL AND
             (pr.facilityId = :parentId OR pr2.facilityId = :parentId))
         OR (:facilityId IS NULL AND :parentId IS NULL)
       )
@@ -293,11 +296,14 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     """)
     public List<OrdManagement_ProductDTO> getProductsByOrderID(@Param("orderID") Integer orderID);
 
-    @Query(""" 
-    SELECT o.orderID, o.shippingCode, o.status
-        FROM Order o
-    """)
-    public List<OrderDetailDTO> getAllOrderIdShippingCodes();
+    @Query("""
+    SELECT new com.main.dto.OrderDetailDTO(o.orderID, o.shippingCode, o.status)
+    FROM Order o
+    WHERE o.shippingCode IS NOT NULL
+      AND o.status <> 'DaGiao'
+""")
+    List<OrderDetailDTO> getAllOrderIdShippingCodes();
+
 
     @Query(""" 
     SELECT o.orderID, o.shippingCode, o.status
@@ -305,6 +311,9 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             WHERE o.shippingCode = :shippingCode
     """)
     public OrderDetailDTO getOrderByShippingCodes(@Param("shippingCode") String shippingCode);
+
+    boolean existsByFacilityAndStatusNot(Facility facility, String status);
+
     @Query("""
     SELECT o.orderID
         , o.orderDate
@@ -329,6 +338,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     WHERE o.customer.customerId=:customerId
     """)
     List<Order> getOrdersByCusID(@Param("customerId") String customerId);
+
 }
 
 

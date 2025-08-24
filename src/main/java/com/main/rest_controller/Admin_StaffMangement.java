@@ -67,7 +67,7 @@ public class Admin_StaffMangement {
         if (Objects.equals(role, "ROLE_ADMIN")) {
             if (Objects.equals(areaId, "ADMIN")) {
                 System.err.println("trả về admin");
-//                System.err.println(staffService.getAdmin(pageNumber, keyWord));
+
                 return ResponseEntity.ok(staffService.getAdmin(pageNumber, keyWord));
             }
 

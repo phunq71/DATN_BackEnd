@@ -8,10 +8,13 @@ import com.main.mapper.CategoryMapper;
 import com.main.repository.CategoryFlatResult;
 import com.main.repository.CategoryRepository;
 import com.main.service.CategoryService;
+import com.main.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,7 +78,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDTO createCategory(CategoryDTO dto) {
+    public CategoryDTO createCategory(CategoryDTO dto, MultipartFile file){
         Category entity = new Category();
         entity.setCategoryName(dto.getCategoryName());
 
@@ -90,12 +93,23 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         entity.setCategoryId(generateCategoryID(prefix));
+        entity.setCategoryName(dto.getCategoryName());
+        String nameFile = null;
+        if(file != null){
+            try {
+                nameFile = FileUtil.saveImage(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            entity.setBanner(nameFile);
+        }
+        entity.setContent(dto.getContent());
         categoryRepository.save(entity);
         return toDTO(entity);
     }
 
     @Override
-    public CategoryDTO updateCategory(String id, CategoryDTO dto) {
+    public CategoryDTO updateCategory(String id, CategoryDTO dto, MultipartFile file){
         Category entity = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục"));
 
@@ -106,6 +120,18 @@ public class CategoryServiceImpl implements CategoryService {
             entity.setParent(null);
         }
 
+
+        String nameFile = null;
+        if(file != null){
+            try {
+                nameFile = FileUtil.saveImage(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            FileUtil.deleteFile(dto.getBanner());
+            entity.setBanner(nameFile);
+        }
+        entity.setContent(dto.getContent());
         categoryRepository.save(entity);
         return toDTO(entity);
     }
@@ -122,7 +148,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (hasActiveProduct) {
             throw new RuntimeException("Không thể xóa danh mục vì có sản phẩm đang hoạt động.");
         }
-
+        FileUtil.deleteFile(entity.getBanner());
         categoryRepository.delete(entity);
 
     }
@@ -138,6 +164,8 @@ public class CategoryServiceImpl implements CategoryService {
                 entity.getCategoryId(),
                 entity.getCategoryName(),
                 entity.getParent() != null ? entity.getParent().getCategoryId() : null,
+                entity.getContent(),
+                entity.getBanner(),
                 new ArrayList<>()
         );
     }

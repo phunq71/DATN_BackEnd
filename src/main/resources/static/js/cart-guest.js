@@ -208,30 +208,34 @@ async function handleColorChange(event, productGroup) {
 
         // Find the new item to check stock quantity
         const newItem = findItemByID(newItemID);
-        if (newItem) {
-            // Check if current quantity exceeds new stock
-            if (currentQuantity > newItem.stockQuantity) {
-                const newQuantity = newItem.stockQuantity;
-                quantityInput.value = newQuantity;
-                Swal.fire({
-                    title: 'Xin lỗi vì sự bất tiện này!',
-                    text: `Chỉ còn ${newItem.stockQuantity} sản phẩm trong kho. Đã tự động điều chỉnh số lượng`,
-                    icon: 'warning', // 'success', 'error', 'warning', 'info', 'question'
-                    confirmButtonColor: '#000000'
-                });
-            }
+        if (newItem && currentQuantity > newItem.stockQuantity) {
+            quantityInput.value = newItem.stockQuantity;
+            Swal.fire({
+                title: 'Xin lỗi vì sự bất tiện này!',
+                text: `Chỉ còn ${newItem.stockQuantity} sản phẩm trong kho. Đã tự động điều chỉnh số lượng`,
+                icon: 'warning',
+                confirmButtonColor: '#000000'
+            });
         }
 
         // Update cart
-        carts.forEach(cart => {
-            if(cart.itemID===oldItemID) {
-                cart.itemID = newItemID;
-                // Update quantity if needed
-                if (newItem && currentQuantity > newItem.stockQuantity) {
-                    cart.quantity = newItem.stockQuantity;
-                }
+        const currentCartIndex = carts.findIndex(cart => cart.itemID === oldItemID);
+        const existingCartIndex = carts.findIndex(cart => cart.itemID === newItemID);
+
+        if (existingCartIndex !== -1 && existingCartIndex !== currentCartIndex) {
+            // Gộp số lượng
+            carts[existingCartIndex].quantity =
+                parseInt(carts[existingCartIndex].quantity) +
+                parseInt(carts[currentCartIndex].quantity);
+            // Xóa item cũ
+            carts.splice(currentCartIndex, 1);
+        } else {
+            // Cập nhật itemID
+            carts[currentCartIndex].itemID = newItemID;
+            if (newItem && currentQuantity > newItem.stockQuantity) {
+                carts[currentCartIndex].quantity = newItem.stockQuantity;
             }
-        });
+        }
 
         localStorage.setItem('carts', JSON.stringify(carts));
         itemCarts = await getItem(carts);
@@ -249,38 +253,43 @@ async function handleSizeChange(event) {
 
     // Find the new item to check stock quantity
     const newItem = findItemByID(newItemID);
-    if (newItem) {
-        // Check if current quantity exceeds new stock
-        if (currentQuantity > newItem.stockQuantity) {
-            const newQuantity = newItem.stockQuantity;
-            quantityInput.value = newQuantity;
-            Swal.fire({
-                title: 'Xin lỗi vì sự bất tiện này!',
-                text: `Chỉ còn ${item.stockQuantity} sản phẩm trong kho. Đã tự động điều chỉnh số lượng`,
-                icon: 'warning', // 'success', 'error', 'warning', 'info', 'question'
-                confirmButtonColor: '#000000'
-            });
+    if (newItem && currentQuantity > newItem.stockQuantity) {
+        quantityInput.value = newItem.stockQuantity;
+        Swal.fire({
+            title: 'Xin lỗi vì sự bất tiện này!',
+            text: `Chỉ còn ${newItem.stockQuantity} sản phẩm trong kho. Đã tự động điều chỉnh số lượng`,
+            icon: 'warning',
+            confirmButtonColor: '#000000'
+        });
+    }
+
+    // Update cart
+    const currentCartIndex = carts.findIndex(cart => cart.itemID === oldItemID);
+    const existingCartIndex = carts.findIndex(cart => cart.itemID === newItemID);
+
+    if (existingCartIndex !== -1 && existingCartIndex !== currentCartIndex) {
+        // Gộp số lượng
+        carts[existingCartIndex].quantity =
+            parseInt(carts[existingCartIndex].quantity) +
+            parseInt(carts[currentCartIndex].quantity);
+        // Xóa item cũ
+        carts.splice(currentCartIndex, 1);
+    } else {
+        // Cập nhật itemID
+        carts[currentCartIndex].itemID = newItemID;
+        if (newItem && currentQuantity > newItem.stockQuantity) {
+            carts[currentCartIndex].quantity = newItem.stockQuantity;
         }
     }
 
-    // Update the row's itemID
+    // Cập nhật row dataset
     row.dataset.itemId = newItemID;
-
-    // Update cart
-    carts.forEach(cart => {
-        if(cart.itemID===oldItemID) {
-            cart.itemID = newItemID;
-            // Update quantity if needed
-            if (newItem && currentQuantity > newItem.stockQuantity) {
-                cart.quantity = newItem.stockQuantity;
-            }
-        }
-    });
 
     localStorage.setItem('carts', JSON.stringify(carts));
     itemCarts = await getItem(carts);
     initCart();
 }
+
 
 // Function to handle quantity change
 async function handleQuantityChange(event, input) {

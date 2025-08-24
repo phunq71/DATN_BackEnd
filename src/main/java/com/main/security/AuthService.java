@@ -56,6 +56,35 @@ public class AuthService {
         return cookies;
     }
 
+    public Map<String, ResponseCookie> generateTokenCookies2(UserDetails userDetails, boolean rememberMe) {
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+        long accessTokenMaxAge = 0;
+        long refreshTokenMaxAge = 0; // 7 ngày nếu nhớ, -1 nếu không
+
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(accessTokenMaxAge)
+                .sameSite("Lax")
+                .build();
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(refreshTokenMaxAge)
+                .sameSite("Lax")
+                .build();
+
+        Map<String, ResponseCookie> cookies = new HashMap<>();
+        cookies.put("accessToken", accessTokenCookie);
+        cookies.put("refreshToken", refreshTokenCookie);
+        return cookies;
+    }
+
 
     public UserDetails loadUser(String email) {
         return userDetailsService.loadUserByUsername(email);

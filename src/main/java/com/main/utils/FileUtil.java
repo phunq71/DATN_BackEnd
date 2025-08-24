@@ -47,6 +47,23 @@ public final class FileUtil {
         return fileName;
     }
 
+
+    public static String saveImage2(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+
+        String fileName = file.getOriginalFilename();
+
+        // Đường dẫn lưu file
+        Path filePath = Paths.get(UPLOAD_DIR, fileName);
+
+        // Ghi file
+        Files.write(filePath, file.getBytes());
+
+        return fileName;
+    }
+
     /**
      * Xoá file trong thư mục uploads theo tên file.
      *

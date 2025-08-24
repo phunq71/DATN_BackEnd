@@ -11,8 +11,12 @@ import com.main.repository.FavoriteRepository;
 import com.main.repository.ProductRepository;
 import com.main.service.FavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.FormattableFlags;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +32,8 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Autowired
     private FavoriteMapper favoriteMapper;
+    @Autowired
+    private ProductRepository productRepository;
 
     @Override
     public List<ProductFavoriteDTO> getFavoritesByCustomer(String customerId) {
@@ -36,11 +42,19 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         // Lấy danh sách sản phẩm đầy đủ từ DB
         List<Product> products = productRepo.findAllById(productIds);
-
+        Pageable pageable = PageRequest.of(0, 10);
+        List <Product> products1 = productRepository.findTopSellingProducts(pageable);
+        List<String> productIDs = products1.stream().map(Product::getProductID).toList();
         // Duyệt từng sản phẩm, map sang DTO
-        return products.stream()
-                .map(favoriteMapper::toDTO)
-                .collect(Collectors.toList());
+        List<ProductFavoriteDTO> listResult = new ArrayList<>();
+
+        products.forEach(product -> {
+            ProductFavoriteDTO productFavoriteDTO = new ProductFavoriteDTO();
+            productFavoriteDTO = favoriteMapper.toDTO(product, productIDs);
+            listResult.add(productFavoriteDTO);
+        });
+
+        return listResult;
     }
 
     //xóa sp dc yêu thích

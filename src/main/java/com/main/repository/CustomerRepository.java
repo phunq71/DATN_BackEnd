@@ -32,6 +32,7 @@ public interface CustomerRepository extends JpaRepository<Customer, String > {
          , c.fullName
          , c.gender
          , c.address
+         , c.membership.rank
          , c.dob
          , c.imageAvt
          , c.addressIdGHN FROM Customer c

@@ -1,10 +1,11 @@
 package com.main.rest_controller;
 
 import com.main.dto.*;
-import com.main.entity.Account;
-import com.main.entity.Facility;
-import com.main.entity.Order;
-import com.main.entity.Staff;
+import com.main.entity.*;
+import com.main.repository.CustomerRepository;
+import com.main.repository.LogOrderRepository;
+import com.main.repository.OrderRepository;
+import com.main.repository.StaffRepository;
 import com.main.service.*;
 import com.main.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,8 +35,14 @@ public class OrdManagementRestController {
     private final VoucherService voucherService;
     private final TransactionService transactionService;
     private final StaffService staffService;
+    private final LogOrderRepository logOrderRepository;
+    private final StaffRepository staffRepository;
+    private final CustomerService customerService;
+    private final CustomerRepository customerRepository;
+    private final MailService mailService;
+    private final OrderRepository orderRepository;
 
-    @GetMapping("/opulentia_admin/area")
+    @GetMapping("/admin/area")
     public ResponseEntity<List<FacilityOrdManagerDTO>> getFacilitiesByAccount() {
         String role = AuthUtil.getRole();
         String accountId = AuthUtil.getAccountID();
@@ -54,31 +62,51 @@ public class OrdManagementRestController {
         return ResponseEntity.status(401).build();
     }
 
-    @GetMapping("/opulentia_admin/order/{pageNumber}")
+    @GetMapping("/admin/order/{pageNumber}")
     public ResponseEntity<Page<OrdManagement_OrderDTO>> getFacilities(
             @PathVariable Integer pageNumber,
             @RequestParam(required = false) String areaId,
             @RequestParam(required = false) String storeId,
-            @RequestParam(required = false) String day,
+            @RequestParam(required = false) List<String> day,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String orderType,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String orderId) {
-
-
-        System.err.println(orderId+" "+areaId + " " + storeId + " " + day + " " + status + " " + orderType + " " + search + " " + pageNumber);
-
-        if (status != null && (status.equals("ChoGiaoHang") || status.equals("DaGiao") || status.equals("ChoLayHang"))) {
+        System.out.println("🙉🙉🙉🙉🙉🙉🙉");
+        if (status != null && (status.equals("ChoGiaoHang") || status.equals("DaGiao") || status.equals("SanSangGiao"))) {
             statusOrderGHN(); // nếu bạn cần đồng bộ đơn hàng GHN
         }
 
         LocalDateTime startDate = null;
         LocalDateTime endDate = null;
-        if (day != null && !day.equals("")) {
-            LocalDate localDate = LocalDate.parse(day);
-            startDate = localDate.atStartOfDay();
-            endDate = localDate.plusDays(1).atStartOfDay();
+
+        if (day != null && !day.isEmpty()) {
+            // Nếu FE gửi ?day=2025-08-19&day=2025-08-21
+            String firstDay  = (day.size() > 0) ? day.get(0) : null;
+            String secondDay = (day.size() > 1) ? day.get(1) : null;
+
+            LocalDate start;
+            LocalDate end;
+
+            if (firstDay == null || firstDay.isBlank()) {
+                // Nếu ngày đầu null hoặc rỗng thì lấy ngày sau
+                start = (secondDay != null && !secondDay.isBlank()) ? LocalDate.parse(secondDay) : null;
+            } else {
+                start = LocalDate.parse(firstDay);
+            }
+
+// Xử lý end
+            if (secondDay == null || secondDay.isBlank()) {
+                end = start;
+            } else {
+                end = LocalDate.parse(secondDay);
+            }
+
+            startDate = start.atStartOfDay();
+            endDate   = end.atTime(LocalTime.MAX);
         }
+
+
         Integer Orderid = null;
         if(orderId!=null && !orderId.equals("")) {
             Orderid = extractOrderId(orderId);
@@ -120,7 +148,7 @@ public class OrdManagementRestController {
         return ResponseEntity.ok(finalPage);
     }
 
-    @PostMapping("/opulentia_admin/order/confirm")
+    @PostMapping("/admin/order/confirm")
     public ResponseEntity<?> confirmOrder(@RequestBody Map<String, String> request) {
         String role = AuthUtil.getRole();
         String accountId = AuthUtil.getAccountID();
@@ -128,17 +156,23 @@ public class OrdManagementRestController {
         try {
             Integer orderId = Integer.parseInt(request.get("orderID"));
             System.out.println("Order ID nè: " + orderId);
+
             Order o = orderService.findOrderByID(orderId);
             if (o == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Không tìm thấy đơn hàng ID = " + orderId);
             }
+            LogOrders logOrders = new LogOrders();
+            logOrders.setStaff(staff);
+            logOrders.setOrder(o);
+            logOrders.setContent("Đơn hàng đã được xác nhận");
+            logOrders.setUpdateAt(LocalDateTime.now());
+            logOrderRepository.save(logOrders);
 
             String status = o.getStatus();
             // Các trạng thái không được cập nhật
             List<String> khongChoPhepCapNhat = Arrays.asList("ChuanBiDon", "SanSangGiao", "DaGiao", "ChoGiaoHang");
             if (Objects.equals(role, "ROLE_ADMIN") || Objects.equals(role, "ROLE_AREA")) {
                 if ("ChoXacNhan".equals(status)) {
-
                     o.setStaff(staff);
                     o.setStatus("ChuanBiDon");
                     o.setUpdateStatusAt(LocalDateTime.now());
@@ -154,11 +188,14 @@ public class OrdManagementRestController {
                 return ResponseEntity.ok("⚠️ Bạn không có quyền xác nhận đơn");
             }
 
+            // thêm lưu log
+
+
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body("❌ orderID không hợp lệ");
         }
     }
-    @PostMapping("/opulentia_admin/order/ready-to-ship")
+    @PostMapping("/admin/order/ready-to-ship")
     public ResponseEntity<?> markReadyToShip(@RequestBody GhnOrderRequestDTO payload) {
         System.out.println("order tu pay load: "+payload.getOrderID());
         try {
@@ -173,9 +210,9 @@ public class OrdManagementRestController {
         }
     }
     private List<OrderDetailDTO> statusOrderGHN() {
-        List<OrderDetailDTO> orderDetailDTOS = orderService.getAllOrderIdShippingCodes();
+        List<OrderDetailDTO> orderDetailDTOS = orderService.getAllOrderIdShippingCodes(); // tại hàm này 💾💾💾
         int updatedCount = 0;
-
+        System.out.println("Test size 👉👉👉: " + orderDetailDTOS.size());
         for (OrderDetailDTO dto : orderDetailDTOS) {
             String shippingCode = dto.getShippingCode();
 
@@ -194,11 +231,24 @@ public class OrdManagementRestController {
                 if (systemStatus != null && !systemStatus.equals(currentStatus)) {
                     Order order = orderService.findOrderByID(orderDetail.getOrderID());
                     order.setStatus(systemStatus);
+                    LogOrders logOrders = new LogOrders();
+                    logOrders.setStaff(null);
+                    logOrders.setOrder(order);
+
+                    logOrders.setUpdateAt(LocalDateTime.now());
+
+                    if (systemStatus.equals("ChoGiaoHang")){
+                        logOrders.setContent("Shipper đã lấy đơn, đợi giao hàng");
+                    }else if(systemStatus.equals("DaGiao")){
+                        logOrders.setContent("Đơn hàng đã được giao thành công");
+                    }
+                    logOrderRepository.save(logOrders);
                     orderService.save(order);
                     updatedCount++;
                     if(systemStatus.equals("DaGiao")){
                         transactionService.updateStatusByOrderId(dto.getOrderID());
                         voucherService.addVoucherCustomerOrderSuccess(dto.getOrderID());
+                        customerService.updateRankByCustomerId(order.getCustomer());
                     }
                 }
 
@@ -252,5 +302,57 @@ public class OrdManagementRestController {
 
         return Integer.parseInt(numberOnly); // 123
     }
+
+
+    @PutMapping("/admin/orders11/reject")
+    public ResponseEntity<?> rejectOrder(@RequestBody Map<String, String> body) {
+        try {
+            String orderId = body.get("orderId");
+            String reason = body.get("reason");
+
+            // Lấy số bằng regex
+            String numberOnly = orderId.replaceAll("\\D", ""); // 0031037
+
+            // Chuyển về int (tự động bỏ 0 đầu)
+            int orderNumber = Integer.parseInt(numberOnly);
+            System.out.println("Reject Order: " + orderId);
+            System.out.println(orderNumber);
+            System.out.println("Reason: " + reason);
+            orderService.cancelOrder2(orderNumber, reason);
+            mailService.sendRejectOrderEmail(orderId, reason
+                    , orderRepository.findByOrderID(orderNumber).getCustomer().getAccount().getEmail()
+                    , orderRepository.findByOrderID(orderNumber).getCustomer().getFullName() );
+            return ResponseEntity.ok("Đơn hàng " + orderId + " đã bị từ chối với lý do: " + reason);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi hệ thống: " + e.getMessage());
+        }
+    }
+
+
+    // Endpoint chấp nhận hủy đơn
+    @PostMapping("/admin/order/cancelOrderCustomer")
+    public ResponseEntity<?> chapnhanHuy(@RequestBody Map<String, String> payload) {
+        try {
+            String orderId = payload.get("orderId");
+
+            System.out.println("ChapnhanHuy orderId: " + orderId);
+//
+            // Lấy số bằng regex
+            String numberOnly = orderId.replaceAll("\\D", ""); // 0031037
+
+            // Chuyển về int (tự động bỏ 0 đầu)
+            int orderNumber = Integer.parseInt(numberOnly);
+
+            orderService.cancelOrder2(orderNumber, "Huỷ đơn hàng theo ý khách");
+            return  ResponseEntity.ok("Đơn hàng " );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi server");
+        }
+    }
+
+
 }
 
