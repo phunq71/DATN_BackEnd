@@ -194,6 +194,7 @@ public class HomeController {
         String formattedSoTien = df.format(soTien) + " ₫";
 
         model.addAttribute("soTien", formattedSoTien);
+        model.addAttribute("soTien1", soTien);
 
         model.addAttribute("maDH", maDH );
 

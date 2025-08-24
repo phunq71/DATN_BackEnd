@@ -199,10 +199,10 @@
         <div class="q-header">
           <img src="/logo/Opulentia.jpg" alt="Shop Logo" class="q-logo">
         </div>
-        <img th:src="'https://qr.sepay.vn/img?acc=0862492594&bank=MB&amount=' + ${soTien} + '&des=' + ${maDH} + '&template=compact&download=false'"
+        <img th:src="'https://qr.sepay.vn/img?acc=0862492594&bank=MB&amount=' + ${soTien1} + '&des=' + ${maDH} + '&template=compact&download=false'"
              alt="QR Code"
              style="width: 100%; max-width: 250px; border-radius: 8px;">
-        <a  th:src="'https://qr.sepay.vn/img?acc=0862492594&bank=MB&amount=' + ${soTien} + '&des=' + ${maDH} + '&template=compact&download=false'"
+        <a  th:src="'https://qr.sepay.vn/img?acc=0862492594&bank=MB&amount=' + ${soTien1} + '&des=' + ${maDH} + '&template=compact&download=false'"
             download="QR_ThanhToan" class="q-btn q-btn-download">Tải mã QR</a>
       </div>
 
@@ -267,7 +267,7 @@
     <div class="q-instructions">
       <p><strong>Lưu ý quan trọng:</strong></p>
       <ul>
-        <li>Vui lòng chuyển khoản chính xác số tiền <strong>₫5.121.000</strong></li>
+        <li>Vui lòng chuyển khoản chính xác số tiền <strong th:text="${soTien}"></strong></li>
         <li>Nội dung chuyển khoản phải ghi rõ <strong>ID đơn hàng</strong></li>
         <li>Thời gian xử lý: 5-15 phút sau khi chuyển khoản</li>
         <li>Kiểm tra lại thông tin tài khoản trước khi chuyển tiền</li>
