@@ -1,11 +1,14 @@
 package com.main;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.util.TimeZone;
 
 
 @SpringBootApplication
@@ -22,4 +25,11 @@ public class DatnBeApplication {
 						", Max request size: " + props.getMaxRequestSize()
 		);
 	}
+
+	@PostConstruct
+	public void init(){
+		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+		System.out.println("Application running in timezone: " + TimeZone.getDefault().getID());
+	}
+
 }

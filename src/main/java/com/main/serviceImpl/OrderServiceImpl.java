@@ -482,7 +482,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Boolean addOrderCustomer(Map<String, Object> checkoutInfo) {
+    public Integer addOrderCustomer(Map<String, Object> checkoutInfo) {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -635,10 +635,10 @@ public class OrderServiceImpl implements OrderService {
             logOrderRepository.save(logOrders);
 
 
-            return true;
+            return order.getOrderID();
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 

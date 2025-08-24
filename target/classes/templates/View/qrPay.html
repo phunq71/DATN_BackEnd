@@ -199,13 +199,16 @@
         <div class="q-header">
           <img src="/logo/Opulentia.jpg" alt="Shop Logo" class="q-logo">
         </div>
-        <img src="/logo/QR_Code.png" alt="Mã QR thanh toán" class="q-qr-code">
-        <a href="/logo/QR_Code.png" download="QR_ThanhToan" class="q-btn q-btn-download">Tải mã QR</a>
+        <img th:src="'https://qr.sepay.vn/img?acc=0862492594&bank=MB&amount=' + ${soTien} + '&des=' + ${maDH} + '&template=compact&download=false'"
+             alt="QR Code"
+             style="width: 100%; max-width: 250px; border-radius: 8px;">
+        <a  th:src="'https://qr.sepay.vn/img?acc=0862492594&bank=MB&amount=' + ${soTien} + '&des=' + ${maDH} + '&template=compact&download=false'"
+            download="QR_ThanhToan" class="q-btn q-btn-download">Tải mã QR</a>
       </div>
 
 
 
-<!--      <div class="q-timer" id="q-countdown">05:00</div>-->
+      <!--      <div class="q-timer" id="q-countdown">05:00</div>-->
     </div>
 
     <!-- Cột phải - Hướng dẫn và trạng thái -->
@@ -213,7 +216,7 @@
       <div class="q-order-info">
         <p><strong>ID đơn hàng:</strong>
           <span class="q-order-id">
-          <span id="orderId">DH20230615001</span>
+          <span id="orderId" th:text="${maHD}"></span>
           <button class="q-copy-btn" onclick="copyOrderId()">Copy</button>
         </span>
         </p>
@@ -227,13 +230,13 @@
           <li>Kiểm tra thông tin và xác nhận thanh toán</li>
         </ol>
       </div>
-      <div class="q-amount">₫5.121.000</div>
+      <div class="q-amount" th:text="${soTien}"></div>
       <div class="q-status q-pending">Đang chờ thanh toán</div>
 
-<!--      <div class="q-btn-group">-->
-<!--        <button class="q-btn q-btn-primary" id="q-checkStatus">Kiểm tra trạng thái</button>-->
-<!--        <a href="#" class="q-btn q-btn-secondary">Quay lại trang chủ</a>-->
-<!--      </div>-->
+      <!--      <div class="q-btn-group">-->
+      <!--        <button class="q-btn q-btn-primary" id="q-checkStatus">Kiểm tra trạng thái</button>-->
+      <!--        <a href="#" class="q-btn q-btn-secondary">Quay lại trang chủ</a>-->
+      <!--      </div>-->
     </div>
   </div>
 
@@ -272,7 +275,7 @@
     </div>
   </div>
 
-<!--  <a href="/support" class="q-support-link">Cần hỗ trợ? Liên hệ chúng tôi</a>-->
+  <!--  <a href="/support" class="q-support-link">Cần hỗ trợ? Liên hệ chúng tôi</a>-->
 
   <script>
     // Countdown timer
@@ -325,10 +328,87 @@
       startTimer(fiveMinutes, display);
     };
 
+
+
     // Simulate payment status check
     // document.getElementById('q-checkStatus').addEventListener('click', function() {
     //   alert('Đang kiểm tra trạng thái thanh toán...');
     // });
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const orderIdElement = document.getElementById("orderId");
+      if (!orderIdElement) return;
+
+      const maHD = orderIdElement.textContent.trim();
+      const statusDiv = document.querySelector(".q-status");
+
+      const intervalId = setInterval(() => {
+        axios.get(`/opulentia_user/result?maDH=${encodeURIComponent(maHD)}`, {
+          withCredentials: true
+        })
+                .then(response => {
+                  if (response.data === true) {
+                    clearInterval(intervalId); // Dừng polling
+
+                    // Cập nhật giao diện
+                    statusDiv.textContent = "Đã thanh toán 👌";
+                    statusDiv.classList.remove("q-pending");
+                    statusDiv.classList.add("q-success"); // nhớ định nghĩa css q-success (xanh)
+
+                    // Redirect sau 2 giây
+                    setTimeout(() => {
+                      window.location.href = "https://datn1-eubngvadfdb4crgk.southeastasia-01.azurewebsites.net/opulentia_user/allOrder";
+                    }, 2000);
+                  } else {
+                    console.log("Chưa thanh toán...");
+                  }
+                })
+                .catch(error => {
+                  console.error("Lỗi khi gọi API:", error);
+                });
+      }, 1000); // check mỗi giây thay vì 500ms cho nhẹ server
+    });
+  </script>
+</div>
+</body>
+</html>  alert('Đang kiểm tra trạng thái thanh toán...');
+    // });
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const orderIdElement = document.getElementById("orderId");
+      if (!orderIdElement) return;
+
+      const maHD = orderIdElement.textContent.trim();
+      const statusDiv = document.querySelector(".q-status");
+
+      const intervalId = setInterval(() => {
+        axios.get(`/result?maDH=${encodeURIComponent(maHD)}`, {
+          withCredentials: true
+        })
+                .then(response => {
+                  if (response.data === true) {
+                    clearInterval(intervalId); // Dừng polling
+
+                    // Cập nhật giao diện
+                    statusDiv.textContent = "Đã thanh toán 👌";
+                    statusDiv.classList.remove("q-pending");
+                    statusDiv.classList.add("q-success"); // nhớ định nghĩa css q-success (xanh)
+
+                    // Redirect sau 2 giây
+                    setTimeout(() => {
+                      window.location.href = "https://datn1-eubngvadfdb4crgk.southeastasia-01.azurewebsites.net/opulentia_user/allOrder";
+                    }, 2000);
+                  } else {
+                    console.log("Chưa thanh toán...");
+                  }
+                })
+                .catch(error => {
+                  console.error("Lỗi khi gọi API:", error);
+                });
+      }, 1000); // check mỗi giây thay vì 500ms cho nhẹ server
+    });
   </script>
 </div>
 </body>

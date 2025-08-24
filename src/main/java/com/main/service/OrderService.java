@@ -50,7 +50,7 @@ public interface OrderService {
                 , String status);
     public List<OrdManagement_ProductDTO> getProductsByOrderID(Integer orderID);
     public Order save(Order order);
-    Boolean addOrderCustomer(Map<String, Object> checkoutInfo);
+    Integer addOrderCustomer(Map<String, Object> checkoutInfo);
     public List<OrderDetailDTO> getAllOrderIdShippingCodes();
     public OrderDetailDTO getOrderIdByShippingCodes(String shippingCode);
     String createGhnOrder(GhnOrderRequestDTO payload);

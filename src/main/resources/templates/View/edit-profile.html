@@ -891,6 +891,7 @@
             // Validate client
             if (!/^0\d{9}$/.test(newPhone)) {
                 feedback.textContent = 'Số điện thoại không hợp lệ. Vui lòng nhập 10 chữ số bắt đầu bằng 0.';
+                feedback.addClass("show");
                 return;
             }
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.dto.ProductViewDTO;
 import com.main.entity.Product;
+import com.main.repository.OrderRepository;
 import com.main.repository.ProductRepository;
 import com.main.security.JwtService;
 import com.main.service.ProductService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +44,8 @@ public class HomeController {
     private JwtService jwtService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private OrderRepository orderRepository;
 
 //    @GetMapping({"/viewAll"})
 //    public String viewAll() {
@@ -145,10 +149,10 @@ public class HomeController {
 //
 
 //
-//	@GetMapping("/qrPay")
-//	public String qrPay() {
-//		return "View/qrPay";
-//	}
+	@GetMapping("/qrPay")
+	public String qrPay() {
+		return "View/qrPay";
+	}
 //
 //	@GetMapping("/allOrders")
 //	public String allOrders() {
@@ -175,6 +179,25 @@ public class HomeController {
     @GetMapping("/favicon.ico")
     public String redirectFavicon() {
         return "redirect:/logo/Opulentia.jpg";
+    }
+
+
+
+    @GetMapping("/opulentia_user/order_qrpay/qr")
+    public String showQrPage(@RequestParam("maDH") Integer maDH,
+                             Model model) {
+        // Gán dữ liệu cho model để FE (Thymeleaf) render
+        String formattedMaDH = String.format("#DH%06d", maDH);
+
+        model.addAttribute("maDH", formattedMaDH);
+
+        BigDecimal soTien = orderRepository.findById(maDH).get().getTransaction().getAmount();
+
+        model.addAttribute("maDH", maDH);
+        model.addAttribute("soTien", soTien);
+
+
+        return "qrPay"; // trỏ tới file qrPay.html
     }
 
 //

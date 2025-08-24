@@ -94,8 +94,9 @@ async function fetchDataCheckout() {
                 text: 'Vui lòng thêm số điện thoại để mua hàng.',
                 confirmButtonText: 'OK'
             }).then(() => {
-                window.location.href = '/opulentia_user/edit-profile';
-            });
+                setTimeout(() => {
+                    window.location.href = '/opulentia_user/edit-profile';
+                }, 800); });
             return;
         }
 
@@ -729,19 +730,9 @@ function hienThiHauMai(hauMai1, hauMai2, checkoutInfo) {
 //=====================================ĐẶT HÀNG =========================================
 
 function datHang() {
-    if (checkoutInfo.paymentMethod === 'sepay') {
-        Swal.fire({
-            icon: 'info',
-            title: 'Thanh toán SePay',
-            text: 'Tính năng đang phát triển. Vui lòng chọn phương thức khác!',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'OK'
-        });
-        return;
-    }
     if (service_id === null && service_type_id === null) {
         Swal.fire({
-            icon: 'warning',  // 'success', 'error', 'info', 'question' cũng được
+            icon: 'warning',
             title: 'Xin lỗi!',
             text: 'Hiện tại địa chỉ của bạn không có phương thức vận chuyển phù hợp.',
             confirmButtonText: 'OK'
@@ -752,25 +743,29 @@ function datHang() {
     axios.post('/opulentia_user/order/add', checkoutInfo, {
         withCredentials: true,
     })
-
         .then(function (response) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Đặt hàng thành công!',
-                text: 'Cảm ơn bạn đã mua hàng tại Opulentia.',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Đến trang đơn hàng'
-            }).then(() => {
-                // Chuyển hướng sau khi người dùng bấm OK
-                window.location.href = '/opulentia_user/allOrder';
-            });
+            const data = response.data;
 
-            console.log('Đặt hàng thành công:', response.data);
+            if (data.redirectUrl) {
+                // Nếu BE trả redirectUrl (sepay) → chuyển hướng thẳng sang QR
+                window.location.href = data.redirectUrl;
+            } else {
+                // Nếu không → show thông báo đặt hàng thành công như bình thường
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đặt hàng thành công!',
+                    text: 'Cảm ơn bạn đã mua hàng tại Opulentia.',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Đến trang đơn hàng'
+                }).then(() => {
+                    window.location.href = '/opulentia_user/allOrder';
+                });
+            }
+
+            console.log('Đặt hàng thành công:', data);
             localStorage.removeItem('checkedCartItemIDs');
             localStorage.removeItem('selectAllChecked');
-
         })
-
         .catch(function (error) {
             Swal.fire({
                 icon: 'error',
@@ -781,8 +776,8 @@ function datHang() {
             });
             console.error('Lỗi khi đặt hàng:', error.response?.data || error.message);
         });
-
 }
+
 
 
 window.datHang = datHang;

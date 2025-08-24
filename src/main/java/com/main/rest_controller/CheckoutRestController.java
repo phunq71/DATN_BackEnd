@@ -6,8 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.main.dto.OrderPreviewDTO;
 import com.main.dto.VoucherOrderDTO;
 import com.main.entity.Customer;
+import com.main.entity.Order;
+import com.main.entity.Transaction;
 import com.main.entity.Voucher;
 import com.main.mapper.VoucherMapper;
+import com.main.repository.OrderRepository;
+import com.main.repository.TransactionRepository;
 import com.main.repository.VoucherRepository;
 import com.main.service.CustomerService;
 import com.main.service.FacilityService;
@@ -36,6 +40,8 @@ public class CheckoutRestController {
 
     private final CustomerService customerService;
     private final VoucherService voucherService;
+    private final OrderRepository orderRepository;
+    private final TransactionRepository transactionRepository;
 
 
     @PostMapping("/datacheckout")
@@ -99,15 +105,53 @@ public class CheckoutRestController {
 
     @PostMapping("/order/add")
     public ResponseEntity<Map<String, String>> checkout(@RequestBody Map<String, Object> checkoutInfo) {
-        boolean result = orderService.addOrderCustomer(checkoutInfo);
+        Integer result = orderService.addOrderCustomer(checkoutInfo);
+        String paymentMethod = (String) checkoutInfo.get("paymentMethod");
 
         Map<String, String> response = new HashMap<>();
-        response.put("message", result ? "Đã nhận checkoutInfo thành công" : "Xử lý thất bại");
 
-        HttpStatus status = result ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
+        if (result != null && "sepay".equalsIgnoreCase(paymentMethod)) {
+            // Trả về link QR cho FE tự chuyển hướng
+            String maDH = String.valueOf(result); // ID đơn hàng từ service
+            String soTien = checkoutInfo.get("soTien").toString();
+            response.put("redirectUrl", "/opulentia_user/order_qrpay/qr?maDH=" + maDH);
+            response.put("message", "Tạo đơn hàng thành công, vui lòng thanh toán bằng QR");
+            return ResponseEntity.ok(response);
+        }
+
+        response.put("message", result != null ? "Đã nhận checkoutInfo thành công" : "Xử lý thất bại");
+        HttpStatus status = result != null ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
+
         return ResponseEntity.status(status).body(response);
     }
 
+
+
+    @GetMapping("/result")
+    @ResponseBody
+    public boolean checkPaymentStatus(@RequestParam("maDH") String maDH) {
+        try {
+            String numberPart = maDH.replace("#DH", "");
+
+            Integer maDH1 = Integer.parseInt(numberPart);
+
+            Order  order = orderRepository.findById(maDH1).orElse(null);
+
+            if (order != null) {
+                if (order.getTransaction().getStatus().equalsIgnoreCase("DaThanhToan")){
+                    return true;
+                }else{
+                    return false;
+                }
+            }else {
+                return false;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 
 

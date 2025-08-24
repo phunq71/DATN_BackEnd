@@ -14,7 +14,8 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://main--glowing-praline-a122bf.netlify.app")
+                        .allowedOrigins("https://main--glowing-praline-a122bf.netlify.app",
+                                "https://my.sepay.vn")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true); // ⚠️ BẮT BUỘC nếu FE xài withCredentials
