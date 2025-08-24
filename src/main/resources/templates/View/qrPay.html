@@ -337,13 +337,12 @@
 
 
     document.addEventListener("DOMContentLoaded", () => {
-      const orderIdElement = document.getElementById("orderId");
-      if (!orderIdElement) return;
-
-      const maDH = orderIdElement.textContent.trim();
-      const statusDiv = document.querySelector(".q-status");
-
       const intervalId = setInterval(() => {
+        const orderIdElement = document.getElementById("orderId");
+        if (!orderIdElement) return;
+
+        const maDH = orderIdElement.textContent;
+        const statusDiv = document.querySelector(".q-status");
         axios.get(`/opulentia_user/result?maDH=${maDH}`, {
           withCredentials: true
         })
