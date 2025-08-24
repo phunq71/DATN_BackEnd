@@ -193,11 +193,11 @@ public class HomeController {
 
         BigDecimal soTien = orderRepository.findById(maDH).get().getTransaction().getAmount();
 
-        model.addAttribute("maDH", maDH);
+        model.addAttribute("maDH", formattedMaDH );
         model.addAttribute("soTien", soTien);
 
 
-        return "qrPay"; // trỏ tới file qrPay.html
+        return "View/qrPay"; // trỏ tới file qrPay.html
     }
 
 //
