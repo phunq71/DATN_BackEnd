@@ -113,7 +113,6 @@ public class CheckoutRestController {
         if (result != null && "sepay".equalsIgnoreCase(paymentMethod)) {
             // Trả về link QR cho FE tự chuyển hướng
             String maDH = String.valueOf(result); // ID đơn hàng từ service
-            String soTien = checkoutInfo.get("soTien").toString();
             response.put("redirectUrl", "/opulentia_user/order_qrpay/qr?maDH=" + maDH);
             response.put("message", "Tạo đơn hàng thành công, vui lòng thanh toán bằng QR");
             return ResponseEntity.ok(response);
