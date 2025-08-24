@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**", "/index", "/logo/**", "/js/**", "/data/**",
                                 "/test/**", "/.well-known/**", "/uploads/**","/oauth2/**","/favicon.ico",
                                 "/api/auth/**", "/testqrcode", "/admin/isLogin",
-                        "/my.sepay.vn/**").permitAll()
+                        "/checkout/success").permitAll()
                         .requestMatchers("/opulentia_user/**", "/edit-profile").hasRole("USER")
                         .anyRequest().authenticated()
                 )

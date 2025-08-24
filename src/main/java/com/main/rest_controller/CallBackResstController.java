@@ -24,8 +24,7 @@ public class CallBackResstController {
     @PostMapping("/checkout/success")
     public Boolean postForSePay(@RequestBody TransactionDTO temp, Model model) {
 
-        String maDH = temp.getCode();
-
+        String maDH = temp.getContent();
 
         Order order = orderRepository.findById(Integer.valueOf(maDH)).orElse(null);
         order.setStatus("ChuanBiDon");

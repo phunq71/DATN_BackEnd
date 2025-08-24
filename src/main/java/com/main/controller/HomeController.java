@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,8 +190,12 @@ public class HomeController {
 
         BigDecimal soTien = orderRepository.findById(maDH).get().getTransaction().getAmount();
 
+        DecimalFormat df = new DecimalFormat("#,###");
+        String formattedSoTien = df.format(soTien) + " ₫";
+
+        model.addAttribute("soTien", formattedSoTien);
+
         model.addAttribute("maDH", maDH );
-        model.addAttribute("soTien", soTien);
 
 
         return "View/qrPay"; // trỏ tới file qrPay.html

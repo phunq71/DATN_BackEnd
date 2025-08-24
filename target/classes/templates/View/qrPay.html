@@ -208,7 +208,7 @@
 
 
 
-      <!--      <div class="q-timer" id="q-countdown">05:00</div>-->
+            <div class="q-timer" id="q-countdown">05:00</div>
     </div>
 
     <!-- Cột phải - Hướng dẫn và trạng thái -->
@@ -251,15 +251,15 @@
       <li>Mở ứng dụng ngân hàng trên điện thoại hoặc máy tính</li>
       <li>Chọn chức năng chuyển khoản</li>
       <li>Nhập thông tin tài khoản ngân hàng bên dưới</li>
-      <li>Nhập số tiền <strong>₫5.121.000</strong></li>
-      <li>Nội dung chuyển khoản: <strong>DH20230615001</strong></li>
+      <li>Nhập số tiền<strong th:text="${soTien}"></strong></li>
+      <li>Nội dung chuyển khoản: <strong th:text="${maDH}"></strong></li>
       <li>Kiểm tra và xác nhận giao dịch</li>
     </ol>
 
     <div class="q-bank-info">
       <p><strong>Thông tin tài khoản:</strong></p>
-      <p>Ngân hàng: <strong>Vietcombank</strong></p>
-      <p>Số tài khoản: <strong>0123456789</strong></p>
+      <p>Ngân hàng: <strong>MB Bank</strong></p>
+      <p>Số tài khoản: <strong>086 249 2594</strong></p>
       <p>Tên tài khoản: <strong>Công ty TNHH Opulentia</strong></p>
       <p>Chi nhánh: <strong>Hồ Chí Minh</strong></p>
     </div>
@@ -276,140 +276,7 @@
   </div>
 
   <!--  <a href="/support" class="q-support-link">Cần hỗ trợ? Liên hệ chúng tôi</a>-->
-
-  <script>
-    // Countdown timer
-    function startTimer(duration, display) {
-      let timer = duration, minutes, seconds;
-      const interval = setInterval(function () {
-        minutes = parseInt(timer / 60, 10);
-        seconds = parseInt(timer % 60, 10);
-
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        display.textContent = minutes + ":" + seconds;
-
-        if (--timer < 0) {
-          clearInterval(interval);
-          display.textContent = "Hết hạn";
-          document.querySelector('.q-status').className = 'q-status q-expired';
-          document.querySelector('.q-status').textContent = 'Mã đã hết hạn';
-        }
-      }, 1000);
-    }
-
-    // Copy order ID function
-    function copyOrderId() {
-      const orderId = 'DH20230615001';
-      navigator.clipboard.writeText(orderId).then(() => {
-        // alert('Đã copy ID đơn hàng: ' + orderId);
-      }).catch(err => {
-        // console.error('Lỗi khi copy: ', err);
-      });
-    }
-
-    // Toggle bank transfer section
-    function toggleBankTransfer() {
-      const bankTransfer = document.getElementById('bankTransfer');
-      const btn = document.querySelector('.q-alternative-btn');
-
-      bankTransfer.classList.toggle('active');
-      if (bankTransfer.classList.contains('active')) {
-        btn.innerHTML = 'Phương án thanh toán khác ▲';
-      } else {
-        btn.innerHTML = 'Phương án thanh toán khác ▼';
-      }
-    }
-
-    window.onload = function () {
-      const fiveMinutes = 60 * 5,
-              display = document.querySelector('#q-countdown');
-      startTimer(fiveMinutes, display);
-    };
-
-
-
-    // Simulate payment status check
-    // document.getElementById('q-checkStatus').addEventListener('click', function() {
-    //   alert('Đang kiểm tra trạng thái thanh toán...');
-    // });
-
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const orderIdElement = document.getElementById("maDH");
-      if (!orderIdElement) return;
-
-      const maDH = orderIdElement.textContent;
-      const statusDiv = document.querySelector(".q-status");
-
-      const intervalId = setInterval(() => {
-        axios.get(`/opulentia_user/result?maDH=${maDH}`, {
-          withCredentials: true
-        })
-                .then(response => {
-                  if (response.data === true) {
-                    clearInterval(intervalId); // Dừng polling
-
-                    // Cập nhật giao diện
-                    statusDiv.textContent = "Đã thanh toán 👌";
-                    statusDiv.classList.remove("q-pending");
-                    statusDiv.classList.add("q-success"); // nhớ định nghĩa css q-success (xanh)
-
-                    // Redirect sau 2 giây
-                    setTimeout(() => {
-                      window.location.href = "https://datn1-eubngvadfdb4crgk.southeastasia-01.azurewebsites.net/opulentia_user/allOrder";
-                    }, 2000);
-                  } else {
-                    console.log("Chưa thanh toán...");
-                  }
-                })
-                .catch(error => {
-                  console.error("Lỗi khi gọi API:", error);
-                });
-      }, 1000); // check mỗi giây thay vì 500ms cho nhẹ server
-    });
-  </script>
-</div>
-</body>
-</html>  alert('Đang kiểm tra trạng thái thanh toán...');
-    // });
-
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const orderIdElement = document.getElementById("orderId");
-      if (!orderIdElement) return;
-
-      const maHD = orderIdElement.textContent.trim();
-      const statusDiv = document.querySelector(".q-status");
-
-      const intervalId = setInterval(() => {
-        axios.get(`/result?maDH=${encodeURIComponent(maHD)}`, {
-          withCredentials: true
-        })
-                .then(response => {
-                  if (response.data === true) {
-                    clearInterval(intervalId); // Dừng polling
-
-                    // Cập nhật giao diện
-                    statusDiv.textContent = "Đã thanh toán 👌";
-                    statusDiv.classList.remove("q-pending");
-                    statusDiv.classList.add("q-success"); // nhớ định nghĩa css q-success (xanh)
-
-                    // Redirect sau 2 giây
-                    setTimeout(() => {
-                      window.location.href = "https://datn1-eubngvadfdb4crgk.southeastasia-01.azurewebsites.net/opulentia_user/allOrder";
-                    }, 2000);
-                  } else {
-                    console.log("Chưa thanh toán...");
-                  }
-                })
-                .catch(error => {
-                  console.error("Lỗi khi gọi API:", error);
-                });
-      }, 1000); // check mỗi giây thay vì 500ms cho nhẹ server
-    });
-  </script>
+  <script src="/js/qrPay.js"></script>
 </div>
 </body>
 </html>
