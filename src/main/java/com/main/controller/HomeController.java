@@ -184,18 +184,12 @@ public class HomeController {
 
 
     @GetMapping("/opulentia_user/order_qrpay/qr")
-    public String showQrPage(@RequestParam("maDH") String maDH,
+    public String showQrPage(@RequestParam("maDH") Integer maDH,
                              Model model) {
-        // Gán dữ liệu cho model để FE (Thymeleaf) render
-        String formattedMaDH = String.format("#DH%06d", maDH);
 
-        String numberPart = maDH.replace("#DH", "");
+        BigDecimal soTien = orderRepository.findById(maDH).get().getTransaction().getAmount();
 
-        Integer maDH1 = Integer.parseInt(numberPart);
-
-        BigDecimal soTien = orderRepository.findById(maDH1).get().getTransaction().getAmount();
-
-        model.addAttribute("maHD", formattedMaDH );
+        model.addAttribute("maDH", maDH );
         model.addAttribute("soTien", soTien);
 
 

@@ -26,12 +26,8 @@ public class CallBackResstController {
 
         String maDH = temp.getCode();
 
-        String numberPart = maDH.replace("#DH", "");
 
-// Ép về Integer
-        Integer maDH1 = Integer.parseInt(numberPart);
-
-        Order order = orderRepository.findById(maDH1).orElse(null);
+        Order order = orderRepository.findById(Integer.valueOf(maDH)).orElse(null);
         order.setStatus("ChuanBiDon");
         orderRepository.save(order);
 

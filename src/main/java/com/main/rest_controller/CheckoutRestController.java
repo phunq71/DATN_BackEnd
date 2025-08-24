@@ -110,10 +110,8 @@ public class CheckoutRestController {
 
         Map<String, String> response = new HashMap<>();
 
-        if (result != null && "sepay".equalsIgnoreCase(paymentMethod)) {
-            // Trả về link QR cho FE tự chuyển hướng
-            String maDH = String.valueOf(result); // ID đơn hàng từ service
-            response.put("redirectUrl", "/opulentia_user/order_qrpay/qr?maDH=" + maDH);
+        if (result != null && "sepay".equalsIgnoreCase(paymentMethod)) {// ID đơn hàng từ service
+            response.put("redirectUrl", "/opulentia_user/order_qrpay/qr?maDH=" + result);
             response.put("message", "Tạo đơn hàng thành công, vui lòng thanh toán bằng QR");
             return ResponseEntity.ok(response);
         }
@@ -128,13 +126,10 @@ public class CheckoutRestController {
 
     @GetMapping("/result")
     @ResponseBody
-    public boolean checkPaymentStatus(@RequestParam("maDH") String maDH) {
+    public boolean checkPaymentStatus(@RequestParam("maDH") Integer maDH) {
         try {
-            String numberPart = maDH.replace("#DH", "");
 
-            Integer maDH1 = Integer.parseInt(numberPart);
-
-            Order  order = orderRepository.findById(maDH1).orElse(null);
+            Order  order = orderRepository.findById(maDH).orElse(null);
 
             if (order != null) {
                 if (order.getTransaction().getStatus().equalsIgnoreCase("DaThanhToan")){

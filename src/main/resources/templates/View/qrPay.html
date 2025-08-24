@@ -216,7 +216,7 @@
       <div class="q-order-info">
         <p><strong>ID đơn hàng:</strong>
           <span class="q-order-id">
-          <span id="orderId" th:text="${maHD}"></span>
+          <span id="orderId" th:text="${maDH}"></span>
           <button class="q-copy-btn" onclick="copyOrderId()">Copy</button>
         </span>
         </p>
@@ -340,11 +340,11 @@
       const orderIdElement = document.getElementById("orderId");
       if (!orderIdElement) return;
 
-      const maHD = orderIdElement.textContent.trim();
+      const maDH = orderIdElement.textContent.trim();
       const statusDiv = document.querySelector(".q-status");
 
       const intervalId = setInterval(() => {
-        axios.get(`/opulentia_user/result?maDH=${encodeURIComponent(maHD)}`, {
+        axios.get(`/opulentia_user/result?maDH=${maDH}`, {
           withCredentials: true
         })
                 .then(response => {
