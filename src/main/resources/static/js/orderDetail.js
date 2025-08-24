@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async function(){
         row.innerHTML = `
             <td>
                 <div style="display: flex; gap: 15px;">
-                    <img src="/uploads/${item.image}" alt="Product" class="od-product-img">
+                    <img src="https://phudatn.blob.core.windows.net/images/${item.image}" alt="Product" class="od-product-img">
                     <div>
                         <div class="od-product-name">${item.productName}</div>
                         <div class="od-product-attr">Màu: ${item.color} | Size: ${item.size}</div>
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', async function(){
         items.forEach(item => {
             htmlString += `
         <div class="rv-product-item">
-            <img src="/uploads/${item.image}" alt="Product Image" class="rv-product-image">
+            <img src="https://phudatn.blob.core.windows.net/images/${item.image}" alt="Product Image" class="rv-product-image">
             <div class="rv-product-info">
                 <div class="rv-product-name">${item.productName}</div>
                 <div class="rv-product-details">
