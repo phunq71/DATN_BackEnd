@@ -119,14 +119,15 @@ public class FacilityServiceImpl implements FacilityService {
         }
         facility.setAddressIdGHN(dto.getAddressIdGHN());
         // --- Rule đặc biệt ---
-        if ("Z".equals(dto.getType())) {
-            if (dto.getManagerId() == null) {
-                throw new RuntimeException("Khu vực phải có 1 quản lý");
-            }
-            Staff manager = staffRepository.findById(dto.getManagerId())
-                    .orElseThrow(() -> new RuntimeException("Manager not found"));
-            facility.setManager(manager);
-        }
+//        if ("Z".equals(dto.getType())) {
+//            if (dto.getManagerId() == null) {
+//                throw new RuntimeException("Khu vực phải có 1 quản lý");
+//            }
+//            Staff manager = staffRepository.findById(dto.getManagerId())
+//                    .orElseThrow(() -> new RuntimeException("Manager not found"));
+//            facility.setManager(manager);
+//        }
+        facility.setManager(null);
 
         if ("W".equals(dto.getType())) {
             if (facility.getParent() == null || !"Z".equals(facility.getParent().getType())) {

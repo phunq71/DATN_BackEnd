@@ -73,7 +73,7 @@ public class OrdManagementRestController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String orderId) {
         System.out.println("🙉🙉🙉🙉🙉🙉🙉");
-        if (status != null && (status.equals("ChoGiaoHang") || status.equals("DaGiao") || status.equals("SanSangGiao"))) {
+        if (status != null && (status.equals("ChoGiaoHang") || status.equals("DaGiao") || status.equals("SanSangGiao") || status.equals("DaYeuCauHuy"))) {
             statusOrderGHN(); // nếu bạn cần đồng bộ đơn hàng GHN
         }
 

@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @RestController
 public class CallBackResstController {
 
@@ -22,20 +25,42 @@ public class CallBackResstController {
     }
 
     @PostMapping("/checkout/success")
-    public Boolean postForSePay(@RequestBody TransactionDTO temp, Model model) {
+    public Boolean postForSePay(@RequestBody TransactionDTO temp) {
 
+        // content = mã đơn hàng
         String maDH = temp.getContent();
 
         Order order = orderRepository.findById(Integer.valueOf(maDH)).orElse(null);
-        order.setStatus("ChuanBiDon");
-        orderRepository.save(order);
+        if (order == null) {
+            return false; // không tìm thấy đơn hàng
+        }
 
         Transaction transaction = order.getTransaction();
-        transaction.setStatus("DaThanhToan");
+        if (transaction == null) {
+            return false; // đơn chưa có transaction
+        }
 
+        // Số tiền cần thanh toán trong đơn
+        BigDecimal soTienTrongDon = transaction.getAmount();
+
+        // Số tiền nhận từ ngân hàng
+        BigDecimal soTienThanhToan = temp.getTransferAmount();
+
+        // So sánh chính xác số tiền
+        if (soTienTrongDon.compareTo(soTienThanhToan) == 0) {
+            order.setStatus("ChuanBiDon");
+            transaction.setStatus("DaThanhToan");
+        } else {
+            transaction.setStatus("ThatBai_SaiSoTien");
+        }
+
+        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setPaymentCode(temp.getReferenceCode());
+
+        orderRepository.save(order);
         transactionRepository.save(transaction);
 
         return true;
-
     }
+
 }

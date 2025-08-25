@@ -28,8 +28,8 @@ public interface InventoryRepository extends JpaRepository<Inventory, InventoryI
                 JOIN it.size s 
                 WHERE v.variantID = :variantId 
                   AND s.code = :code 
-                  AND inv.facility.type = 'K'
-                 AND inv.facility.isUse = true
+                  AND inv.facility.type = 'K' 
+                 AND inv.facility.isUse = true 
             """)
     Integer getQuantityByVariantAndSizeCode(@Param("variantId") String variantId,
                                             @Param("code") String code);
@@ -40,6 +40,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, InventoryI
                 FROM Inventory inv
                 WHERE inv.item.itemId = :itemId
                   AND inv.facility.isUse = true
+                  AND inv.facility.type = 'K'
             """)
     public Integer getStockQuantityByItemId(@Param("itemId") int itemId);
 

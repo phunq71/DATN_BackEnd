@@ -18,10 +18,10 @@ import java.util.List;
 public interface CartRepository extends JpaRepository<Cart, CartId> {
 
     @Query("""
-            SELECT i.itemId, 
-                   p.productName, 
-                   v.variantID, 
-                   v.color, 
+            SELECT i.itemId,
+                   p.productName,
+                   v.variantID,
+                   v.color,
                    s.sizeID, 
                    s.code, 
                    v.price, 

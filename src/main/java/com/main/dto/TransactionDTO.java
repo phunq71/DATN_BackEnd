@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +17,7 @@ public class TransactionDTO {
     private String code;
     private String content;
     private String transferType;
-    private long transferAmount;
+    private BigDecimal transferAmount;
     private long accumulated;
     private String subAccount;
     private String referenceCode;
