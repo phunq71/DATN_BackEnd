@@ -27,10 +27,17 @@ public class CallBackResstController {
     @PostMapping("/checkout/success")
     public Boolean postForSePay(@RequestBody TransactionDTO temp) {
 
-        // content = mã đơn hàng
-        String maDH = temp.getContent();
+        // content có thể chứa nhiều thông tin => tách mã đơn hàng (lấy số đầu tiên)
+        String rawContent = temp.getContent();
+        String firstToken = rawContent.split("\\s+")[0]; // "31069"
+        Integer maDH;
+        try {
+            maDH = Integer.valueOf(firstToken);
+        } catch (NumberFormatException e) {
+            return false; // nội dung không hợp lệ
+        }
 
-        Order order = orderRepository.findById(Integer.valueOf(maDH)).orElse(null);
+        Order order = orderRepository.findById(maDH).orElse(null);
         if (order == null) {
             return false; // không tìm thấy đơn hàng
         }
@@ -62,5 +69,6 @@ public class CallBackResstController {
 
         return true;
     }
+
 
 }

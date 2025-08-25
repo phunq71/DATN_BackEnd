@@ -13,9 +13,7 @@
 
     if (--timer < 0) {
     clearInterval(interval);
-    display.textContent = "Hết hạn";
-    document.querySelector('.q-status').className = 'q-status q-expired';
-    document.querySelector('.q-status').textContent = 'Mã đã hết hạn';
+        window.location.href = "https://datn1-eubngvadfdb4crgk.southeastasia-01.azurewebsites.net/opulentia_user/allOrder";
 }
 }, 1000);
 }

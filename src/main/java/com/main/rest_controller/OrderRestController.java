@@ -92,7 +92,7 @@ public class OrderRestController {
         for (OrderDTO orderDTO : orderDTOs) {
             String currentStatus = orderDTO.getStatus();
             System.out.println("😚😚😚😚😚😚😚😚");
-            if ("SanSangGiao".equals(currentStatus) || "ChoGiaoHang".equals(currentStatus)) {
+            if ("SanSangGiao".equals(currentStatus) || "ChoGiaoHang".equals(currentStatus) || "DaYeuCauHuy".equals(currentStatus)) {
                 System.err.println("🔍 Kiểm tra đơn hàng: " + orderDTO.getOrderID() + ", shippingCode: " + orderDTO.getShippingCode());
 
                 Map<String, Object> mapOrderGHN = orderService.getOrderStatus(orderDTO.getShippingCode());

@@ -30,10 +30,10 @@ public interface CartRepository extends JpaRepository<Cart, CartId> {
                     WHERE img.variant = v AND img.isMainImage = true), 
                    CASE WHEN (SELECT COUNT(inv) 
                               FROM Inventory inv 
-                              WHERE inv.item = i AND inv.facility.isUse = true) > 0 THEN true ELSE false END, 
+                              WHERE inv.item = i AND inv.facility.isUse = true AND inv.facility.type = 'K') > 0 THEN true ELSE false END, 
                    (SELECT SUM(inv.quantity) 
                     FROM Inventory inv 
-                    WHERE inv.item = i AND inv.facility.isUse = true)
+                    WHERE inv.item = i AND inv.facility.isUse = true AND inv.facility.type = 'K')
             FROM Item i 
             JOIN Variant v ON v.variantID = i.variant.variantID 
             JOIN Product p ON p.productID = v.product.productID 
