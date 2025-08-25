@@ -69,6 +69,7 @@ public class CategoryRestController {
     // Xóa danh mục
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable String id) {
+        System.out.println("Delete Category: " + id);
         checkAdmin();
         try {
             categoryService.deleteCategory(id);

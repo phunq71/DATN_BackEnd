@@ -1154,7 +1154,8 @@
                 <div th:text="${star} + ' sao'"></div>
                 <div class="progress-container">
                     <div class="progress-bar"
-                         th:style="'width:' + ${ratingPercentages.containsKey(star) ? ratingPercentages.get(star) : 0} + '%'"></div>
+                         th:style="'width:' + ${ratingPercentages.containsKey(star) ? ratingPercentages.get(star) : 0} + '%'">
+                    </div>
                 </div>
                 <div th:text="${ratingCounts.containsKey(star) ? ratingCounts.get(star) : 0}"></div>
             </div>
