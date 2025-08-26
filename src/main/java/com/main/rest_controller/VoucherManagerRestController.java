@@ -182,7 +182,7 @@ public ResponseEntity<?> createVoucher(
     }
     voucher.setClaimConditions(claimConditions);
     voucher.setPromotion(promotion);
-    if(promotion.getType().equals("Voucher")) {
+    if(promotion.getType().equals("VoucherCampaign")) {
         voucher.setType(true);
     }else{
         voucher.setType(false);
@@ -221,7 +221,7 @@ public ResponseEntity<?> createVoucher(
         else {
             voucher.setEndDate(null);
         }
-        if(promotion.getType().equals("Voucher")) {
+        if(promotion.getType().equals("VoucherCampaign")) {
             voucher.setType(true);
         }else{
             voucher.setType(false);
