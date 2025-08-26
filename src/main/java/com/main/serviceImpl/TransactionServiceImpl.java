@@ -17,8 +17,10 @@ public class TransactionServiceImpl implements TransactionService {
     public void updateStatusByOrderId(Integer orderId) {
         Transaction transaction = new Transaction();
         transaction = transactionRepository.findByOrder_OrderID(orderId);
-        transaction.setTransactionDate(LocalDateTime.now());
-        transaction.setStatus("DaThanhToan");
+        if (transaction.getPaymentMethod().equalsIgnoreCase("cod")) {
+            transaction.setTransactionDate(LocalDateTime.now());
+            transaction.setStatus("DaThanhToan");
+        }
         transactionRepository.save(transaction);
     }
 }

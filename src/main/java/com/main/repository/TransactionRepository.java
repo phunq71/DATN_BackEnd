@@ -177,7 +177,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
         LEFT JOIN v.items i
         LEFT JOIN i.orderDetails od
         LEFT JOIN od.order o
-        JOIN o.transaction ts ON ts.status = 'DaThanhToan'
+        JOIN o.transaction ts ON ts.status = 'DaThanhToan' AND ts.transactionType = true
         WHERE c.parent IS NOT NULL
           AND (o.orderDate IS NULL OR YEAR(o.orderDate) = :year)
         GROUP BY c.categoryName
@@ -192,7 +192,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
         ORDER BY YEAR(o.orderDate) DESC
     """)
     List<Integer> getAvailableYearCategory();
-
 
     //-----------------------ByShop---------------------------------
 
